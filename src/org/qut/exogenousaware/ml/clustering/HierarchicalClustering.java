@@ -25,7 +25,7 @@ import lombok.Singular;
 @Builder
 public class HierarchicalClustering {
 	
-	@NonNull int clusterNum;
+	int clusterNum;
 	@NonNull DistanceType distance;
 	@NonNull LinkageType linkage;
 	@NonNull @Singular List<FeatureVector> observations;

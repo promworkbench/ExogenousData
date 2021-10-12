@@ -6,11 +6,13 @@ import org.deckfour.xes.model.impl.XAttributeImpl;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Builder
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class ExogenousAttribute extends XAttributeImpl implements XAttributeContinuous {
 
 	/**
@@ -18,7 +20,7 @@ public class ExogenousAttribute extends XAttributeImpl implements XAttributeCont
 	 */
 	private static final long serialVersionUID = 7581819879857126131L;
 
-	@Getter @Setter private String key;
+	@Setter private String key;
 	@Getter @Setter private double value;
 	@Getter @Setter private XExtension extension;
 	@Getter private String transform;

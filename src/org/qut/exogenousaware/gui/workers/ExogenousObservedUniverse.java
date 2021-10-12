@@ -118,6 +118,7 @@ public class ExogenousObservedUniverse extends SwingWorker<Map<String,XYSeriesCo
 		return new ArrayList<Object>() {{ add(lastupdate);add(lastDataUpdate); }};
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	protected Map<String,XYSeriesCollection> doInBackground() throws Exception {
 		List<Map<String,TransformedAttribute>> lastupdate = new ArrayList<Map<String,TransformedAttribute>>();
@@ -130,8 +131,12 @@ public class ExogenousObservedUniverse extends SwingWorker<Map<String,XYSeriesCo
 				.forEach( out -> {
 					this.progress.setValue(this.progress.getValue()+1);
 					if (out.size() == 2) {
+						try {
 						lastupdate.addAll((Collection<? extends Map<String, TransformedAttribute>>) out.get(0));
 						lastDataUpdate.addAll((Collection<? extends Map<String, Object>>) out.get(1));
+						} catch (ClassCastException e) {
+							
+						}
 					}
 				});
 //		move to next stage of work, getting the numerical series

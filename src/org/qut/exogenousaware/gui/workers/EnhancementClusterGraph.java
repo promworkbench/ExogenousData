@@ -204,6 +204,7 @@ public class EnhancementClusterGraph extends SwingWorker<JPanel, String> {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<List<Integer>> shapeBasedClustering(List<Integer> seriesIdentifiers) {
 //		create feature vectors to be used in clustering
 		List<FeatureVector> obs = new ArrayList<FeatureVector>();

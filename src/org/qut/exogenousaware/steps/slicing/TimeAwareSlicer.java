@@ -14,7 +14,6 @@ import org.qut.exogenousaware.steps.slicing.data.SubSeries;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
-import lombok.NonNull;
 
 /**
  * A Slicing function which looks for the most recent updates from each exogenous timeseries.<br>
@@ -34,7 +33,7 @@ public class TimeAwareSlicer implements Slicer{
 	/**
 	 * Time period to slice for in milliseconds
 	 */
-	@NonNull long timePeriod;
+	long timePeriod;
 	
 	@Default String identifier = "timeawareslicer";
 	

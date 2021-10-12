@@ -78,6 +78,7 @@ public class EnhancementMedianGraph extends SwingWorker<JPanel, String> {
 		return this;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public ChartPanel make() {
 //		for each time point (rounded to .25 of an hour) find median
 		Map<Double, List<Double>> trueMedians = new HashMap<Double, List<Double>>();
@@ -205,6 +206,7 @@ public class EnhancementMedianGraph extends SwingWorker<JPanel, String> {
 		}
 	}
 	
+	@SuppressWarnings({ "cast", "unchecked" })
 	public double findSample(XYSeries series, Double sampleStart, Double sampleEnd) throws ArithmeticException,CloneNotSupportedException {
 //		find a pair such that LHS is the lostmost of the sample point (mid) and RHS is the rightmost of the sample point
 //		return a value for the mid point of the sample

@@ -12,7 +12,7 @@ public class FeatureVectorImpl implements FeatureVector {
 
 	@NonNull @Singular @Getter List<Double> values;
 	@NonNull @Singular @Getter List<String> columns;
-	@NonNull @Getter int identifier;
+	@Getter int identifier;
 	
 	public int getSize() {
 		return this.values.size();

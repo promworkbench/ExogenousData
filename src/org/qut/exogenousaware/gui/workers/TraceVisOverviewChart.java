@@ -158,6 +158,7 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 		return seriesRenderBounds;
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected JPanel backgroundBuildPanel() {
 //		create plot similar to Up Perscope fig 1.
 //		setup containers
@@ -166,8 +167,6 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 		XYLineAndShapeRenderer endoRender = null;
 		XYSeriesCollection exoSignals = null;
 		XYLineAndShapeRenderer exoRender = null;
-//		setup graph pane
-		JPanel graphPane = new JPanel();
 //		get the first event timestamp
 		double starting = this.endo.stream()
 				.map(ev -> getEventTimestampMillis(ev))

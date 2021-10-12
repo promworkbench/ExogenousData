@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +13,6 @@ import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.deckfour.xes.info.XLogInfo;
@@ -26,7 +23,6 @@ import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.datadiscovery.model.DiscoveredPetriNetWithData;
 import org.processmining.datapetrinets.expression.GuardExpression;
 import org.processmining.datapetrinets.ui.ConfigurationUIHelper;
-import org.processmining.framework.util.ui.widgets.ProMList;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetGraph;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithData;
 import org.processmining.plugins.astar.petrinet.PetrinetReplayerWithILP;
@@ -42,11 +38,12 @@ import org.qut.exogenousaware.gui.panels.ExogenousInvestigatorSelectionPanel;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import prefuse.data.query.ListModel;
 
 @Builder
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class ExogenousDiscoveryInvestigator extends JPanel{
 	
 	/**

@@ -140,7 +140,7 @@ public class ExogenousInvestigatorDotPanel  {
 					throw new IllegalStateException("Unable to find a class type for a petrinet node:: "+ node.getClass());
 				}
 //				get edges with this element as source
-				List<PetrinetEdge> edges;
+				List<PetrinetEdge< ? extends PetrinetNode, ? extends PetrinetNode>> edges;
 				if (p != null) {
 					final Place pp = p;
 					edges = this.graph.getEdges().stream()
@@ -157,7 +157,7 @@ public class ExogenousInvestigatorDotPanel  {
 					edges = null;
 				}
 //				get targets for edges
-				if (edges != null) {
+				if (edges != null ) {
 					for(PetrinetEdge< ? extends PetrinetNode, ? extends PetrinetNode> edge: edges) {
 						if (!seen.contains(edge.getTarget().getId().toString()) & !next.contains(edge.getTarget())) {
 							next.add(edge.getTarget());
@@ -271,7 +271,7 @@ public class ExogenousInvestigatorDotPanel  {
 					throw new IllegalStateException("Unable to find a class type for a petrinet node:: "+ node.getClass());
 				}
 //				get edges with this element as source
-				List<PetrinetEdge> edges;
+				List<PetrinetEdge< ? extends PetrinetNode, ? extends PetrinetNode>> edges;
 				if (p != null) {
 					final Place pp = p;
 					edges = this.updatedGraph.getEdges().stream()

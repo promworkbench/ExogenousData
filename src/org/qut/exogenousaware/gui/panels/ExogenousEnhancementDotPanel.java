@@ -170,7 +170,7 @@ public class ExogenousEnhancementDotPanel {
 					throw new IllegalStateException("Unable to find a class type for a petrinet node:: "+ node.getClass());
 				}
 //				get edges with this element as source
-				List<PetrinetEdge> edges;
+				List<PetrinetEdge< ? extends PetrinetNode, ? extends PetrinetNode>> edges;
 				if (p != null) {
 					final Place pp = p;
 					edges = this.updatedGraph.getEdges().stream()
@@ -322,7 +322,7 @@ public class ExogenousEnhancementDotPanel {
 					throw new IllegalStateException("Unable to find a class type for a petrinet node:: "+ node.getClass());
 				}
 //				get edges with this element as source
-				List<PetrinetEdge> edges;
+				List<PetrinetEdge< ? extends PetrinetNode, ? extends PetrinetNode>> edges;
 				if (p != null) {
 					final Place pp = p;
 					edges = this.graph.getEdges().stream()

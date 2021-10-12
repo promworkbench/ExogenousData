@@ -28,13 +28,14 @@ public class TimeSeriesSampling {
 	 * @throws ArithmeticException
 	 * @throws CloneNotSupportedException
 	 */
+	@SuppressWarnings("unchecked")
 	public static double findSample(XYSeries series, Double sampleStart, Double sampleEnd) throws ArithmeticException,CloneNotSupportedException {
 //		find a pair such that LHS is the lostmost of the sample point (mid) and RHS is the rightmost of the sample point
 //		return a value for the mid point of the sample
 		double sampleMiddle = sampleStart + ((sampleEnd - sampleStart) / 2.0);
 		XYDataItem pairLeft = null;
 		XYDataItem pairRight = null;
-		List<XYDataItem> items = (List<XYDataItem>) series.createCopy(0, series.getItemCount()-1).getItems();
+		List<XYDataItem> items = series.createCopy(0, series.getItemCount()-1).getItems();
 //		find data points in sample window
 		List<XYDataItem> windowedItems = items.stream()
 				.filter(it -> it.getX().doubleValue() >= sampleStart)

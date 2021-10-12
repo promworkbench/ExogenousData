@@ -45,6 +45,7 @@ import org.qut.exogenousaware.gui.workers.TraceVisTraceBreakdownCharts;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -63,6 +64,7 @@ import lombok.Setter;
 		parameterLabels = { "" }
 )
 @Visualizer
+@EqualsAndHashCode(callSuper=false)
 public class ExogenousTraceView extends JPanel {
 	
 	private static final long serialVersionUID = 7656143847405225511L;
@@ -80,7 +82,7 @@ public class ExogenousTraceView extends JPanel {
 	@Builder.Default private int lastEventSliceTouched = 0;
 	@Builder.Default private boolean lastEventSliceHiglighted = false;
 	
-	private JScrollPane traceBreakdownView = new JScrollPane();
+	@Builder.Default private JScrollPane traceBreakdownView = new JScrollPane();
 
 	public ExogenousTraceView setup() {
 		this.setAlignmentX(JPanel.CENTER_ALIGNMENT);
