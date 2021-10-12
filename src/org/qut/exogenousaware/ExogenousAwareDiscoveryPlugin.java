@@ -1,56 +1,33 @@
 package org.qut.exogenousaware;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.JComponent;
 
-import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
+import org.processmining.contexts.uitopia.UIPluginContext;
+import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
+import org.processmining.contexts.uitopia.annotations.Visualizer;
+import org.processmining.framework.plugin.annotations.Plugin;
+import org.processmining.framework.plugin.annotations.PluginLevel;
+import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithData;
 import org.qut.exogenousaware.data.ExogenousAnnotatedLog;
 import org.qut.exogenousaware.gui.ExogenousDiscoveryInvestigator;
 import org.qut.exogenousaware.gui.ExogenousTraceExplorer;
 import org.qut.exogenousaware.gui.ExogenousTraceView;
-import org.processmining.contexts.uitopia.UIPluginContext;
-import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
-import org.processmining.contexts.uitopia.annotations.Visualizer;
-import org.processmining.dataawareexplorer.explorer.DataAwareExplorer;
-import org.processmining.dataawareexplorer.explorer.ExplorerControllerImpl;
-import org.processmining.datapetrinets.io.DataPetriNetImporter.DPNWithLayout;
-import org.processmining.framework.plugin.PluginContext;
-import org.processmining.framework.plugin.annotations.Plugin;
-import org.processmining.framework.plugin.annotations.PluginLevel;
-import org.processmining.framework.plugin.annotations.PluginVariant;
-import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithData;
 
 
 
 /**
- * Plugin to perform Exogenous-Aware Discovery using the framework presented in:
- * Up Periscope : 
+ * Plugins to perform Exogenous-Aware Discovery using the framework presented in:
+ * xPM: Process Mining with Exogenous Data
  * 
- * @Plugin
- * Exogenous Aware Log Preperation
- * 
- * @@Parameters 
- * Source Endogenous Log : Event log
- * Source Exogenous logs : Set of Event logs
- * 
- * @@Returns
- * Exogenous Annotated Log : Event Log
- * 
- * @Plugin
- * Exogenous Annotated Visulisation
- * 
- * @@Parameters
- * Exogenous Annotated Log : Event Log
- * 
- * @@Returns
- * Exogenous Trace View : GUI
- * 
- * 
- * 
+ * Current plugins are:
+ * 	- Exogenous Aware Log Preperation
+ * 	- Exogenous Trace Visualisation (Visualiser)
+ *  - Exogenous Aware Discovery
+ *  - Exogenous Discovery Investigator (Visualiser)
+ * 	- Exogenous Aware Enhancement (not implemented)
 */
 public class ExogenousAwareDiscoveryPlugin {
 	

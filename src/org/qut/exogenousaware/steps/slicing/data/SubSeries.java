@@ -73,6 +73,9 @@ public class SubSeries {
 	
 	/**
 	 * Returns the time index for this subseries, relevant to the endogenous event
+	 * 
+	 * @param relative Should returned longs be calculated from endogenous momment
+	 * 
 	 * @return a list of time stamps for exogenous measurements
 	 */
 	public List<Long> getXSeries(Boolean relative){

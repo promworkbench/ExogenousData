@@ -10,8 +10,8 @@ public class Linking {
 
 	/**
 	 * 
-	 * @param endogenous
-	 * @param exoLog
+	 * @param endogenous trace in endogenous universe to be investigated
+	 * @param exoLog the exogenous data set under investigation
 	 * @return Linked exogenous traces for a endogenous trace
 	 */
 	static public ArrayList<XTrace> findLinkedExogenousSignals(XTrace endogenous, XLog exoLog){

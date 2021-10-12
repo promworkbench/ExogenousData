@@ -54,9 +54,9 @@ public class Slicing {
 
 	/**
 	 * 
-	 * @param endogenous
-	 * @param exogenous
-	 * @return slicePoints
+	 * @param endogenous the endogenous trace under investigation
+	 * @param exogenous the linked exogenous observations
+	 * @return slicePoints a map containing for each event, a map of subseries cuts from the linked exogenous oberservations
 	 * 
 	 */
 	static public Map<String,Map<String,List<SubSeries>>> naiveEventSlicing (XTrace endogenous, ArrayList<XTrace> exogenous) throws UnsupportedOperationException {
