@@ -9,7 +9,7 @@
 	<property name="src" location="${home}/src" />
 
 	<!-- location of test code, binaries, and test files (can be modified) -->
-	<property name="dir.test-src" location="${test.basedir}/../tests/src-test" />
+	<property name="dir.test-src" location="${test.basedir}/src-test" />
 	<property name="dir.test-bin" location="${test.basedir}/bin-test" />
 	<property name="dir.testfiles" location="${test.basedir}/testfiles" />
 	
@@ -127,7 +127,7 @@
 
 	      <!-- JUnit: test cases to run -->
     	  <sysproperty key="test.testFileRoot" path="${dir.testfiles}"/>
-	      <test name="org.processmining.tests.newpackage.NewPackageTest" todir="${test.basedir}" />
+	      <test name="org.processmining.tests.qut.exogenousaware" todir="${test.basedir}" />
 	    </junit>
 		
 		<!-- Cobertura: generate HTML coverage report -->
