@@ -102,6 +102,7 @@ public class ICPM2021 {
 		}
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void runBalancedConformance(HashMap<String,String> args, String inputModel, FileWriter outputcsv, File outputlog) throws Throwable {
 		try {
 			System.out.println("[Job] starting job :: ICPM2021 :: "+args.get("model"));

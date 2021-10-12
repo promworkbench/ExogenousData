@@ -19,15 +19,19 @@ import org.processmining.qut.exogenousaware.gui.ExogenousTraceView;
 
 
 /**
- * Plugins to perform Exogenous-Aware Discovery using the framework presented in:\n
- * xPM: Process Mining with Exogenous Data\n
- * \n
- * Current plugins are:\n
- *\t- Exogenous Aware Log Preperation\n
- *\t- Exogenous Trace Visualisation (Visualiser)\n
- *\t- Exogenous Aware Discovery\n
- *\t- Exogenous Discovery Investigator (Visualiser)\n
- *\t- Exogenous Aware Enhancement (not implemented)\n
+ * Plugins to perform Exogenous-Aware Discovery using the framework presented in:<br>
+ * <b>xPM: Process Mining with Exogenous Data [x]</b><br>
+ * <br>
+ * Current plugins are:<br>
+ * <ul>
+ * <li>Exogenous Aware Log Preperation</li>
+ * <li>Exogenous Trace Visualisation (Visualiser)</li>
+ * <li>Exogenous Aware Discovery</li>
+ * <li>Exogenous Discovery Investigator (Visualiser)</li>
+ * <li>Exogenous Aware Enhancement (not implemented)</li>
+ *</ul>
+ *<br>
+ *[x]: Will add cite or reference to dblp when avaliable, expected to be presented at EDBA2021, co-located at ICPM2021.
 */
 public class ExogenousAwareDiscoveryPlugin {
 	
