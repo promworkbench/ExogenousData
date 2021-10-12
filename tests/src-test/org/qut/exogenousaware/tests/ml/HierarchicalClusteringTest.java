@@ -1,17 +1,17 @@
 package org.qut.exogenousaware.tests.ml;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.qut.exogenousaware.ml.clustering.HierarchicalClustering;
 import org.qut.exogenousaware.ml.data.Cluster;
 import org.qut.exogenousaware.ml.data.FeatureVector;
 import org.qut.exogenousaware.ml.data.FeatureVectorImpl;
 
-class HierarchicalClusteringTest {
+public class HierarchicalClusteringTest {
 
 	List<FeatureVector> clearCut = new ArrayList<FeatureVector>() {{
 		add(FeatureVectorImpl.builder()
@@ -117,7 +117,7 @@ class HierarchicalClusteringTest {
 	
 	
 	@Test
-	void clearCutTest() {
+	public void clearCutTest() {
 		System.out.println("Starting clear cut test...");
 		HierarchicalClustering clusterer = HierarchicalClustering.builder()
 				.clusterNum(2)
@@ -147,7 +147,7 @@ class HierarchicalClusteringTest {
 	}
 	
 	@Test
-	void lessClearCutTest() {
+	public void lessClearCutTest() {
 		System.out.println("Starting less clear cut test...");
 		HierarchicalClustering clusterer = HierarchicalClustering.builder()
 				.clusterNum(3)
@@ -192,7 +192,7 @@ class HierarchicalClusteringTest {
 	}
 	
 	@Test
-	void randomTest() {
+	public void randomTest() {
 		System.out.println("Starting random obs test over 5 data sets...");
 		for(int rd=0; rd < 5; rd++) {
 			System.out.println("Starting on data set "+(rd+1)+"...");

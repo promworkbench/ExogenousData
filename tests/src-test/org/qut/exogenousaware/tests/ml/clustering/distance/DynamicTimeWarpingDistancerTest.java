@@ -1,11 +1,11 @@
 package org.qut.exogenousaware.tests.ml.clustering.distance;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.qut.exogenousaware.ml.clustering.distance.DynamicTimeWarpingDistancer;
 import org.qut.exogenousaware.ml.data.FeatureVector;
 import org.qut.exogenousaware.ml.data.FeatureVectorImpl;
 
-class DynamicTimeWarpingDistancerTest {
+public class DynamicTimeWarpingDistancerTest {
 
 	
 	FeatureVector A = FeatureVectorImpl.builder()
@@ -25,7 +25,7 @@ class DynamicTimeWarpingDistancerTest {
 	
 	
 	@Test
-	void canCompute() {
+	public void canCompute() {
 		
 		DynamicTimeWarpingDistancer distancer = DynamicTimeWarpingDistancer.builder().build();
 		

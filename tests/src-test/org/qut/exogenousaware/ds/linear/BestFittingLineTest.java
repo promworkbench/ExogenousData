@@ -2,9 +2,9 @@ package org.qut.exogenousaware.ds.linear;
 
 import static org.junit.Assert.assertTrue;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-class BestFittingLineTest {
+public class BestFittingLineTest {
 	
 	Double simple_x_1 = 25.0;
 	Double simple_x_2 = 50.0;
@@ -18,7 +18,7 @@ class BestFittingLineTest {
 	
 	
 	@Test
-	void twoPointtest() {
+	public void twoPointtest() {
 		BestFittingLine controller = BestFittingLine.builder()
 				.X(simple_x_1)
 				.X(simple_x_2)
@@ -38,7 +38,7 @@ class BestFittingLineTest {
 	}
 	
 	@Test
-	void threePointtest() {
+	public void threePointtest() {
 		BestFittingLine controller = BestFittingLine.builder()
 				.X(simple_x_1)
 				.X(simple_x_2)
