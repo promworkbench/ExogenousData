@@ -1,4 +1,4 @@
-package org.qut.exogenousaware.tests.steps;
+package org.processmining.tests.qut.exogenousaware.steps;
 
 import static org.junit.Assert.assertEquals;
 

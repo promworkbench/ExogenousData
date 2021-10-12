@@ -1,4 +1,4 @@
-package org.qut.exogenousaware.ds.linear;
+package org.processmining.tests.qut.exogenousaware.ds.linear;
 
 import static org.junit.Assert.assertTrue;
 

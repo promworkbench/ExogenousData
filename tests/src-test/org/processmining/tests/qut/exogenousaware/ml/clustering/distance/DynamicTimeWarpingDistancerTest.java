@@ -1,4 +1,4 @@
-package org.qut.exogenousaware.tests.ml.clustering.distance;
+package org.processmining.tests.qut.exogenousaware.ml.clustering.distance;
 
 import org.junit.Test;
 import org.processmining.qut.exogenousaware.ml.clustering.distance.DynamicTimeWarpingDistancer;

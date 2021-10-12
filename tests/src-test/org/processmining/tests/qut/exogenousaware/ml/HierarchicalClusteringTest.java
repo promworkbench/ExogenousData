@@ -1,4 +1,4 @@
-package org.qut.exogenousaware.tests.ml;
+package org.processmining.tests.qut.exogenousaware.ml;
 
 import static org.junit.Assert.assertEquals;
 
