@@ -31,17 +31,17 @@ public class HierarchicalClusteringTest {
 			.build()
 		);
 		add(FeatureVectorImpl.builder()
-			.value(4.0)
+			.value(10.0)
 			.column("x")
-			.value(4.0)
+			.value(10.0)
 			.column("y")
 			.identifier(3)
 			.build()
 		);
 		add(FeatureVectorImpl.builder()
-			.value(5.0)
+			.value(9.5)
 			.column("x")
-			.value(5.0)
+			.value(9.5)
 			.column("y")
 			.identifier(4)
 			.build()
@@ -58,9 +58,9 @@ public class HierarchicalClusteringTest {
 			.build()
 		);
 		add(FeatureVectorImpl.builder()
-			.value(1.0)
+			.value(-2.0)
 			.column("x")
-			.value(1.0)
+			.value(-2.0)
 			.column("y")
 			.identifier(2)
 			.build()
@@ -82,17 +82,17 @@ public class HierarchicalClusteringTest {
 				.build()
 		);
 		add(FeatureVectorImpl.builder()
-			.value(4.0)
+			.value(7.5)
 			.column("x")
-			.value(4.0)
+			.value(7.5)
 			.column("y")
 			.identifier(5)
 			.build()
 		);
 		add(FeatureVectorImpl.builder()
-			.value(5.0)
+			.value(8.0)
 			.column("x")
-			.value(5.0)
+			.value(8.0)
 			.column("y")
 			.identifier(6)
 			.build()
@@ -171,18 +171,18 @@ public class HierarchicalClusteringTest {
 		}
 		
 		assertEquals(clusterer.getClusters().size(), 3);
-//		check that [1.0,1.0] is in a lone cluster
+//		check that [0.0,0.0] is in a lone cluster
 		for(Cluster cluster : clusterer.getClusters()) {
 			if (cluster.size() == 1) {
 				assertEquals(cluster.getMembers().contains(this.lessClearCut.get(1)), true);
 			}
 		}
 		
-//		check that [2.0,2.0] & [2.7,2.7] are in the same cluster
+//		check that [7.5,7.5] & [8.0,8.0] are in the same cluster
 		for(Cluster cluster : clusterer.getClusters()) {
 			if (cluster.size() == 2) {
-				assertEquals(cluster.getMembers().contains(this.lessClearCut.get(0)), true);
-				assertEquals(cluster.getMembers().contains(this.lessClearCut.get(3)), true);
+				assertEquals(cluster.getMembers().contains(this.lessClearCut.get(4)), true);
+				assertEquals(cluster.getMembers().contains(this.lessClearCut.get(5)), true);
 			}
 		}
 //		assertEquals(clusterer.getClusters().get(1).getMembers().contains(this.lessClearCut.get(0)),true);
