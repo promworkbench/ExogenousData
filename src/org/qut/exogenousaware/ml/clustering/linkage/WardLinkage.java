@@ -96,7 +96,13 @@ public class WardLinkage implements LinkageDistancer {
 //				save distance for future
 				a.addDistanceToCache(B, score);
 			} else {
-				score = a.getDistance(B);
+//				need to add catch for exception that cannot occur
+//				already tested in previous if but cannot return null to build
+				try {
+					score = a.getDistance(B);
+				} catch (Exception e) {
+					score = -1;
+				}
 			}
 			if (scorer.scoreIsLessThan(score)) {
 				scorer.swap(score,a,B);

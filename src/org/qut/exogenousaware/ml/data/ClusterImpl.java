@@ -1,5 +1,6 @@
 package org.qut.exogenousaware.ml.data;
 
+import java.security.KeyException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +33,12 @@ public class ClusterImpl implements Cluster {
 		return this.cachedDistances.containsKey(B);
 	}
 	
-	public double getDistance(Cluster B) {
-		return this.cachedDistances.containsKey(B) ? this.cachedDistances.get(B) : null;
+	public double getDistance(Cluster B) throws KeyException {
+		if (this.cachedDistances.containsKey(B)) {
+			return this.cachedDistances.get(B);
+		} else {
+			throw new KeyException("Unseen cluster passed in, unable to find distance");
+		}
 	}
 	
 	public boolean addDistanceToCache(Cluster B, double distance) {
