@@ -1,6 +1,7 @@
 package org.processmining.qut.exogenousaware;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JComponent;
 
@@ -12,6 +13,8 @@ import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithData;
 import org.processmining.qut.exogenousaware.data.ExogenousAnnotatedLog;
+import org.processmining.qut.exogenousaware.data.ExogenousDataset;
+import org.processmining.qut.exogenousaware.exceptions.CannotConvertException;
 import org.processmining.qut.exogenousaware.gui.ExogenousDiscoveryInvestigator;
 import org.processmining.qut.exogenousaware.gui.ExogenousTraceExplorer;
 import org.processmining.qut.exogenousaware.gui.ExogenousTraceView;
@@ -20,28 +23,28 @@ import org.processmining.qut.exogenousaware.gui.ExogenousTraceView;
 
 /**
  * Plugins to perform Exogenous-Aware Discovery using the framework presented in:<br>
- * <b>xPM: Process Mining with Exogenous Data [x]</b><br>
+ * <b>xPM: Process Mining with Exogenous Data [1]</b><br>
  * <br>
  * Current plugins are:<br>
  * <ul>
- * <li>Exogenous Aware Log Preperation</li>
- * <li>Exogenous Trace Visualisation (Visualiser)</li>
- * <li>Exogenous Aware Discovery</li>
+ * <li>Exogenous Aware Log Preperation [1]</li>
+ * <li>Exogenous Trace Visualisation (Visualiser) [1]</li>
+ * <li>Exogenous Aware Discovery [1]</li>
  * <li>Exogenous Discovery Investigator (Visualiser)</li>
- * <li>Exogenous Aware Enhancement (not implemented)</li>
+ * <li>Exogenous Aware Enhancement (EESA Visualisations and Ranking) [x]</li>
  *</ul>
  *<br>
- *[x]: Will add cite or reference to dblp when avaliable, expected to be presented at EDBA2021, co-located at ICPM2021.
+ *[1] 	A. Banham, S. J. J. Leemans, M. T. Wynn, R. Andrews, xPM: A framework for process mining
+		with exogenous data, in: Process Mining Workshops - ICPM 2021 International Workshops, volume 
+		433 of Lecture Notes in Business Information Processing,
+		Springer, 2021, pp. 85–97.
+ *[x]	A journal article in the coming future (under review as-of 12/07/2022).
 */
 public class ExogenousAwareDiscoveryPlugin {
 	
-	
-	
-	
-	
 	@Plugin(
-			name = "Exogenous Aware Log Preperation",
-			parameterLabels = {"Process Log", "Exogenous Data Sources"},
+			name = "Exogenous Annotated Log Preparation",
+			parameterLabels = {"Event Log", "Exo-Panels"},
 			returnLabels = {"Exogenous Annotated Log"},
 			returnTypes = {ExogenousAnnotatedLog.class},
 			userAccessible = true
@@ -52,9 +55,20 @@ public class ExogenousAwareDiscoveryPlugin {
 			email = "adam.banham@hdr.qut.edu.au"
 	)
 	public ExogenousAnnotatedLog preperation(UIPluginContext context, XLog endogenous, XLog[] exogenous) throws Throwable{
-		ArrayList<XLog> exoLogs = new ArrayList<XLog>();
+		List<ExogenousDataset> exoLogs = new ArrayList<ExogenousDataset>();
 		for(XLog elog: exogenous) {
-			exoLogs.add(elog);
+			ExogenousDataset temp;
+			try {
+				temp = ExogenousDataset.builder()
+						.source(elog)
+						.build()
+						.setup();
+			} catch (CannotConvertException e) {
+				// if log cannot naively be convert to dataset then move on
+				System.out.println("[ExogenousAnnotatedLog] Cannot convert log='"+ elog.getAttributes().get("concept:name").toString()+"' to an exogenous dataset.");
+				continue;
+			}
+			exoLogs.add(temp);
 		}
 		ExogenousAnnotatedLog annotated = ExogenousAnnotatedLog
 				.builder()
@@ -62,6 +76,7 @@ public class ExogenousAwareDiscoveryPlugin {
 				.exogenousDatasets(exoLogs)
 				.classifiers(endogenous.getClassifiers())
 				.extensions(endogenous.getExtensions())
+				.useDefaultConfiguration(true)
 				.globalEventAttributes(endogenous.getGlobalEventAttributes())
 				.globalTraceAttributes(endogenous.getGlobalTraceAttributes())
 				.attributes(endogenous.getAttributes())
@@ -73,8 +88,8 @@ public class ExogenousAwareDiscoveryPlugin {
 	}
 	
 	@Plugin(
-			name = "Exogenous Trace Visualisation",
-			parameterLabels = {"Endogenous Annotated Log"},
+			name = "Exogenous Annotated Log Explorer",
+			parameterLabels = {"Exogenous Annotated Log"},
 			returnLabels = {"ExogenousTraceExplorer"}, 
 			returnTypes = {ExogenousTraceView.class}, 
 			userAccessible = true
@@ -97,7 +112,7 @@ public class ExogenousAwareDiscoveryPlugin {
 		);
 	}
 	
-	@Plugin(name = "Exogenous Aware Discovery", parameterLabels = {"Endogenous Annotated Log","Control Flow DPN"}, returnLabels = {"Exogenous Discovery Investigator"}, returnTypes = {ExogenousDiscoveryInvestigator.class}, userAccessible = true)
+	@Plugin(name = "Exogenous Aware Discovery", parameterLabels = {"Exogenous Annotated Log(xlog)","Control Flow DPN"}, returnLabels = {"Exogenous Discovery Investigator"}, returnTypes = {ExogenousDiscoveryInvestigator.class}, userAccessible = true)
 	@UITopiaVariant(affiliation = "QUT", author = "A. Banham", email = "adam.banham@hdr.qut.edu.au")
 	public ExogenousDiscoveryInvestigator exogenousDiscovery(UIPluginContext context, ExogenousAnnotatedLog exogenous, PetriNetWithData dpn) throws Throwable{
 		

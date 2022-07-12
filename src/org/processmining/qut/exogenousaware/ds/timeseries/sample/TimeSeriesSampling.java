@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.processmining.qut.exogenousaware.ds.linear.BestFittingLine;
 
 /**
@@ -51,20 +52,20 @@ public class TimeSeriesSampling {
 			List<XYDataItem> rightmostItems = windowedItems.stream()
 					.filter(it -> it.getX().doubleValue() > sampleMiddle)
 					.collect(Collectors.toList());
-			if (leftmostItems.size()==0 || rightmostItems.size()==0) {
+			if (leftmostItems.size() < 1 || rightmostItems.size() < 1) {
 //				case(2)(a) need to find either a leftmost or a rightmost to complete pair
-				if (leftmostItems.size() == 0) {
+				if (leftmostItems.size() < 1) {
 //					case(2)(a)(i) find a possible left else throw
 					List<XYDataItem> possibleLeft = items.stream()
 							.filter(it -> it.getX().doubleValue() < sampleMiddle)
 							.collect(Collectors.toList());
 					if (possibleLeft.size() > 0) {
-						leftmostItems.add(possibleLeft.get(possibleLeft.size()));
+						leftmostItems.add(possibleLeft.get(possibleLeft.size()-1));
 					} else {
-						
 						throw new ArithmeticException("Unable to find a leftmost element for this sample window.");
 					}
-				} else {
+				} 
+				if (rightmostItems.size() < 1){
 //					case(2)(a)(ii) find a possible right else throw
 					List<XYDataItem> possibleRight = items.stream()
 							.filter(it -> it.getX().doubleValue() > sampleMiddle)
@@ -75,10 +76,17 @@ public class TimeSeriesSampling {
 						throw new ArithmeticException("Unable to find a rightmost element for this sample window.");
 					}
 				}
+				if (leftmostItems.size() > 0 && rightmostItems.size() > 0) {
+					pairLeft = leftmostItems.get(leftmostItems.size()-1);
+					pairRight = rightmostItems.get(0);
+				} else {
+					throw new ArithmeticException("Unable to find suitable pair witin sample window");
+				}
+			} else {
+	//			case(3) we can make a pair
+				pairLeft = leftmostItems.get(leftmostItems.size()-1);
+				pairRight = rightmostItems.get(0);
 			}
-//			case(3) we can make a pair
-			pairLeft = leftmostItems.get(leftmostItems.size()-1);
-			pairRight = rightmostItems.get(0);
 		} else {
 //			case (1)(b) no data points within window, need to right leftmost and rightmost
 			List<XYDataItem> possibleLeft = items.stream()
@@ -88,7 +96,7 @@ public class TimeSeriesSampling {
 					.filter(it -> it.getX().doubleValue() > sampleMiddle)
 					.collect(Collectors.toList());
 //			case (4) only items to one side of middle
-			if (possibleLeft.size() == 0 || possibleRight.size() == 0) {
+			if (possibleLeft.size() < 1 || possibleRight.size() < 1) {
 				throw new ArithmeticException("Unable to find suitable pair witin sample window");
 			} else {
 				pairLeft = possibleLeft.get(possibleLeft.size()-1);
@@ -106,7 +114,8 @@ public class TimeSeriesSampling {
 				.findIntercept();
 		return sampler.findY(sampleMiddle);
 	}
-
+	
+	
 	/**
 	 * Resamples a series at a given frequency, adding a sample values into a bin map for future analysis.
 	 * @param series to be resampled
@@ -114,9 +123,9 @@ public class TimeSeriesSampling {
 	 * @param resampleFrequency is how often the samples should be taken
 	 */
 	public static void resampleSeries(XYSeries series, Map<Double, List<Double>> binMap, double resampleFrequency) {
-		double startx = series.getX(0).doubleValue();
+		double startx = series.getMinX();
 		startx = startx + (startx % resampleFrequency);
-		double endx = series.getX(series.getItemCount()-1).doubleValue();
+		double endx = series.getMaxX();
 		endx = endx + (endx % resampleFrequency);
 //		sample between start and end using the window segment
 		while (startx <= endx) {
@@ -148,9 +157,9 @@ public class TimeSeriesSampling {
 	 * @param resampleRollingWindow is how large the width of window is [-,+] sample point
 	 */
 	public static void resampleSeries(XYSeries series, Map<Double, List<Double>> binMap, double resampleFrequency, double resampleRollingWindow) {
-		double startx = series.getX(0).doubleValue();
+		double startx = series.getMinX();
 		startx = startx + (startx % resampleFrequency);
-		double endx = series.getX(series.getItemCount()-1).doubleValue();
+		double endx = series.getMaxX();
 		endx = endx + (endx % resampleFrequency);
 //		sample between start and end using the window segment
 		while (startx <= endx) {
@@ -179,4 +188,83 @@ public class TimeSeriesSampling {
 		}
 	}
 	
+	
+	/**
+	 * Resamples a given series over a given timeline. 
+	 * @param series to resample
+	 * @param binMap to store 
+	 * @param timeline to be used for sample points
+	 */
+	public static void resampleSeries(XYSeries series, Map<Double, List<Double>> binMap, List<Double> timeline) {
+		try {
+			//		setup interval space
+					double min = series.getMinX();
+					double max = series.getMaxX();
+					double interval = timeline.get(1) - timeline.get(0);
+					List<Double> intervalSpace = timeline.stream()
+							.filter(i -> i >= min && i <= max)
+							.collect(Collectors.toList());
+			//		edge case (1) interval space is too small to sample from
+					if (timeline.size() < 1) {
+						return;
+					}
+			//		sample at each point in interval space
+					for(double point: intervalSpace) {
+						double sample;
+						try {
+							sample = findSample(series, point-interval, point+interval);
+						} catch (ArithmeticException | CloneNotSupportedException e) {
+							// skip interval point if sample cannot be computed
+							// e.printStackTrace();
+							continue;
+						}
+						if (!binMap.containsKey(point)) {
+							binMap.put(point, new ArrayList<Double>());
+						}
+						binMap.get(point).add(sample);
+					}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+		}
+	}
+	
+	/**
+	 * Given a collection of XYSeries, finds a timeline which spans from least X to max X in 1% intervals.
+	 * @param data Collection of series to be considered when creating timeline.
+	 * @return the timeline for the given data.
+	 */
+	public static List<Double> findTimeline(XYSeriesCollection data) {
+		return findTimeline(data,100);
+	}
+	
+	public static List<Double> findTimeline(XYSeriesCollection data, int NumberOfIntervals) {
+//		step one: find leftmost and rightmost across series
+		double last = Double.MAX_VALUE;
+		double first = Double.MIN_VALUE;
+		for(XYSeries series: (List<XYSeries>) data.getSeries()) {
+			double checklast = series.getMinX();
+			double checkfirst = series.getMaxX();
+			last = checklast < last ? checklast : last;
+			first = checkfirst > first ? checkfirst : first;
+		}
+//		step two: create timeline such that each point at most (1/n)% away from its neighbours
+		List<Double> timeline = new ArrayList<Double>();
+		double timespan = Math.abs(Math.min(0, last)) + Math.abs(Math.max(0, first));
+		double interval = timespan / NumberOfIntervals;
+		double current = last + interval;
+//		System.out.println("[TimeSeriesSampling] Computing timespan with the following :: last="+last+" first="+first+" interval="+interval+" timespan="+timespan);
+//		build timeline
+		timeline.add(last);
+		while(current < first) {
+			timeline.add(current);
+			current += interval;
+		}
+		timeline.add(first);
+		if (timeline.size() < NumberOfIntervals) {
+			throw new UnsupportedOperationException("[TimeSeriesSampling] Unable to compute a timeline :: Reason :: timeline was shorter than 100 intervals :: "+timeline.size());
+		}
+		return timeline;
+	}
 }

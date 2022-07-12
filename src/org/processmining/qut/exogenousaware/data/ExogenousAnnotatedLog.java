@@ -11,44 +11,38 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.deckfour.uitopia.api.event.TaskListener.InteractionResult;
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.extension.XExtension;
-import org.deckfour.xes.factory.XFactory;
-import org.deckfour.xes.factory.XFactoryBufferedImpl;
 import org.deckfour.xes.factory.XFactoryNaiveImpl;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.model.XAttribute;
-import org.deckfour.xes.model.XAttributeCollection;
 import org.deckfour.xes.model.XAttributeMap;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.deckfour.xes.model.XVisitor;
-import org.deckfour.xes.model.impl.XAttributeCollectionImpl;
-import org.deckfour.xes.model.impl.XAttributeListImpl;
 import org.deckfour.xes.model.impl.XAttributeLiteralImpl;
 import org.deckfour.xes.model.impl.XAttributeMapImpl;
-import org.deckfour.xes.model.impl.XTraceImpl;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.framework.plugin.Progress;
-import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.TraceBuilder;
-import org.processmining.log.utils.XLogBuilder;
-import org.processmining.qut.exogenousaware.data.storage.ExogenousAttribute;
-import org.processmining.qut.exogenousaware.steps.Linking;
+import org.processmining.qut.exogenousaware.exceptions.LinkNotFoundException;
 import org.processmining.qut.exogenousaware.steps.Slicing;
 import org.processmining.qut.exogenousaware.steps.Transforming;
+import org.processmining.qut.exogenousaware.steps.slicing.data.SlicingConfiguration;
 import org.processmining.qut.exogenousaware.steps.slicing.data.SubSeries;
+import org.processmining.qut.exogenousaware.steps.slicing.gui.SlicingConfigurationDialog;
 import org.processmining.qut.exogenousaware.steps.transform.data.TransformedAttribute;
 
-import lombok.Singular;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Setter;
+import lombok.Singular;
 
 /**
  * Data Construct for storing both endogenous and exogenous data within a event log structure
@@ -62,7 +56,7 @@ import lombok.NonNull;
 public class ExogenousAnnotatedLog implements XLog {
 
 	@Getter @NonNull XLog endogenousLog;
-	@Singular @Getter List<XLog> exogenousDatasets;
+	@Singular @Getter List<ExogenousDataset> exogenousDatasets;
 	@Singular List<XEventClassifier> classifiers;
 	@Singular List<XAttribute> globalTraceAttributes;
 	@Singular List<XAttribute> globalEventAttributes;
@@ -71,6 +65,12 @@ public class ExogenousAnnotatedLog implements XLog {
 	@Default @Setter @Getter HashMap<String, Map<String,List<SubSeries>>> linkedSubseries = new HashMap<String, Map<String,List<SubSeries>>>();
 	@Default XLog exoSubseries = null;
 	@NonNull Boolean parsed;
+	
+//	configuration setup for exogenous aware log
+	@Default private Boolean useDefaultConfiguration = false;
+	@Default @Getter private SlicingConfiguration slicingConfig = null; 
+	
+	
 	
 	/**
 	 * Creates an identical copy of this element.
@@ -89,11 +89,30 @@ public class ExogenousAnnotatedLog implements XLog {
 				this.extensions,
 				this.linkedSubseries,
 				this.exoSubseries,
-				false
+				false,
+				false,
+				this.slicingConfig
 		);
 	}
 	
+	private void handleConfigurationSetup(UIPluginContext context) {
+//		TODO #2 ask for user setup if no configuration is given
+		if (slicingConfig == null) {
+			SlicingConfigurationDialog sdialog = SlicingConfigurationDialog.builder()
+					.datasets(exogenousDatasets)
+					.build()
+					.setup();
+			context.showWizard("Create your slicing configuration", true, false, sdialog);
+			InteractionResult result = context.showWizard("Create your transforming configuration", false, true, sdialog);
+			if (result == InteractionResult.FINISHED) {
+				this.slicingConfig = sdialog.generateConfig();
+			}
+		}
+	}
+	
 	public ExogenousAnnotatedLog setup(UIPluginContext context) {
+//		check that configuration is setup
+		handleConfigurationSetup(context);
 		if (!this.parsed) {
 			this.exoSubseries = new XFactoryNaiveImpl().createLog();
 //			#1 for each endogenous trace, search each exogenous dataset for linked signals
@@ -149,12 +168,26 @@ public class ExogenousAnnotatedLog implements XLog {
 			return subseriesTraces;
 		}
 //		the work
-		for(XLog elog: this.exogenousDatasets) {
-			ArrayList<XTrace> linked = Linking.findLinkedExogenousSignals(endo, elog);
+		for(ExogenousDataset elog: this.exogenousDatasets) {
+//			if (elog.dataType.equals(ExogenousDatasetType.DISCRETE)) {
+//				continue;
+//			}
+			List<XTrace> linked;
+			try {
+				linked = elog.findLinkage(endo); //Linking.findLinkedExogenousSignals(endo, elog);
+			} catch (LinkNotFoundException e) {
+				// if no link can be found then move on
+				continue;
+			}
 //			#2 perform slicing and annotate subseries on each event 
 			Map<String, Map<String, List<SubSeries>>> subseries;
 			try {
-				subseries = Slicing.naiveEventSlicing(endo, linked);
+//				TODO #1 handle to slicing configuration
+				if (this.useDefaultConfiguration || this.slicingConfig == null) {
+					subseries = Slicing.naiveEventSlicing(endo, linked, elog);
+				} else {
+					subseries = this.slicingConfig.slice(endo, linked, elog);
+				}
 			} catch (UnsupportedOperationException err) {
 				System.out.println(
 						"For endogenous trace ("
@@ -165,6 +198,7 @@ public class ExogenousAnnotatedLog implements XLog {
 				return subseriesTraces;
 			} catch (Exception err) {
 				System.out.println("Unexpected error occured with naiveEventSlicing");
+				err.printStackTrace();
 				return subseriesTraces;
 			}
 			for(String evId: subseries.keySet()) {
@@ -177,7 +211,9 @@ public class ExogenousAnnotatedLog implements XLog {
 				} 
 //				else update keys
 				else {
-					this.linkedSubseries.get(evId).putAll(subseries.get(evId));;
+					if (this.linkedSubseries.containsKey(evId) && subseries.containsKey(evId)) {
+						this.linkedSubseries.get(evId).putAll(subseries.get(evId));
+					}
 				}
 //				addd number of links to each event
 				Optional<XEvent> ev = endo.stream()

@@ -28,15 +28,15 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jfree.data.xy.XYSeriesCollection;
-import org.processmining.qut.exogenousaware.gui.panels.ExogenousEnhancementDotPanel.GuardExpressionHandler;
+import org.processmining.qut.exogenousaware.data.dot.GuardExpressionHandler;
 import org.processmining.qut.exogenousaware.gui.workers.EnhancementAllGraph;
-import org.processmining.qut.exogenousaware.gui.workers.EnhancementClusterGraph;
 import org.processmining.qut.exogenousaware.gui.workers.EnhancementMedianGraph;
-import org.processmining.qut.exogenousaware.gui.workers.EnhancementSmudgeGraph;
-import org.processmining.qut.exogenousaware.gui.workers.EnhancementClusterGraph.ClusterGraphType;
+import org.processmining.qut.exogenousaware.gui.workers.EnhancementMedianGraph.ShadingType;
+import org.processmining.qut.exogenousaware.gui.workers.helpers.ExogenousObserverGrouper;
 
 import lombok.Builder;
 import lombok.Builder.Default;
+import lombok.Getter;
 import lombok.NonNull;
 
 @Builder
@@ -45,19 +45,20 @@ public class EnhancementExogenousDatasetGraphController extends JPanel {
 	@NonNull XYSeriesCollection universe;
 	@NonNull List<Map<String,Object>> states;
 	@NonNull List<Map<String,Object>> seriesStates;
-	@NonNull String datasetName;
+	@NonNull @Getter String datasetName;
 	@NonNull Boolean hasExpression;
-	@NonNull String transName;
+	@NonNull @Getter String transName;
 	
-	@Default boolean useGroups = false;
-	@Default List<Integer> groups = null;
+	@Default @Getter boolean useGroups = false;
+	@Default @Getter List<Integer> groups = null;
+	@Default @Getter ExogenousObserverGrouper grouper = null;
 	@Default GuardExpressionHandler guardExpression = null;
 	@Default GridBagLayout layout = new GridBagLayout();
 	@Default GridBagConstraints layoutcc = new GridBagConstraints();
 	@Default JTabbedPane graphPane = new JTabbedPane();
 	@Default JButton pop = new JButton("popout");
 	@Default JButton min = new JButton("maximise");
-	@Default Map<String, SwingWorker<JPanel, String>> cachedGraphs = new HashMap<String, SwingWorker<JPanel, String>>();
+	@Default @Getter Map<String, SwingWorker<JPanel, String>> cachedGraphs = new HashMap<String, SwingWorker<JPanel, String>>();
 	@Default Map<Integer, String> workerToTab = new HashMap<Integer, String>();
 	
 	
@@ -136,6 +137,55 @@ public class EnhancementExogenousDatasetGraphController extends JPanel {
 	
 	public void addTabs() {
 		int tabCount = 0;
+//		add median plot
+		if (this.cachedGraphs.containsKey("Median-S")) {
+			this.graphPane.addTab("Median-S", ((EnhancementMedianGraph) this.cachedGraphs.get("Median")).getNewChart());
+			this.workerToTab.put(tabCount, "Median-S");
+			tabCount++;
+		} else {
+			EnhancementMedianGraph worker = EnhancementMedianGraph.builder()
+					.title(this.datasetName + " - Median (STD)")
+					.xlabel("time:timestamp (hours)")
+					.ylabel("value")
+					.dataState(seriesStates)
+					.useGroups(this.useGroups && this.groups != null)
+					.groups(this.groups)
+					.grouper(this.grouper)
+					.hasExpression(hasExpression)
+					.expression(guardExpression)
+					.graphData(universe)
+					.build()
+					.setup();
+			worker.execute();
+			this.graphPane.addTab("Median-S", worker.getMain());
+			this.cachedGraphs.put("Median-S", worker);
+			this.workerToTab.put(tabCount, "Median-S");
+			tabCount++;
+		}
+		if (this.cachedGraphs.containsKey("Median")) {
+			this.graphPane.addTab("Median", ((EnhancementMedianGraph) this.cachedGraphs.get("Median")).getNewChart());
+			this.workerToTab.put(tabCount, "Median");
+			tabCount++;
+		} else {
+			EnhancementMedianGraph worker = EnhancementMedianGraph.builder()
+					.title(this.datasetName + " - Median (Q1-3)")
+					.xlabel("time:timestamp (hours)")
+					.ylabel("value")
+					.shadingType(ShadingType.Quartile)
+					.dataState(seriesStates)
+					.useGroups(this.useGroups && this.groups != null)
+					.groups(this.groups)
+					.grouper(this.grouper)
+					.hasExpression(hasExpression)
+					.expression(guardExpression)
+					.graphData(universe)
+					.build()
+					.setup();
+			this.graphPane.addTab("Median", worker.getMain());
+			this.cachedGraphs.put("Median", worker);
+			this.workerToTab.put(tabCount, "Median");
+			tabCount++;
+		}
 //		add normal line-series plot
 		if (this.cachedGraphs.containsKey("Line")) {
 			this.graphPane.addTab("Line", ((EnhancementAllGraph) this.cachedGraphs.get("Line")).getNewChart());
@@ -154,105 +204,81 @@ public class EnhancementExogenousDatasetGraphController extends JPanel {
 					.groups(this.groups)
 					.build()
 					.setup();
-			worker.execute();
 			this.graphPane.addTab("Line", worker.getMain());
 			this.cachedGraphs.put("Line", worker);
 			this.workerToTab.put(tabCount, "Line");
 			tabCount++;
 		}
 //		add smudge plot
-		if (this.cachedGraphs.containsKey("Smudge")) {
-			this.graphPane.addTab("Smudge", ((EnhancementSmudgeGraph) this.cachedGraphs.get("Smudge")).getNewChart());
-			this.workerToTab.put(tabCount, "Smudge");
-			tabCount++;
-		} else {
-			EnhancementSmudgeGraph worker = EnhancementSmudgeGraph.builder()
-					.title(this.datasetName + " - Smudge")
-					.xlabel("time:timestamp (hours)")
-					.ylabel("value")
-					.dataState(seriesStates)
-					.hasExpression(hasExpression)
-					.expression(guardExpression)
-					.useGroups(this.useGroups && this.groups != null)
-					.groups(this.groups)
-					.graphData(universe)
-					.build()
-					.setup();
-			graphPane.addTab("Smudge", worker.getMain());
-			this.cachedGraphs.put("Smudge", worker);
-			this.workerToTab.put(tabCount, "Smudge");
-			tabCount++;
-		}		
-//		add median plot
-		if (this.cachedGraphs.containsKey("Median")) {
-			this.graphPane.addTab("Median", ((EnhancementMedianGraph) this.cachedGraphs.get("Median")).getNewChart());
-			this.workerToTab.put(tabCount, "Median");
-			tabCount++;
-		} else {
-			EnhancementMedianGraph worker = EnhancementMedianGraph.builder()
-					.title(this.datasetName + " - Median")
-					.xlabel("time:timestamp (hours)")
-					.ylabel("value")
-					.dataState(seriesStates)
-					.useGroups(this.useGroups && this.groups != null)
-					.groups(this.groups)
-					.hasExpression(hasExpression)
-					.expression(guardExpression)
-					.graphData(universe)
-					.build()
-					.setup();
-			this.graphPane.addTab("Median", worker.getMain());
-			this.cachedGraphs.put("Median", worker);
-			this.workerToTab.put(tabCount, "Median");
-			tabCount++;
-		}
+//		if (this.cachedGraphs.containsKey("Smudge")) {
+//			this.graphPane.addTab("Smudge", ((EnhancementSmudgeGraph) this.cachedGraphs.get("Smudge")).getNewChart());
+//			this.workerToTab.put(tabCount, "Smudge");
+//			tabCount++;
+//		} else {
+//			EnhancementSmudgeGraph worker = EnhancementSmudgeGraph.builder()
+//					.title(this.datasetName + " - Smudge")
+//					.xlabel("time:timestamp (hours)")
+//					.ylabel("value")
+//					.dataState(seriesStates)
+//					.hasExpression(hasExpression)
+//					.expression(guardExpression)
+//					.useGroups(this.useGroups && this.groups != null)
+//					.groups(this.groups)
+//					.graphData(universe)
+//					.build()
+//					.setup();
+//			graphPane.addTab("Smudge", worker.getMain());
+//			this.cachedGraphs.put("Smudge", worker);
+//			this.workerToTab.put(tabCount, "Smudge");
+//			tabCount++;
+//		}		
 //		add Cluster (Model Based Approach) plot
-		if (this.cachedGraphs.containsKey("Cluster Model")) {
-			this.graphPane.addTab("Cluster", null, ((EnhancementClusterGraph) this.cachedGraphs.get("Cluster Model")).getNewChart(), "Model Based");
-			this.workerToTab.put(tabCount, "Cluster Model");
-			tabCount++;
-		} else {
-			EnhancementClusterGraph worker = EnhancementClusterGraph.builder()
-					.title(this.datasetName + " - Clustered Sequences (Model)")
-					.xlabel("time:timestamp (hours)")
-					.ylabel("value")
-					.dataState(seriesStates)
-					.hasExpression(hasExpression)
-					.expression(guardExpression)
-					.graphData(universe)
-					.useGroups(this.useGroups && this.groups != null)
-					.groups(this.groups)
-					.build()
-					.setup();
-			this.graphPane.addTab("Cluster", null, worker.getMain() , "Model Based");
-			this.cachedGraphs.put("Cluster Model", worker);
-			this.workerToTab.put(tabCount, "Cluster Model");
-			tabCount++;
-		}
-//		add Cluster (Shape Based Approach) plot
-		if (this.cachedGraphs.containsKey("Cluster Shape")) {
-			this.graphPane.addTab("Cluster", null, ((EnhancementClusterGraph) this.cachedGraphs.get("Cluster Shape")).getNewChart(), "Shape Based");
-			this.workerToTab.put(tabCount, "Cluster Shape");
-			tabCount++;
-		} else {
-			EnhancementClusterGraph worker = EnhancementClusterGraph.builder()
-					.title(this.datasetName + " - Clustered Sequences (Shape)")
-					.xlabel("time:timestamp (hours)")
-					.ylabel("value")
-					.graphType(ClusterGraphType.shape)
-					.dataState(seriesStates)
-					.hasExpression(hasExpression)
-					.expression(guardExpression)
-					.graphData(universe)
-					.useGroups(this.useGroups && this.groups != null)
-					.groups(this.groups)
-					.build()
-					.setup();
-			graphPane.addTab("Cluster", null, worker.getMain() , "Shape Based");
-			this.cachedGraphs.put("Cluster Shape", worker);
-			this.workerToTab.put(tabCount, "Cluster Shape");
-			tabCount++;
-		}
+//		if (this.cachedGraphs.containsKey("Cluster Model")) {
+//			this.graphPane.addTab("Cluster", null, ((EnhancementClusterGraph) this.cachedGraphs.get("Cluster Model")).getNewChart(), "Model Based");
+//			this.workerToTab.put(tabCount, "Cluster Model");
+//			tabCount++;
+//		} else {
+//			EnhancementClusterGraph worker = EnhancementClusterGraph.builder()
+//					.title(this.datasetName + " - Clustered Sequences (Model)")
+//					.xlabel("time:timestamp (hours)")
+//					.ylabel("value")
+//					.dataState(seriesStates)
+//					.hasExpression(hasExpression)
+//					.expression(guardExpression)
+//					.graphData(universe)
+//					.useGroups(this.useGroups && this.groups != null)
+//					.groups(this.groups)
+//					.build()
+//					.setup();
+//			this.graphPane.addTab("Cluster", null, worker.getMain() , "Model Based");
+//			this.cachedGraphs.put("Cluster Model", worker);
+//			this.workerToTab.put(tabCount, "Cluster Model");
+//			tabCount++;
+//		}
+////		add Cluster (Shape Based Approach) plot
+//		if (this.cachedGraphs.containsKey("Cluster Shape")) {
+//			this.graphPane.addTab("Cluster", null, ((EnhancementClusterGraph) this.cachedGraphs.get("Cluster Shape")).getNewChart(), "Shape Based");
+//			this.workerToTab.put(tabCount, "Cluster Shape");
+//			tabCount++;
+//		} else {
+//			EnhancementClusterGraph worker = EnhancementClusterGraph.builder()
+//					.title(this.datasetName + " - Clustered Sequences (Shape)")
+//					.xlabel("time:timestamp (hours)")
+//					.ylabel("value")
+//					.graphType(ClusterGraphType.shape)
+//					.dataState(seriesStates)
+//					.hasExpression(hasExpression)
+//					.expression(guardExpression)
+//					.graphData(universe)
+//					.useGroups(this.useGroups && this.groups != null)
+//					.groups(this.groups)
+//					.build()
+//					.setup();
+//			graphPane.addTab("Cluster", null, worker.getMain() , "Shape Based");
+//			this.cachedGraphs.put("Cluster Shape", worker);
+//			this.workerToTab.put(tabCount, "Cluster Shape");
+//			tabCount++;
+//		}
 		graphPane.addChangeListener(new ChangeListener() {
 			
 			public void stateChanged(ChangeEvent e) {
@@ -284,8 +310,10 @@ public class EnhancementExogenousDatasetGraphController extends JPanel {
 						.states(this.source.states)
 						.hasExpression(this.source.hasExpression)
 						.guardExpression(this.source.guardExpression)
-						.cachedGraphs(this.source.cachedGraphs)
 						.transName(this.source.transName)
+						.useGroups(true)
+						.groups(this.source.groups)
+						.grouper(this.source.grouper)
 						.build()
 						.setup()
 						.maximise();
@@ -306,6 +334,23 @@ public class EnhancementExogenousDatasetGraphController extends JPanel {
 			this.source.pop.setEnabled(true);
 		}
 		
+	}
+	
+	public EnhancementExogenousDatasetGraphController createCopy() {
+		return EnhancementExogenousDatasetGraphController.builder()
+				.datasetName(this.datasetName)
+				.universe(this.universe)
+				.seriesStates(this.seriesStates)
+				.states(this.states)
+				.hasExpression(this.hasExpression)
+				.guardExpression(this.guardExpression)
+				.transName(this.transName)
+				.useGroups(true)
+				.groups(this.groups)
+				.grouper(this.grouper)
+				.build()
+				.setup()
+				.maximise();
 	}
 
 	@Builder

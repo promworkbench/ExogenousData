@@ -28,6 +28,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.processmining.qut.exogenousaware.data.ExogenousDatasetType;
 import org.processmining.qut.exogenousaware.gui.ExogenousTraceView;
 import org.processmining.qut.exogenousaware.steps.transform.data.TransformedAttribute;
 
@@ -114,7 +115,10 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 			for(Entry<String, XAttribute> entry : ev.getAttributes().entrySet()) {
 				if (entry.getValue().getClass().equals(TransformedAttribute.class)) {
 					TransformedAttribute xattr = (TransformedAttribute) entry.getValue();
-					exogenousTimeSeries.add(xattr.getSource().getSource());
+//					can only visualise numerical traces
+					if (xattr.getSource().getDatatype().equals(ExogenousDatasetType.NUMERICAL)) {
+						exogenousTimeSeries.add(xattr.getSource().getSource());
+					}
 				}
 			}
 		}
@@ -143,7 +147,7 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 				}
 			}
 //			build series and render
-			String title = "%s (XDS#%d)";
+			String title = "%s (Exo-Panel#%d)";
 			String name = getExogenousName(exo);
 			XYSeries series = new XYSeries(String.format(title, name, exoCount));
 			for(int idx = 0; idx < x.size(); idx++) {
@@ -160,7 +164,6 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 	
 	@SuppressWarnings("unchecked")
 	protected JPanel backgroundBuildPanel() {
-//		create plot similar to Up Perscope fig 1.
 //		setup containers
 		Map<String,Double> bounds = null;
 		XYSeriesCollection endoMoments = null;
@@ -183,9 +186,9 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 		endoRender = (XYLineAndShapeRenderer) out.get(1);
 //		build dummy plot
 		JFreeChart chart = ChartFactory.createXYLineChart(
-				"Slicing Subseries for "+ endo.getAttributes().get("concept:name").toString(), 
+				"Linked exo-series for trace: "+ endo.getAttributes().get("concept:name").toString(), 
 				"time:timestamp (hours)", 
-				"measurement", 
+				"measurement value", 
 				null
 		);
 		XYPlot plot = chart.getXYPlot();
@@ -193,7 +196,6 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 //		add endoSliceMoments
 		plot.setDataset(0, endoMoments);
 		plot.setRenderer(0, endoRender);
-//		#TODO add labels to axis instead of legend
 		
 //		add full subseries to chart
 		plot.setDataset(1, exoSignals);
@@ -237,6 +239,7 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 		);
 		
 		chart.setBackgroundPaint(Color.LIGHT_GRAY);
+		chart.getLegend().setBackgroundPaint(Color.LIGHT_GRAY);
 		return this.chart;
 	}
 	

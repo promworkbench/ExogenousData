@@ -1,14 +1,12 @@
 package org.processmining.qut.exogenousaware.gui;
 
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,13 +16,12 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
+import javax.swing.JScrollBar;
 import javax.swing.SwingConstants;
 
 import org.deckfour.xes.model.XAttributeTimestamp;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XTrace;
-import org.deckfour.xes.model.impl.XAttributeLiteralImpl;
 import org.jfree.chart.ChartPanel;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.Visualizer;
@@ -33,14 +30,16 @@ import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.util.ui.widgets.ProMSplitPane;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.ClickListener;
-import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.TraceBuilder;
-import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Event;
-import org.processmining.framework.util.ui.widgets.traceview.ProMTraceView.Trace;
 import org.processmining.qut.exogenousaware.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousaware.gui.listeners.EndoTraceListener;
+import org.processmining.qut.exogenousaware.gui.panels.ExogenousTraceViewJChartFilterPanel;
+import org.processmining.qut.exogenousaware.gui.panels.ExogenousTraceViewJChartFilterPanel.EventFilter;
+import org.processmining.qut.exogenousaware.gui.promlist.ProMListComponents.exoTraceBuilder;
 import org.processmining.qut.exogenousaware.gui.workers.TraceVisEventChart;
 import org.processmining.qut.exogenousaware.gui.workers.TraceVisOverviewChart;
 import org.processmining.qut.exogenousaware.gui.workers.TraceVisTraceBreakdownCharts;
+
+import com.fluxicon.slickerbox.ui.SlickerScrollBarUI;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -82,8 +81,10 @@ public class ExogenousTraceView extends JPanel {
 	@Builder.Default private int lastEventSliceTouched = 0;
 	@Builder.Default private boolean lastEventSliceHiglighted = false;
 	
-	@Builder.Default private JScrollPane traceBreakdownView = new JScrollPane();
-
+	@Builder.Default @Getter private ExogenousTraceViewJChartFilterPanel traceBreakdownView = new ExogenousTraceViewJChartFilterPanel();
+	private EventFilter eventfilter;
+	
+	
 	public ExogenousTraceView setup() {
 		this.setAlignmentX(JPanel.CENTER_ALIGNMENT);
 		this.setAlignmentY(JPanel.CENTER_ALIGNMENT);
@@ -94,7 +95,8 @@ public class ExogenousTraceView extends JPanel {
 //		layout managers
 		this.rightTopBottom.setLayout(new GridLayout(0,1));
 		this.rightTopBottom.validate();
-		this.leftRight.setLayout( new GridLayout(1,2));
+		this.leftRight.setLayout(new GridLayout(1,2));
+		this.leftRight.setResizeWeight(0);
 		this.leftRight.validate();
 		this.setLayout(new GridLayout(1,1));
 //		new setup, trace list on left, spliting to
@@ -232,14 +234,21 @@ public class ExogenousTraceView extends JPanel {
 				
 				)
 				.collect(Collectors.toSet());
+		exoTraceBuilder builder = new exoTraceBuilder(evKeySet);
 		ProMTraceList<XTrace> traceView = new ProMTraceList<XTrace>(
-				new exoTraceBuilder(evKeySet)
+				builder
 		);
 		traceView.addAll(this.source.getEndogenousLog());
 		traceView.addTraceClickListener(
 				new endoClickListener(this)
 		);
-		
+//		style trace list
+		JScrollBar bar = traceView.getScrollPane().getVerticalScrollBar();
+		bar.setUI(new SlickerScrollBarUI(bar, Color.LIGHT_GRAY, Color.GRAY,Color.DARK_GRAY, 4, 12));
+		bar = traceView.getScrollPane().getHorizontalScrollBar();
+		bar.setUI(new SlickerScrollBarUI(bar, Color.LIGHT_GRAY, Color.GRAY,Color.DARK_GRAY, 4, 12));
+		traceView.getScrollPane().validate();
+		traceView.validate();
 //		ordering of elements and styling
 		bottomRight.add(
 				new JLabel("Avaliable Endogenous Traces:") 
@@ -264,19 +273,25 @@ public class ExogenousTraceView extends JPanel {
 		if (this.traceOverviewChart != null) {
 			if (!this.lastEventSliceHiglighted) {
 				this.traceOverviewChart.getChart().getXYPlot().getRenderer(0).setSeriesPaint(eventIndex, Color.orange);
+				this.traceOverviewChart.getChart().getXYPlot().getRenderer(0).setSeriesStroke(eventIndex, new BasicStroke(5));
 				this.traceOverviewChart.validate();
 				this.lastEventSliceHiglighted = true;
 				this.lastEventSliceTouched = eventIndex;
 			} else {
 				this.traceOverviewChart.getChart().getXYPlot().getRenderer(0).setSeriesPaint(this.lastEventSliceTouched, new Color(0F, 0F, 0F, 0.33F));
-				this.traceOverviewChart.getChart().getXYPlot().getRenderer(0).setSeriesPaint(eventIndex, Color.orange);
+				this.traceOverviewChart.getChart().getXYPlot().getRenderer(0).setSeriesStroke(this.lastEventSliceTouched, new BasicStroke(1));
+				if (eventIndex != this.lastEventSliceTouched) {
+					this.traceOverviewChart.getChart().getXYPlot().getRenderer(0).setSeriesPaint(eventIndex, Color.orange);
+					this.traceOverviewChart.getChart().getXYPlot().getRenderer(0).setSeriesStroke(eventIndex, new BasicStroke(5));
+					this.lastEventSliceHiglighted = true;
+				} else {
+					this.lastEventSliceHiglighted = false;
+				}
 				this.traceOverviewChart.validate();
-				this.lastEventSliceHiglighted = true;
 				this.lastEventSliceTouched = eventIndex;
 			}
 		}
 	}
-	
 	
 	public boolean setSelectEndogenous(XTrace select, EndoTraceListener listener) {
 		if (this.selectedEndogenous == null) {
@@ -322,17 +337,32 @@ public class ExogenousTraceView extends JPanel {
 	}
 	
 	public double getEventTimestampMillis(XEvent ev) {
-		return (double) ((XAttributeTimestamp) ev.getAttributes().get("time:timestamp")).getValueMillis();
+		return ((XAttributeTimestamp) ev.getAttributes().get("time:timestamp")).getValueMillis();
 	}
 	
 	public double getExoEventValue(XEvent ev) {
 		return Double.parseDouble(ev.getAttributes().get("exogenous:value").toString());
 	}
 	
-	public void updateTraceBreakdownEvent(XEvent ev) {
-		this.traceBreakdownView.setViewportView(this.buildIndividualEventBreakdown(ev));
-		this.traceBreakdownView.validate();
-		this.traceBreakdownView.getParent().validate();
+	public void updateTraceBreakdownEvent(XEvent ev, int eventIndex) {
+		
+		if (ev != null) {
+			if (this.eventfilter != null) {
+				this.traceBreakdownView.removeFilter(this.eventfilter);
+			}
+			this.eventfilter = EventFilter
+					.builder()
+					.eventIndex(eventIndex)
+					.build();
+			
+			this.traceBreakdownView.filter( 
+					this.eventfilter
+			);
+		} else {
+			this.traceBreakdownView.removeFilter(this.eventfilter);
+			this.eventfilter = null;
+		}
+		
 		this.rightTopBottom.validate();
 	}
 	
@@ -347,6 +377,17 @@ public class ExogenousTraceView extends JPanel {
 		return chartbuilder.getView();
 	}
 	
+ 	public static JLabel createLeftAlignedLabel(String text, Boolean bold, int fontSize) {
+ 		JLabel label = new JLabel(text, SwingConstants.LEADING);
+		label.setFont(new Font("Times new Roman", bold ? Font.BOLD : null, fontSize));
+		label.setBackground(Color.DARK_GRAY);
+		label.setHorizontalAlignment(JLabel.LEFT);
+		label.setAlignmentX(JPanel.RIGHT_ALIGNMENT);
+		return label;
+ 	}
+ 	
+ 	
+// 	interfaces
  	public static class endoClickListener implements ClickListener<XTrace> {
 		
 		private ExogenousTraceView source;
@@ -357,210 +398,15 @@ public class ExogenousTraceView extends JPanel {
 
 		@Override
 		public void traceMouseDoubleClicked(XTrace trace, int traceIndex, int eventIndex, MouseEvent e) {
-			// TODO Auto-generated method stub
 			this.source.setSelectEndogenous(trace);
 		}
 
 		@Override
 		public void traceMouseClicked(XTrace trace, int traceIndex, int eventIndex, MouseEvent e) {
-			// TODO Auto-generated method stub
 			this.source.setSelectEndogenous(trace);
 		}
 		
 	}
-	
- 	public static JLabel createLeftAlignedLabel(String text, Boolean bold, int fontSize) {
- 		JLabel label = new JLabel(text, SwingConstants.LEADING);
-		label.setFont(new Font("Times new Roman", bold ? Font.BOLD : null, fontSize));
-		label.setBackground(Color.DARK_GRAY);
-		label.setHorizontalAlignment(JLabel.LEFT);
-		label.setAlignmentX(JPanel.RIGHT_ALIGNMENT);
-		return label;
- 	}
- 	
-//  Usage 
-//	#TODO colors for events with exogenous linked subseries
-//	ProMTraceList<XTrace> traceView = new ProMTraceList<XTrace>(
-//		new exoTraceBuilder()
-//  );
-//	traceView.addAll(this.source.getEndogenousLog());
-	public static class exoTraceBuilder implements TraceBuilder<XTrace> {
 
-		private Set<String> exoEvents;
-		
-		public exoTraceBuilder(Set<String> exoEvents) {
-			this.exoEvents = exoEvents;
-		}
-		
-		
-		@Override
-		public Trace<? extends Event> build(XTrace element) {
-			// TODO Auto-generated method stub
-			Boolean hasExo = false;
-			if (element.getAttributes().keySet().contains("exogenous:exist")) {
-				hasExo = ((XAttributeLiteralImpl) element.getAttributes().get("exogenous:exist") ).getValue().contentEquals("True");
-			}
-			return new exoTrace(element, 
-					hasExo,
-					exoEvents
-			);
-		}
-		
-		
-		public static class exoTrace implements Trace<Event> {
-			
-			private XTrace source;
-			private Boolean hasExo;
-			private Set<String> exoEvents;
-			
-			public exoTrace(XTrace source, Boolean hasExo, Set<String> exoEvents) {
-				this.source = source;
-				this.hasExo = hasExo;
-				this.exoEvents = exoEvents;
-			}
-			
-			@Override
-			public Iterator<Event> iterator() {
-				
-				List<String> evSet = this.source.stream().map(ev -> ev.getID().toString()).collect(Collectors.toList());
-				return new exoIterator(
-						this.source.iterator(), 
-						this.hasExo ? this.exoEvents.stream().filter(s -> evSet.contains(s)).collect(Collectors.toSet()) : new HashSet<String>() 
-						);
-			}
-
-			@Override
-			public String getName() {
-				return this.source.getAttributes().get("concept:name").toString();
-			}
-
-			@Override
-			public Color getNameColor() {
-				return this.hasExo ? new Color(65,150,98) : Color.red;
-			}
-
-			@Override
-			public String getInfo() {
-				// TODO Auto-generated method stub
-				String info = "";
-				for(String key: this.source.getAttributes().keySet()) {
-					info += String.format("%s : %s \n",
-							key, this.source.getAttributes().get(key)
-					);
-				}
-				return info;
-			}
-
-			@Override
-			public Color getInfoColor() {
-				// TODO Auto-generated method stub
-				return Color.black;
-			}
-			
-		}
-		
-		public static class exoIterator implements Iterator<Event> {
-
-			Iterator<XEvent> source;
-			private Set<String> exoEvents;
-			
-			public exoIterator(Iterator<XEvent> source, Set<String> exoEvents) {
-				this.source = source;
-				this.exoEvents = exoEvents;
-			}
-			
-			@Override
-			public boolean hasNext() {
-				// TODO Auto-generated method stub
-				return this.source.hasNext();
-			}
-
-			@Override
-			public Event next() {
-				// TODO Auto-generated method stub
-				XEvent ev = this.source.next();
-				return new exoEvent(
-						ev,
-						ev.getAttributes().keySet().stream().anyMatch(s -> s.contains("exogenous:dataset"))
-						);
-			}
-			
-		}
-		
-		public static class exoEvent implements Event {
-			
-			private XEvent source;
-			private Boolean hasExo;
-			
-			public exoEvent(XEvent source, Boolean hasExo) {
-				this.source = source;
-				this.hasExo = hasExo;
-			}
-			
-
-			@Override
-			public Color getWedgeColor() {
-				if (this.hasExo) {
-					return new Color(65,150,98);
-				} else {
-					return Color.red;
-				}
-			}
-
-			@Override
-			public Color getBorderColor() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public String getLabel() {
-				return this.source.getAttributes().get("concept:name").toString();
-			}
-
-			@Override
-			public Color getLabelColor() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public String getTopLabel() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public Color getTopLabelColor() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public String getBottomLabel() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public Color getBottomLabelColor() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public String getBottomLabel2() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public Color getBottomLabel2Color() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-		}
-	}
 	
 }

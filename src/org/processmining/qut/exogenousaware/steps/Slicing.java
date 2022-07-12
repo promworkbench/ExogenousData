@@ -12,6 +12,10 @@ import java.util.stream.Collectors;
 import org.deckfour.xes.model.XAttributeTimestamp;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XTrace;
+import org.processmining.qut.exogenousaware.data.ExogenousDataset;
+import org.processmining.qut.exogenousaware.data.ExogenousDatasetType;
+import org.processmining.qut.exogenousaware.steps.slicing.FutureOutcomeSlicer;
+import org.processmining.qut.exogenousaware.steps.slicing.Slicer;
 import org.processmining.qut.exogenousaware.steps.slicing.TimeAwareSlicer;
 import org.processmining.qut.exogenousaware.steps.slicing.data.SubSeries;
 
@@ -59,7 +63,7 @@ public class Slicing {
 	 * @return slicePoints a map containing for each event, a map of subseries cuts from the linked exogenous oberservations
 	 * 
 	 */
-	static public Map<String,Map<String,List<SubSeries>>> naiveEventSlicing (XTrace endogenous, ArrayList<XTrace> exogenous) throws UnsupportedOperationException {
+	static public Map<String,Map<String,List<SubSeries>>> naiveEventSlicing (XTrace endogenous, List<XTrace> exogenous, ExogenousDataset edataset) throws UnsupportedOperationException {
 		Map<String,Map<String,List<SubSeries>>> eventSlices = new HashMap<String,Map<String,List<SubSeries>>>();
 //		for each event add a key and a empty list of connected exogenous events
 		for(XEvent event: endogenous){
@@ -70,20 +74,48 @@ public class Slicing {
 			if (exoTrace.size() < 1) {
 				continue;
 			}
-//			create a list of periods to use
-			long hour = 1000 * 60 * 60;
-			List<Long> periods = new ArrayList<Long>();
-			periods.add(hour*2);
-			periods.add(hour*4);
-			periods.add(hour*6);
-			periods.add(hour*12);
-			for(long period: periods) {
-	//			get slicing points for this piece of the exogenous dataset
-	//			Map<String,ArrayList<XEvent>> slicePoints = naiveSlicingPoints(endogenous, exoTrace);
-				Map<XEvent, SubSeries> slicePoints = TimeAwareSlicer
-						.builder().timePeriod(period).build()
-						.slice(endogenous, exoTrace);
-	//			update each event with matching sub-series 
+//			(1) numerical case
+			if (edataset.getDataType().equals(ExogenousDatasetType.NUMERICAL)) {
+	//			create a list of periods to use
+				long hour = 1000 * 60 * 60;
+				List<Long> periods = new ArrayList<Long>();
+				periods.add(hour*2);
+				periods.add(hour*4);
+				periods.add(hour*6);
+				periods.add(hour*12);
+				for(long period: periods) {
+		//			get slicing points for this piece of the exogenous dataset
+		//			Map<String,ArrayList<XEvent>> slicePoints = naiveSlicingPoints(endogenous, exoTrace);
+					Map<XEvent, SubSeries> slicePoints = TimeAwareSlicer
+							.builder().timePeriod(period).build()
+							.slice(endogenous, exoTrace, edataset);
+		//			update each event with matching sub-series 
+					for(XEvent endoEvent: slicePoints.keySet()) {
+						Map<String, List<SubSeries>> endoMap = eventSlices.get(endoEvent.getID().toString());
+						String endoKey = exoTrace.getAttributes().get("exogenous:name").toString();
+						if (endoMap.containsKey(endoKey)) {
+							endoMap.get(endoKey).add(slicePoints.get(endoEvent));
+						} else {
+							List<SubSeries> lister = new ArrayList<SubSeries>();
+							lister.add(slicePoints.get(endoEvent));
+							endoMap.put(endoKey,lister);
+						}
+					}
+				}
+			} 
+//			(2) discrete case
+			else if (edataset.getDataType().equals(ExogenousDatasetType.DISCRETE)) {
+//				setup params
+				long hour = 1000 * 60 * 60;
+				long period = hour * 48;
+//				create slicer
+				Slicer slicer = FutureOutcomeSlicer.builder()
+						.timePeriod(period)
+						.build();
+//				perform slice
+				Map<XEvent, SubSeries> slicePoints = slicer.slice(endogenous, exoTrace, edataset);
+//				store slices 
+//				update each event with matching sub-series 
 				for(XEvent endoEvent: slicePoints.keySet()) {
 					Map<String, List<SubSeries>> endoMap = eventSlices.get(endoEvent.getID().toString());
 					String endoKey = exoTrace.getAttributes().get("exogenous:name").toString();
@@ -97,7 +129,6 @@ public class Slicing {
 				}
 			}
 		}
-		
 		return eventSlices;
 	}
 	

@@ -1,0 +1,79 @@
+name: Update Production (tue svn) with Package Changes
+
+on:
+  release:
+      types: [published]
+      branches:
+        - master
+  workflow_dispatch:
+
+jobs:
+
+  send_to_prod:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "svn checking out prod"
+        env:
+          user: ${{ secrets.SVN_USERNAME }}
+          pass: ${{ secrets.SVN_PASSWORD }}
+        run: |
+            echo "::group::svn checkout from prod"
+            mkdir svn_temp
+            cd svn_temp
+            svn co --username "$user" --password "$pass" https://svn.win.tue.nl/repos/prom/Packages/ExogenousData
+            echo "------"
+            echo "$(ls -al)"
+            echo "------"
+            cd ExogenousData
+            echo "$(ls -al)"
+            echo "------"
+            cd Trunk
+            echo "$(ls -al)"
+            echo "------"
+            svn update
+            svn cleanup
+            cd ../../..
+            echo "::endgroup::"
+      - uses: actions/checkout@v3
+        with:
+          path: "tmp"
+      - name: "moving changes into prod dir"
+        run: |
+          echo "::group::getting git and copying over"
+          echo "------"
+          echo "$(ls -al)"
+          echo "------"
+          cd tmp
+          echo "$(ls -al)"
+          echo "------"
+          cd ../svn_temp/ExogenousData/Trunk
+          echo "$(ls -al)"
+          echo "------"
+          cd ../../..
+          rm -fr tmp/.svn
+          rsync -vau tmp/ svn_temp/ExogenousData/Trunk
+          rm -fr tmp
+          echo "::endgroup::"
+      - name: "svn committing to prod"
+        env:
+          user: ${{ secrets.SVN_USERNAME }}
+          pass: ${{ secrets.SVN_PASSWORD }}
+        run: |
+          echo "::group::sending to prod via svn"
+          echo "commiting with :: ${{ github.event.release.name }} : ${{ github.event.release.body }}"
+          echo "\# ${{ github.event.release.name }}\n${{ github.event.release.body }}" > ./svn_temp/commit.txt
+          echo "------"
+          echo "$(ls -al)"
+          echo "------"
+          cd svn_temp/ExogenousData/Trunk
+          echo "$(ls -al)"
+          echo "------"
+          svn add --force .
+          svn cleanup .
+          echo "------"
+          svn status --show-updates
+          echo "------"
+          echo "$(ls -al)"
+          echo "------"
+          svn commit -F ../../commit.txt --no-auth-cache --non-interactive  --username "$user" --password "$pass"
+          echo "::endgroup::"
