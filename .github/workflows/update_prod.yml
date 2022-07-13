@@ -1,4 +1,4 @@
-name: Update Production (tue svn) with Package Changes
+name: ProM Updated
 
 on:
   release:
@@ -61,7 +61,9 @@ jobs:
         run: |
           echo "::group::sending to prod via svn"
           echo "commiting with :: ${{ github.event.release.name }} : ${{ github.event.release.body }}"
-          echo "\# ${{ github.event.release.name }}\n${{ github.event.release.body }}" > ./svn_temp/commit.txt
+          echo "${{ github.event.release.name }}" >> ./svn_temp/commit.txt 
+          echo "${{ github.event.release.body }}" >> ./svn_temp/commit.txt
+          perl -p -i.bak -e 's#\r\n#\n#go' ./svn_temp/commit.txt
           echo "------"
           echo "$(ls -al)"
           echo "------"

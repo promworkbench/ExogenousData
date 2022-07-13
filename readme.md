@@ -1,3 +1,5 @@
+[![ProM Updated](https://github.com/AdamBanham/ExogenousData/actions/workflows/update_prod.yml/badge.svg)](https://github.com/AdamBanham/ExogenousData/actions/workflows/update_prod.yml)
+
 # Exogenous Data ProM Plugin
 
 This package for the ProM framework, implements several features around the xPM framework for process mining with exogenous data. The main feature of this plugin is an interface for viewing the output from several steps of the framework. i.e. viewing an xlog, performing decision mining with exogenous data and generating EESA visualisation (and ranking a collection). While this plugin creates a user-friendly way to interface with xPM, the inputs and outputs (exo-panels and their creation) are still unstable and require a complete formalisation. Furthermore, only a limited set of transformers and slicers are supported. Thus, customised implementations are required for non-trivial slices or transforms. Please get in contact with me if you require assistance with the creation of exo-panels or exo-descriptions, or non-trivial options for creating determinations in a xPM instantiation.
@@ -23,6 +25,12 @@ After linking, slicing and transforming is completed, the following plugin can b
 
 By clicking on an endogenous trace on the left panel, an overview of the trace will be generated on the right. A user can then explore exo-panels and slicers to finding associated slices and view them. Using the event sequence on the right, a user can highlight when the trace occurred in the large graph (top-right) and individual breakdowns of each exo-panel and slicers will be filters to clicked event (bottom-right). 
 
+#### Filtering Log Data 
+Endogenous traces will be highlighted in left pane, with selected under concept:name.
+Clicking on an endogenous event in the right pane will highlighted the event in the overview graph and will filter description graphs below. Click event again to stop filtering and highlighting.
+Clicking on the buttons on the left of description graphs will further filter graphs, e.g. only show graphs from a single exo-panel or only show a slices from a set of slicing functions.
+
+![Exogenous Annotated Log Filtering](docs/screens/20220713_TraceViewUpdate.PNG)
 
 ### Performing Exogenous Aware Discovery
 
@@ -82,8 +90,8 @@ To get in contact, see https://www.adambanham.io/#/contact for my current email 
 
 # References
 
-[1] F. Mannhardt, M. de Leoni, H. A. Reijers, and W. M. P. van der Aalst, ìDecision Mining Revisited - Discovering Overlapping Rules,î in Advanced Information Systems Engineering, Cham, 2016, pp. 377ñ392.
+[1] F. Mannhardt, M. de Leoni, H. A. Reijers, and W. M. P. van der Aalst, ‚ÄúDecision Mining Revisited - Discovering Overlapping Rules,‚Äù in Advanced Information Systems Engineering, Cham, 2016, pp. 377‚Äì392.
 <br>
 or 
 <br>
-F. Mannhardt, M. De Leoni, and H. A. Reijers, ìThe multi-perspective process explorer,î in CEUR Workshop Proceedings, Innsbruck, Austria, Sep. 2015, vol. 1418, pp. 130ñ134.
+F. Mannhardt, M. De Leoni, and H. A. Reijers, ‚ÄúThe multi-perspective process explorer,‚Äù in CEUR Workshop Proceedings, Innsbruck, Austria, Sep. 2015, vol. 1418, pp. 130‚Äì134.
