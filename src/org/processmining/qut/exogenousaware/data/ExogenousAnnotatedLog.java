@@ -30,10 +30,12 @@ import org.processmining.qut.exogenousaware.exceptions.LinkNotFoundException;
 import org.processmining.qut.exogenousaware.gui.colours.ExoPanelPicker;
 import org.processmining.qut.exogenousaware.steps.Slicing;
 import org.processmining.qut.exogenousaware.steps.Transforming;
+import org.processmining.qut.exogenousaware.steps.determination.Determination;
 import org.processmining.qut.exogenousaware.steps.slicing.data.SlicingConfiguration;
 import org.processmining.qut.exogenousaware.steps.slicing.data.SubSeries;
 import org.processmining.qut.exogenousaware.steps.slicing.gui.SlicingConfigurationDialog;
 import org.processmining.qut.exogenousaware.steps.transform.data.TransformedAttribute;
+import org.processmining.qut.exogenousaware.steps.transform.gui.TransformConfigurationDialog;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,6 +67,7 @@ public class ExogenousAnnotatedLog implements XLog {
 	@Singular Set<XExtension> extensions;
 	@Default @Setter @Getter HashMap<String, Map<String,List<SubSeries>>> linkedSubseries = new HashMap<String, Map<String,List<SubSeries>>>();
 	@Default XLog exoSubseries = null;
+	@Default List<Determination> determinations = new ArrayList<>();
 	@NonNull Boolean parsed;
 	
 //	configuration setup for exogenous aware log
@@ -90,6 +93,7 @@ public class ExogenousAnnotatedLog implements XLog {
 				this.extensions,
 				this.linkedSubseries,
 				this.exoSubseries,
+				this.determinations,
 				false,
 				false,
 				this.slicingConfig
@@ -104,16 +108,24 @@ public class ExogenousAnnotatedLog implements XLog {
 					.build()
 					.setup();
 			context.showWizard("Create your slicing configuration", true, false, sdialog);
-			InteractionResult result = context.showWizard("Create your transforming configuration", false, true, sdialog);
+			TransformConfigurationDialog tdialog = TransformConfigurationDialog.builder()
+					.partialDeterminations(sdialog.generatePartials())
+					.build()
+					.setup();
+			InteractionResult result = context.showWizard("Create your transforming configuration", false, true, tdialog);
 			if (result == InteractionResult.FINISHED) {
 				this.slicingConfig = sdialog.generateConfig();
+				this.determinations = tdialog.generateDeterminations();
 			}
 		}
+		return;
 	}
 	
 	public ExogenousAnnotatedLog setup(UIPluginContext context) {
 //		check that configuration is setup
-		handleConfigurationSetup(context);
+		if (!this.useDefaultConfiguration) {
+			handleConfigurationSetup(context);
+		}
 		if (!this.parsed) {
 //			set base colours for exo-panels
 			ExoPanelPicker picker = ExoPanelPicker.builder().build();
@@ -129,7 +141,7 @@ public class ExogenousAnnotatedLog implements XLog {
 			progress.setCaption("Linking endogenous traces...");
 //			run parallel work pool over handler
 			List<List<XTrace>> subseries = this.endogenousLog.parallelStream()
-				.map( trace -> handleEndogenousTraceLinkage(trace, progress))
+				.map( trace -> handleDeterminations(trace, progress))
 				.collect(Collectors.toList());
 //			add subseries collection into subseries Xlog
 			progress.setMaximum(this.endogenousLog.size()+subseries.size());
@@ -167,6 +179,21 @@ public class ExogenousAnnotatedLog implements XLog {
 		return this;
 	}
 	
+	public List<XTrace> handleDeterminations(XTrace endo, Progress progress){
+		List<XTrace> subseriesTraces = new ArrayList<XTrace>();
+		
+//		the work; apply all determinations to this endogenous trace to produce 
+//		a possible association with exogenous data
+		for(Determination deter: this.determinations) {
+			List<XTrace> foundExoTraces = deter.apply(endo);
+			subseriesTraces.addAll(foundExoTraces);
+		}
+		progress.inc();
+		return subseriesTraces;
+	}
+	
+	
+	@Deprecated
 	public List<XTrace> handleEndogenousTraceLinkage(XTrace endo, Progress progress) {
 		List<XTrace> subseriesTraces = new ArrayList<XTrace>();
 		// don't do work if we are cancelled :(

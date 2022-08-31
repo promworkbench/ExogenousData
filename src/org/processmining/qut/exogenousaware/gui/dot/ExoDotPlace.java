@@ -23,5 +23,15 @@ public class ExoDotPlace extends DotNode {
 					put("xlabel", label);
 				}}
 		);
+		setOption("layer", "net");
+	}
+	
+	@Override
+	public String toString() {
+		String result = "\"" + getId() + "\" [label=" + labelToString() + ", id=\"" + getId() + "\"";
+		for (String key : getOptionKeySet()) {
+			result += "," + key + "=" + escapeString(getOption(key));
+		}
+		return result + "];";
 	}
 }

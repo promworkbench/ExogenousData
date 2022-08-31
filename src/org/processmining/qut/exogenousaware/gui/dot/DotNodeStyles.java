@@ -10,10 +10,12 @@ import org.processmining.datapetrinets.expression.GuardExpression;
 import org.processmining.datapetrinets.expression.syntax.ExprRoot;
 import org.processmining.datapetrinets.expression.syntax.ExpressionParser;
 import org.processmining.datapetrinets.expression.syntax.SimpleNode;
+import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.plugins.graphviz.dot.DotEdge;
 import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.qut.exogenousaware.data.dot.GuardExpressionHandler;
+import org.processmining.qut.exogenousaware.stats.models.ProcessModelStatistics;
 
 /**
  * Static class for making exogenous dot nodes for a dot visusalisation.
@@ -24,6 +26,9 @@ import org.processmining.qut.exogenousaware.data.dot.GuardExpressionHandler;
 public class DotNodeStyles {
 	private DotNodeStyles() {};
 	
+	private static String TransitionInfoParams = " (%d) ";
+	private static String TransitionInfoFreqParams = " (%d / %.1f%%) ";
+	
 	public static DotNode buildPlaceNode(String label) {
 		return new ExoDotPlace(label);
 	}
@@ -33,6 +38,7 @@ public class DotNodeStyles {
 		p.setOption("fillcolor", "green");
 		p.setOption("style", "filled");
 		p.setOption("xlabel","START");
+		p.setOption("width", "1.0");
 		return p;
 	}
 	
@@ -40,79 +46,164 @@ public class DotNodeStyles {
 		return new ExoDotEdge(source, target);
 	}
 	
+	public static DotEdge buildBackwardsEdge(DotNode source, DotNode target) {
+		return new BackwardDotEdge(source, target);
+	}
+	
 	public static DotNode buildEndingPlaceNode(String label) {
 		DotNode p = buildPlaceNode(label);
 		p.setOption("fillcolor", "red");
 		p.setOption("style", "filled");
 		p.setOption("xlabel","END");
+		p.setOption("width", "1.0");
 		return p;
 	}
 	
+	public static DotNode buildDecisionCluster(String label, List<DotNode> members, int group) {
+		return DecisionCluster.builder().label(label).members(members).group(group).build().setup();
+	}
+	
+	private static String buildStatLabel(Transition t, ProcessModelStatistics stats) {
+		int totalObs = 0;
+		float relativeFreq = 0.0f;
+		boolean relative = false;
+		String label = t.getLabel();
+		
+		totalObs = stats.getObservations(t);
+		
+		for(Place dplace: stats.getDecisionMoments()) {
+			if (stats.isOutcome(t, dplace)) {
+				relativeFreq = stats.getInformation(dplace).getMapToFrequency().get(t);
+				relative = true;
+				break;
+			}
+		}
+		
+		if (relative) {
+			label += String.format(TransitionInfoFreqParams, totalObs, (relativeFreq*100f));
+		} else {
+			label += String.format(TransitionInfoParams, totalObs);
+		}
+		
+		return label;
+	}
+	
+	private static String buildTauStatLabel(Transition t, ProcessModelStatistics stats) {
+		int totalObs = 0;
+		float relativeFreq = 0.0f;
+		boolean relative = false;
+		String label = "";
+		
+		totalObs = stats.getObservations(t);
+		
+		for(Place dplace: stats.getDecisionMoments()) {
+			if (stats.isOutcome(t, dplace)) {
+				relativeFreq = stats.getInformation(dplace).getMapToFrequency().get(t);
+				relative = true;
+				break;
+			}
+		}
+		
+		if (relative) {
+			label += String.format(TransitionInfoFreqParams, totalObs, (relativeFreq*100f));
+		} else {
+			label += String.format(TransitionInfoParams, totalObs);
+		}
+		
+		return label;
+	}
+	
 	public static DotNode buildTauTransition(Transition t) {
-		String label = createTransitionLabel(t.getLabel());
+		String label = createTransitionLabel("", true);
+		return new ExoDotTransition(label, t.getId().toString(), t.getLabel(), new GuardExpressionHandler(null, null));
+	}
+	
+	public static DotNode buildTauTransition(Transition t, ProcessModelStatistics stats) {
+		String label = createTransitionLabel(buildTauStatLabel(t, stats), true);
 		return new ExoDotTransition(label, t.getId().toString(), t.getLabel(), new GuardExpressionHandler(null, null));
 	}
 	
 	public static DotNode buildNoRuleTransition(Transition t) {
-		String label = createTransitionLabel(t.getLabel());
+		boolean istau = t.getLabel().startsWith("tau ");
+		String label = createTransitionLabel(istau ? "" : t.getLabel(), istau);
+		return new ExoDotTransition(label, t.getId().toString(), t.getLabel(), new GuardExpressionHandler(null, null));
+	}
+	
+	public static DotNode buildNoRuleTransition(Transition t, ProcessModelStatistics stats) {
+		boolean istau = t.getLabel().startsWith("tau ");
+		String label = createTransitionLabel(istau ? buildTauStatLabel(t, stats) : buildStatLabel(t, stats), istau);
 		return new ExoDotTransition(label, t.getId().toString(), t.getLabel(), new GuardExpressionHandler(null, null));
 	}
 	
 	public static DotNode buildNoRuleTransition(Transition t, Map<String,String> swapper) {
-		String label = createTransitionLabel(t.getLabel());
+		boolean istau = t.getLabel().startsWith("tau ");
+		String label = createTransitionLabel(istau ? "" : t.getLabel(), istau );
+		return new ExoDotTransition(label, t.getId().toString(), t.getLabel(), new GuardExpressionHandler(null, swapper));
+	}
+	
+	public static DotNode buildNoRuleTransition(Transition t, ProcessModelStatistics stats, Map<String,String> swapper) {
+		boolean istau = t.getLabel().startsWith("tau ");
+		String label = createTransitionLabel(istau ? buildTauStatLabel(t, stats) : buildStatLabel(t, stats), istau);
 		return new ExoDotTransition(label, t.getId().toString(), t.getLabel(), new GuardExpressionHandler(null, swapper));
 	}
 	
 	public static DotNode buildRuleTransition(Transition t, GuardExpression g, Map<String,String> swapper) {
-		String label = createTransitionLabel(t.getLabel(), g, swapper);
+		boolean istau = t.getLabel().startsWith("tau ");
+		String label = createTransitionLabel(istau ? "" : t.getLabel(), istau, g, swapper);
 		return new ExoDotTransition(label,t.getId().toString(), t.getLabel(), new GuardExpressionHandler(g, swapper));
 	}
 	
-	private static String createTransitionLabel(String label) {
+	public static DotNode buildRuleTransition(Transition t, ProcessModelStatistics stats, GuardExpression g, Map<String,String> swapper) {
+		boolean istau = t.getLabel().startsWith("tau ");
+		String label = createTransitionLabel(istau ? buildTauStatLabel(t, stats) : buildStatLabel(t, stats), istau, g, swapper);
+		return new ExoDotTransition(label,t.getId().toString(), t.getLabel(), new GuardExpressionHandler(g, swapper));
+	}
+	
+	private static String createTransitionLabel(String label, boolean istau) {
 		String labelFortmat = ""
-				+ "<<TABLE BGCOLOR=\"%s\" BORDER=\"1\" CELLBORDER=\"0\" SCALE=\"BOTH\" CELLPADDING=\"0\" CELLSPACING=\"0\" PORT=\"HEAD\">"
+				+ "<<TABLE BGCOLOR=\"%s\" BORDER=\"1\"     CELLPADDING=\"0\" CELLSPACING=\"0\" PORT=\"HEAD\">"
 				+ "<TR>"
-				+ "<TD BORDER=\"0\" SCALE=\"WIDTH\" CELLPADDING=\"2\" CELLBORDER=\"0\" >"
+				+ "<TD BORDER=\"0\"   CELLPADDING=\"2\"   >"
 				+ "<FONT COLOR=\"%s\">%s </FONT>"
 				+ "</TD>"
 				+ "</TR>"
 				+ "<TR>"
-				+ "<TD BGCOLOR=\"black\" HEIGHT=\"5\" SCALE=\"WIDTH\" ALIGN=\"LEFT\" BORDER=\"0\" CELLPADDING=\"2\" CELLBORDER=\"0\" CELLSPACING=\"0\"></TD>"
+				+ "<TD BGCOLOR=\"black\" HEIGHT=\"5\"   ALIGN=\"LEFT\" BORDER=\"0\" CELLPADDING=\"2\"   CELLSPACING=\"0\"></TD>"
 				+ "</TR><TR>"
-				+ "<TD BGCOLOR=\"black\" HEIGHT=\"5\" SCALE=\"WIDTH\" ALIGN=\"LEFT\" BORDER=\"0\" CELLPADDING=\"2\" CELLBORDER=\"0\" CELLSPACING=\"0\"></TD>"
+				+ "<TD BGCOLOR=\"black\" HEIGHT=\"5\"   ALIGN=\"LEFT\" BORDER=\"0\" CELLPADDING=\"2\"   CELLSPACING=\"0\"></TD>"
 				+ "</TR>";
 		
 		String end = ""
 				+ "</TABLE>>";
 		String formattedlabel = String.format(labelFortmat, 
-				label.toLowerCase().contains("tau ") ? "BLACK" : "WHITE",
-				label.toLowerCase().contains("tau ") ? "WHITE" : "BLACK",
-				label.toLowerCase().contains("tau ") ? "&tau;" : label
+				istau ? "BLACK" : "WHITE",
+				istau ? "WHITE" : "BLACK",
+				istau ? "&tau;"+label : label
 		);
 		formattedlabel = formattedlabel + end;
 		return formattedlabel;
 	}
 	
-	private static String createTransitionLabel(String label, GuardExpression g, Map<String,String> swapper) {
+	private static String createTransitionLabel(String label, boolean istau, GuardExpression g, Map<String,String> swapper) {
 		String labelFortmat = ""
-				+ "<<TABLE BGCOLOR=\"%s\" BORDER=\"1\" CELLBORDER=\"0\" SCALE=\"BOTH\" CELLPADDING=\"0\" CELLSPACING=\"0\" PORT=\"HEAD\">"
+				+ "<<TABLE BGCOLOR=\"%s\" BORDER=\"1\"     CELLPADDING=\"0\" CELLSPACING=\"0\" PORT=\"HEAD\">"
 				+ "<TR>"
-				+ "<TD BORDER=\"0\" SCALE=\"WIDTH\" CELLPADDING=\"2\" CELLBORDER=\"0\" >"
+				+ "<TD BORDER=\"0\"   CELLPADDING=\"2\"   >"
 				+ "<FONT COLOR=\"%s\">%s </FONT>"
 				+ "</TD>"
 				+ "</TR>"
 				+ "<TR>"
-				+ "<TD BGCOLOR=\"black\" HEIGHT=\"5\" SCALE=\"WIDTH\" ALIGN=\"LEFT\" BORDER=\"0\" CELLPADDING=\"2\" CELLBORDER=\"0\" CELLSPACING=\"0\"></TD>"
+				+ "<TD BGCOLOR=\"black\" HEIGHT=\"5\"   ALIGN=\"LEFT\" BORDER=\"0\" CELLPADDING=\"2\"   CELLSPACING=\"0\"></TD>"
 				+ "</TR><TR>"
-				+ "<TD BGCOLOR=\"black\" HEIGHT=\"5\" SCALE=\"WIDTH\" ALIGN=\"LEFT\" BORDER=\"0\" CELLPADDING=\"2\" CELLBORDER=\"0\" CELLSPACING=\"0\"></TD>"
+				+ "<TD BGCOLOR=\"black\" HEIGHT=\"5\"   ALIGN=\"LEFT\" BORDER=\"0\" CELLPADDING=\"2\"   CELLSPACING=\"0\"></TD>"
 				+ "</TR>";
 		
 		String end = ""
 				+ "</TABLE>>";
 		String formattedlabel = String.format(labelFortmat, 
-				label.toLowerCase().contains("tau ") ? "BLACK" : "WHITE",
-				label.toLowerCase().contains("tau ") ? "WHITE" : "BLACK",
-				label.toLowerCase().contains("tau ") ? "&tau;" : label
+				istau ? "BLACK" : "WHITE",
+				istau ? "WHITE" : "BLACK",
+				istau ? "&tau;"+label : label
 		);
 		List<String> exprList = new ArrayList<String>();
 		try {

@@ -29,6 +29,7 @@ public class ExoDotTransition extends DotNode {
 				}}
 		
 		);
+		setOption("layer", "net");
 		this.oldLabel = oldLabel;
 		this.transLabel = transLabel;
 		this.controlFlowId = controlFlowId;
@@ -68,5 +69,14 @@ public class ExoDotTransition extends DotNode {
 	
 	public void revertHighlight() {
 		this.setLabel(this.oldLabel);
+	}
+	
+	@Override
+	public String toString() {
+		String result = "\"" + getId() + "\" [label=" + labelToString() + ", id=\"" + getId() + "\"";
+		for (String key : getOptionKeySet()) {
+			result += "," + key + "=" + escapeString(getOption(key));
+		}
+		return result + "];";
 	}
 }

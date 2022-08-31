@@ -37,7 +37,9 @@ public class ChainAttributeLinker implements Linker {
 //		find all links
 		List<XTrace> linkedSubset = new ArrayList<XTrace>();
 //		check that endogenous trace has attribute of focus
+//		System.out.println("checking for attributes :: "+ this.attributes.toString());
 		for(String attribute: this.attributes) {
+			
 			if (!endogenous.getAttributes().containsKey(attribute)) {
 				return linkedSubset;
 			}
@@ -66,6 +68,10 @@ public class ChainAttributeLinker implements Linker {
 			check = check & linker.linkedTo(endogenous, exogenous);
 		}
 		return check;
+	}
+
+	public String getName() {
+		return "CAL";
 	}
 
 }

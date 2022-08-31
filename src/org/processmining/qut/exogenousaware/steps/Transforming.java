@@ -8,9 +8,9 @@ import org.deckfour.xes.model.XEvent;
 import org.processmining.qut.exogenousaware.data.ExogenousDatasetType;
 import org.processmining.qut.exogenousaware.data.storage.ExogenousAttribute;
 import org.processmining.qut.exogenousaware.steps.slicing.data.SubSeries;
-import org.processmining.qut.exogenousaware.steps.transform.PossibleOutcomeTransformer;
-import org.processmining.qut.exogenousaware.steps.transform.SlopeTransformer;
 import org.processmining.qut.exogenousaware.steps.transform.data.TransformedAttribute;
+import org.processmining.qut.exogenousaware.steps.transform.type.PossibleOutcomeTransformer;
+import org.processmining.qut.exogenousaware.steps.transform.type.linear.SlopeTransformer;
 
 public class Transforming {
 		
@@ -40,7 +40,7 @@ public class Transforming {
 		List<TransformedAttribute> attrs = new ArrayList<TransformedAttribute>();
 		if (subtimeseries.getDatatype().equals(ExogenousDatasetType.NUMERICAL)) {
 			if (subtimeseries.getSubEvents().size() > 1) {
-				attrs.add(SlopeTransformer.builder().dataset(dataset).build().transform(subtimeseries));
+				attrs.add(SlopeTransformer.builder().build().transform(subtimeseries));
 			}
 		} else if (subtimeseries.getDatatype().equals(ExogenousDatasetType.DISCRETE)) {
 			attrs.add(PossibleOutcomeTransformer.builder().Outcome("SEPSIS INFECTION").build().transform(subtimeseries));
