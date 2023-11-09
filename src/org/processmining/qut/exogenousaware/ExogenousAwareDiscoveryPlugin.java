@@ -38,7 +38,7 @@ import org.processmining.qut.exogenousaware.steps.determination.configs.AIME2022
  *[1] 	A. Banham, S. J. J. Leemans, M. T. Wynn, R. Andrews, xPM: A framework for process mining
 		with exogenous data, in: Process Mining Workshops - ICPM 2021 International Workshops, volume 
 		433 of Lecture Notes in Business Information Processing,
-		Springer, 2021, pp. 85–97.
+		Springer, 2021, pp. 85-97.
  *[x]	A journal article in the coming future (under review as-of 12/07/2022).
 */
 public class ExogenousAwareDiscoveryPlugin {
