@@ -8,7 +8,7 @@ import org.apache.commons.math3.stat.inference.WilcoxonSignedRankTest;
 import org.processmining.qut.exogenousaware.ml.data.FeatureVector;
 
 /**
- * The test is named for Frank Wilcoxon (1892–1965) who, in a single paper, proposed both it and the rank-sum test for two independent samples. <br>
+ * The test is named for Frank Wilcoxon (1892-1965) who, in a single paper, proposed both it and the rank-sum test for two independent samples. <br>
  * The test was popularized by Sidney Siegel (1956) in his influential textbook on non-parametric statistics.<br>
  * Siegel used the symbol T for the test statistic, and consequently, the test is sometimes referred to as the Wilcoxon T-test.<br>
  * <br>
