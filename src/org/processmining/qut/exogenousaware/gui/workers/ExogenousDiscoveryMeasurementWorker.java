@@ -6,13 +6,12 @@ import java.util.Map;
 import javax.swing.SwingWorker;
 
 import org.deckfour.xes.model.XLog;
-import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.plugins.petrinet.replayresult.PNRepResult;
 import org.processmining.qut.exogenousaware.gui.panels.ExogenousDiscoveryProgresser;
 import org.processmining.qut.exogenousaware.gui.panels.ExogenousDiscoveryProgresser.ProgressState;
 import org.processmining.qut.exogenousaware.gui.panels.ExogenousDiscoveryProgresser.ProgressType;
-import org.processmining.qut.exogenousaware.measures.datapetrinets.ReasoningPrecision;
-import org.processmining.qut.exogenousaware.measures.datapetrinets.ReasoningRecall;
+import org.processmining.qut.exogenousaware.measures.datapetrinets.DecisionPrecision;
+import org.processmining.qut.exogenousaware.measures.datapetrinets.DecisionRecall;
 import org.processmining.qut.exogenousaware.stats.models.ModelStatistics;
 import org.processmining.qut.exogenousaware.stats.models.ProcessModelStatistics;
 
@@ -41,31 +40,28 @@ public class ExogenousDiscoveryMeasurementWorker extends SwingWorker<Map<String,
 		
 //		setup measure state
 		int total = 0;
-		double weightedTotal = 0.0;
 		for(Object moment : statistics.getDecisionMoments()) {
 			total += statistics.getDecisionOutcomes(moment).size();
-			weightedTotal += ((ProcessModelStatistics) statistics ).getInformation((Place) moment).getRelativeFrequency() * statistics.getDecisionOutcomes(moment).size(); 
 		}
-		System.out.println("weighted total :: " + weightedTotal);
 		ProgressState state = progresser.getState(ProgressType.Measurements);
 		state.setTotal(total * 2);
 		state.setProgress(0);
 //		measure decision recall
-		double recall = ReasoningRecall.builder()
+		double recall = DecisionRecall.builder()
 				.progressInc(1)
 				.progresser(progresser)
 				.variableMapping(variableMap)
 				.build()
 				.measure(endogenousLog, model, statistics, alignment);
-		measures.put(ReasoningRecall.NAME, recall);
+		measures.put(DecisionRecall.NAME, recall);
 		
-		double precision = ReasoningPrecision.builder()
+		double precision = DecisionPrecision.builder()
 				.progressInc(1)
 				.progresser(progresser)
 				.variableMapping(variableMap)
 				.build()
 				.measure(endogenousLog, model, statistics, alignment);
-		measures.put(ReasoningPrecision.NAME, precision);
+		measures.put(DecisionPrecision.NAME, precision);
 		
 		return measures;
 	}

@@ -10,13 +10,14 @@ public class BackwardDotEdge extends DotEdge {
 		super(source, target);
 		
 		if (source.getClass().equals(ExoDotTransition.class)) {
-			setOption("headport", "HEAD");
+			setOption("headport", "TITLE");
 		}
 		if (target.getClass().equals(ExoDotTransition.class)) {
-			setOption("tailport", "HEAD");
+			setOption("tailport", "TITLE");
 		}
 		
 		setOption("dir","back");
+		setOption("penwidth", "3.0");
 	}
 	
 	@Override

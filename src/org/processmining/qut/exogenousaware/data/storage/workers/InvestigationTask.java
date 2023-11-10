@@ -3,6 +3,7 @@ package org.processmining.qut.exogenousaware.data.storage.workers;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -17,11 +18,30 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.SwingWorker;
 
+import org.apache.commons.math3.complex.Complex;
+import org.apache.commons.math3.transform.DftNormalization;
+import org.apache.commons.math3.transform.FastFourierTransformer;
+import org.apache.commons.math3.transform.TransformType;
+import org.deckfour.xes.model.XAttribute;
+import org.deckfour.xes.model.XAttributeBoolean;
+import org.deckfour.xes.model.XAttributeContinuous;
+import org.deckfour.xes.model.XAttributeDiscrete;
+import org.deckfour.xes.model.XAttributeLiteral;
+import org.deckfour.xes.model.XAttributeMap;
+import org.deckfour.xes.model.XAttributeTimestamp;
+import org.deckfour.xes.model.XTrace;
+import org.deckfour.xes.model.impl.XAttributeBooleanImpl;
+import org.deckfour.xes.model.impl.XAttributeContinuousImpl;
+import org.deckfour.xes.model.impl.XAttributeDiscreteImpl;
+import org.processmining.datadiscovery.estimators.AbstractDecisionTreeFunctionEstimator;
 import org.processmining.datadiscovery.estimators.DecisionTreeBasedFunctionEstimator;
 import org.processmining.datadiscovery.estimators.FunctionEstimation;
 import org.processmining.datadiscovery.estimators.FunctionEstimator;
 import org.processmining.datadiscovery.estimators.Type;
+import org.processmining.datadiscovery.estimators.impl.DecisionTreeFunctionEstimator;
+import org.processmining.datadiscovery.estimators.impl.DiscriminatingFunctionEstimator;
 import org.processmining.datadiscovery.estimators.impl.OverlappingEstimatorLocalDecisionTree;
+import org.processmining.datadiscovery.estimators.weka.WekaUtil;
 import org.processmining.datadiscovery.model.DecisionPointResult;
 import org.processmining.datadiscovery.model.DiscoveredPetriNetWithData;
 import org.processmining.datadiscovery.plugins.DecisionMining;
@@ -37,10 +57,19 @@ import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PNW
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithDataFactory;
 import org.processmining.plugins.petrinet.replayresult.PNRepResult;
 import org.processmining.plugins.replayer.replayresult.SyncReplayResult;
+import org.processmining.qut.exogenousaware.data.ExogenousDatasetType;
+import org.processmining.qut.exogenousaware.data.graphs.followrelations.FollowGraph;
 import org.processmining.qut.exogenousaware.data.storage.ExogenousDiscoveryInvestigation;
+import org.processmining.qut.exogenousaware.ds.timeseries.approx.TimeSeriesSaxApproximator;
+import org.processmining.qut.exogenousaware.ds.timeseries.data.DiscreteTimeSeries;
+import org.processmining.qut.exogenousaware.ds.timeseries.data.RealTimeSeries;
 import org.processmining.qut.exogenousaware.gui.panels.ExogenousDiscoveryProgresser;
 import org.processmining.qut.exogenousaware.gui.panels.ExogenousDiscoveryProgresser.ProgressState;
 import org.processmining.qut.exogenousaware.gui.panels.ExogenousDiscoveryProgresser.ProgressType;
+import org.processmining.qut.exogenousaware.steps.determination.Determination;
+import org.processmining.qut.exogenousaware.steps.slicing.data.SubSeries;
+import org.processmining.qut.exogenousaware.steps.slicing.data.SubSeries.Scaling;
+import org.processmining.qut.exogenousaware.steps.transform.data.TransformedAttribute;
 
 import com.google.common.util.concurrent.AtomicLongMap;
 
@@ -55,17 +84,394 @@ public class InvestigationTask extends SwingWorker<DiscoveredPetriNetWithData, I
 //	Builder parameters
 	@NonNull private ExogenousDiscoveryInvestigation source;
 	@NonNull private ExogenousDiscoveryProgresser progresser;
+	@NonNull private MinerType minerType;
+	
+//	optional parameters
+	@Default private MinerConfiguration config = MinerConfiguration.builder().build();
 	
 //	Internal states
-	@Default @Getter private int maxConcurrentThreads = Runtime.getRuntime().availableProcessors() > 3 ? Runtime.getRuntime().availableProcessors() - 2 : 1;
+	@Default @Getter private int maxConcurrentThreads = Runtime.getRuntime().availableProcessors() > 3 
+			? Runtime.getRuntime().availableProcessors() - 2 : 1;
 	@Default @Getter private ThreadPoolExecutor pool = null;
 	@Default private Map<Place, FunctionEstimator> estimators = new HashMap<>();
 	@Default private AtomicLongMap<Transition> numberOfExecutions = AtomicLongMap.create();
 	@Default private Map<Transition, AtomicLongMap<String>> numberOfWritesPerTransition = new HashMap<>();
-	@Default private double fitnessThreshold = 0.33;
-	@Default private double instancesPerLeaf = .15;
 	@Default @Getter private Map<String,String> converetedNames = new HashMap<String,String>();
 	@Default @Getter private Map<Transition,Transition> transMap = null;
+	
+	
+	public static enum MinerType {
+		OVERLAPPING,
+		DISCRIMINATING,
+		DECISIONTREE;
+	}
+	
+	public static enum MinerInstanceMode {
+		REL,
+		ABS,
+		THRESHOLD;
+		
+		public boolean isREL() {
+			return this == REL;
+		}
+		
+		public boolean isABS() {
+			return this == ABS;
+		}
+		
+		public boolean isTHRESHOLD() {
+			return this == THRESHOLD;
+		}
+	}
+	
+	@Builder
+	public static class MinerConfiguration {
+		@Default @Getter private double relativeInstanceLevel = 0.15;
+		@Default @Getter private double absoluteInstanceLevel = 25;
+		@Default @Getter private double instanceThreshold = 200;
+		@Default @Getter private MinerInstanceMode instanceHandling = MinerInstanceMode.REL;
+		@Default @Getter private double fitnessThreshold = 0.33;
+		@Default @Getter private double mergeRatio = 0.15;
+		@Default @Getter private boolean unpruned = false;
+		@Default @Getter private boolean binarySplit = false;
+		@Default @Getter private boolean crossValidate = true;
+		@Default @Getter private int crossValidateFolds = 10;
+		@Default @Getter private float confidenceLevel = 0.25f;
+		@Default @Getter private boolean experimentalFeatures = false;
+		@Default @Getter private boolean experimentalSAXFeatures = false;
+		@Default @Getter private boolean experimentalDFTFeatures = false;
+		@Default @Getter private boolean experimentalEDTTSFeatures = false;
+	}
+	
+//	experimental targets
+	private static List<String> SAX_FROM = new ArrayList() {{
+		add("f");
+		add("e");
+		add("a");
+		add("j");
+	}};
+	private static List<String> SAX_TO = new ArrayList() {{ 
+		add("j");
+		add("a");
+		add("j");
+		add("a");
+	}};
+	private static int K_TOP_DFT_COEFICIENTS = 3;
+	
+	public static class KMostElement {
+		
+		public boolean lessThan(KMostElement element) {
+			return false;
+		}
+	}
+	
+	public static class DFTKMostElement extends KMostElement {
+		
+		private int frequency;
+		private double power;
+		
+		public DFTKMostElement(int frequency, double power) {
+			this.frequency = frequency;
+			this.power = power;
+		}
+		
+		public int getFrequency() {
+			return this.frequency;
+		}
+		
+		public double getPower() {
+			return this.power;
+		}
+		
+		@Override
+		public boolean lessThan(KMostElement element) {
+			if (element instanceof DFTKMostElement) {
+				return this.power < ((DFTKMostElement) element).getPower();
+			}
+			return false;
+		}
+		
+		@Override
+		public String toString() {
+			return String.format("(%.1f@%d)", this.power, this.frequency);
+		}
+	}
+	
+//	custom k-most container
+	public static class KMostContainer<T extends KMostElement> {
+		
+		private int k;
+		private List<T> sequence;
+		
+		public KMostContainer(int k) {
+			this.k = k;
+			this.sequence = new ArrayList(k);
+		}
+		
+		public boolean add(T element) {
+			boolean added = false;
+			for(int i=0; i < Math.min(k, this.sequence.size()); i++) {
+				T value = sequence.get(i);
+				if (value.lessThan(element)) {
+					sequence.remove(i);
+					sequence.add(i, element);
+					added = true;
+					return added;
+				}
+			}
+			if (this.sequence.size() < k) {
+				sequence.add(element);
+				added=true;
+			}
+			return added;
+		}
+		
+		public List<T> getOrdering(){
+			List<T> ret = new ArrayList(k);
+			ret.addAll(this.sequence);
+			return ret;
+		}
+		
+		@Override
+		public String toString() {
+			return this.sequence.toString();
+		}
+		
+	}
+	
+	
+//	custom trace processor for classification examples
+	public static class ExperimentalFeatureProcessor extends TraceProcessor {
+		
+		private boolean createDFT = false;
+		private boolean createSAX = false;
+		private boolean createEDTTS = false;
+		
+//		feature names 
+		public static String TOP_K_DFT_FREQ_FEATURE_NAME = "%s_DFT_%d_FREQ";
+		public static String TOP_K_DFT_POWER_FEATURE_NAME = "%s_DFT_%d_POWER";
+		public static String SAX_MEAN_TO_OUTLIER_FEATURE_NAME = "%s_SAX_M_to_%s";
+		public static String SAX_OUTLIER_TO_OUTLIER_FEATURE_NAME = "%s_SAX_%s_to_%s";
+		
+//		sax targets
+		protected static String SAX_MEAN_POS = TimeSeriesSaxApproximator.SAX_LETTERS.get(5);
+		protected static String SAX_MEAN_NEG = TimeSeriesSaxApproximator.SAX_LETTERS.get(4);
+		protected static String SAX_OUTLIER_POS = TimeSeriesSaxApproximator.SAX_LETTERS.get(9);
+		protected static String SAX_OUTLIER_NEG = TimeSeriesSaxApproximator.SAX_LETTERS.get(0);
+		
+
+		public ExperimentalFeatureProcessor(
+				PetrinetGraph net,
+				XTrace xTrace,
+				Map<Place, FunctionEstimator> estimators,
+				SyncReplayResult alignment,
+				AtomicLongMap<Transition> numberOfExecutions,
+				Map<Transition,
+				AtomicLongMap<String>> numberOfWritesPerTransition,
+				Progress progress) {
+			super(net, xTrace, estimators, alignment, numberOfExecutions, numberOfWritesPerTransition, progress);
+		}
+		
+		public ExperimentalFeatureProcessor(
+				PetrinetGraph net,
+				XTrace xTrace,
+				Map<Place, FunctionEstimator> estimators,
+				SyncReplayResult alignment,
+				AtomicLongMap<Transition> numberOfExecutions,
+				Map<Transition,
+				AtomicLongMap<String>> numberOfWritesPerTransition,
+				Progress progress,
+				boolean dft,
+				boolean sax,
+				boolean edtts) {
+			super(net, xTrace, estimators, alignment, numberOfExecutions, numberOfWritesPerTransition, progress);
+			this.createDFT = dft;
+			this.createSAX = sax;
+			this.createEDTTS = edtts;
+		}
+		
+		@Override
+		protected void updateAttributes(XAttributeMap xAttributeMap) {
+			
+			Set<SubSeries> slices = new HashSet<>();
+			
+			for (XAttribute xAttrib : xAttributeMap.values())
+			{
+				String attributeKey = xAttrib.getKey();
+				String varName=WekaUtil.fixVarName(attributeKey);
+//				collect slices from exogenous attributes
+				if (xAttrib instanceof TransformedAttribute) {
+					SubSeries slice = ((TransformedAttribute)xAttrib).getSource();
+					if (slice.getDatatype() == ExogenousDatasetType.NUMERICAL) {
+						slices.add( slice );
+					}
+				}
+//				handle endogenous/exogenous attributes
+				if (xAttrib instanceof XAttributeBoolean) {
+					variableValues.put(varName, ((XAttributeBoolean)xAttrib).getValue());
+				} else if (xAttrib instanceof XAttributeContinuous) {
+					variableValues.put(varName, ((XAttributeContinuous)xAttrib).getValue());
+				} else if (xAttrib instanceof XAttributeDiscrete) {
+					variableValues.put(varName, ((XAttributeDiscrete)xAttrib).getValue());
+				} else if (xAttrib instanceof XAttributeTimestamp) {
+					variableValues.put(varName, ((XAttributeTimestamp)xAttrib).getValue());
+				} else if (xAttrib instanceof XAttributeLiteral) {
+					variableValues.put(varName,((XAttributeLiteral)xAttrib).getValue());
+				}
+			}
+//			create experimental features on the fly 
+//			System.out.println("[InvestigationTask] slices found :: "+slices.size());
+			for(SubSeries slice : slices) {
+//				generate DFT features for each slice
+				if (createDFT) {
+					generateDFTFeatures(slice, xAttributeMap);
+				}
+//				generate SAX features for each slice
+				if (createSAX) {
+					generateSAXFeatures(slice, xAttributeMap);
+				}
+//				generate EDTTS features
+				if (createEDTTS) {
+					generateEDTTSFeatures(slice, xAttributeMap);
+				}
+			}
+//			System.out.println(variableValues.toString());
+		}
+		
+		protected void addAttributes(XAttributeMap map, List<XAttribute> attrs) {
+			for(XAttribute attr: attrs) {
+				map.put(attr.getKey(), attr);
+			}
+		}
+
+		protected void generateSAXFeatures(SubSeries slice, XAttributeMap map) {
+			// TODO Auto-generated method stub
+			try {
+				DiscreteTimeSeries saxSeries = slice
+						.getTimeSeries(Scaling.hour)
+						.createSAXRepresentation();
+				FollowGraph saxGraph = new FollowGraph(saxSeries);
+				addAttributes(map, 
+						createSAXFeature(SAX_MEAN_POS, SAX_OUTLIER_POS, saxGraph, slice)
+				);
+				addAttributes(map, 
+						createSAXFeature(SAX_MEAN_NEG, SAX_OUTLIER_NEG, saxGraph, slice)
+				);
+				addAttributes(map, 
+						createSAXFeature(SAX_OUTLIER_NEG, SAX_OUTLIER_POS, saxGraph, slice)
+				);
+				addAttributes(map, 
+						createSAXFeature(SAX_OUTLIER_POS, SAX_OUTLIER_NEG, saxGraph, slice)
+				);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		private List<XAttribute> createSAXFeature(String startNode, String endNode, 
+				FollowGraph saxGraph, SubSeries slice) {
+			List<XAttribute> attrs = new ArrayList();
+			boolean found = saxGraph.checkForEventualFollowsBetween(startNode, endNode);
+//			System.out.println("saxFeature ::"+ saxGraph +" :: "
+//					+ startNode + " -> " + endNode + " :: " + found);
+			String featureName = String.format(SAX_OUTLIER_TO_OUTLIER_FEATURE_NAME,
+					slice.getComesFrom().getName()+"_"+slice.getAbvSlicingName(),
+					startNode,
+					endNode
+			);	
+			featureName = featureName.replace(":", "_");
+			XAttribute attr = new XAttributeBooleanImpl(featureName, found);
+			featureName = WekaUtil.fixVarName(featureName);
+			variableValues.put(featureName, found);
+			attrs.add(attr);
+			return attrs;
+		}
+
+		protected void generateDFTFeatures(SubSeries slice, XAttributeMap map) {
+			// TODO Auto-generated method stub
+			try {
+				RealTimeSeries sample = slice.getTimeSeries(Scaling.hour)
+						.resampleWithEvenSpacing(64);
+				if (sample.getSize() < 64) {
+					return;
+				}
+	//			perform FFT on series
+//				System.out.println("{InvestigationTask} resampled.");
+				FastFourierTransformer transformer = new FastFourierTransformer(DftNormalization.STANDARD);
+				double[] transformArray = new double[64];
+				List<Double> transformValues = sample.getValues();
+	//			fill transform array with values
+				for(int i=0; i< 64;i++) {
+					if (i < transformValues.size()) {
+						transformArray[i] = transformValues.get(i);
+					} else {
+						transformArray[i] = 0;
+					}
+				}
+//				System.out.println("{InvestigationTask} prepped DFT.");
+				Complex[] coeficcients = transformer.transform(transformArray, TransformType.FORWARD);
+				String coefString = "Sample :: "+sample.toString()+" || DFT coeficcients :: ";
+				boolean nanFound = false;
+				KMostContainer<DFTKMostElement> kcoefs = new KMostContainer(K_TOP_DFT_COEFICIENTS);
+				int freq = 1;
+				for(int i=1;i < 64; i+=2) {
+//					TODO double check that the power of the frequency is |x[k]|^2
+					double cpow = (2.0/64) * Math.pow(coeficcients[i].abs(), 2);
+					nanFound = nanFound || Double.isNaN(cpow);
+					coefString = coefString+"C"+i+"="+cpow+" | ";
+					if (!Double.isNaN(cpow)) {
+						DFTKMostElement el = new DFTKMostElement(freq, cpow);
+						kcoefs.add(el);
+					}
+					freq += 1;
+				}
+				if (nanFound) {
+					System.out.println("{InvestigationTask} completed DFT but "
+							+ "coeficcients are NaN :: "+coefString);
+				} else {
+//					System.out.println("K-most features :: "+ kcoefs.toString());
+				}
+//			create features for top-k powers and top-k frequencies
+			List<DFTKMostElement> ordering = kcoefs.getOrdering();
+			for(int i=0; i < ordering.size(); i++) {
+				addAttributes(map, 
+						createDFTFeature(ordering.get(i), i+1, slice)
+				);
+			}
+			
+			} catch (Exception e) {
+				System.out.println("DFT features failed :: "+ e.getMessage());
+			}
+			
+		}
+		
+		private List<XAttribute> createDFTFeature(DFTKMostElement element, int k, SubSeries slice) {
+			List<XAttribute> attrs = new ArrayList();
+//			create feature to k-freq
+			String featureName = String.format(TOP_K_DFT_FREQ_FEATURE_NAME,
+					slice.getComesFrom().getName()+":"+slice.getAbvSlicingName(),
+					k
+			);
+			featureName = featureName.replace(":", "_");
+			variableValues.put(WekaUtil.fixVarName(featureName), element.getFrequency());
+			attrs.add( new XAttributeDiscreteImpl(featureName, element.getFrequency()));
+//			create feature for k-power
+			featureName = String.format(TOP_K_DFT_POWER_FEATURE_NAME,
+					slice.getComesFrom().getName()+":"+slice.getAbvSlicingName(),
+					k
+			);
+			featureName = featureName.replace(":", "_");
+			variableValues.put(WekaUtil.fixVarName(featureName), element.getPower());
+			attrs.add( new XAttributeContinuousImpl(featureName, element.getPower()));
+			return attrs;
+		}
+		
+		private void generateEDTTSFeatures(SubSeries slice, XAttributeMap map) {
+			// TODO Auto-generated method stub
+			
+		}
+	}
+	
 	
 	public InvestigationTask setup() {
 //		setup pool for later use
@@ -83,16 +489,68 @@ public class InvestigationTask extends SwingWorker<DiscoveredPetriNetWithData, I
 		}
 //		Need to create class types and literalvalues for selected variables
 		Map<String, Type> classTypes = new HashMap<String,Type>();
+		Map<String, Set<String>> literalValues = new HashMap<String,Set<String>>();
+//		handle experimental features inclusion for J48
+		if (config.isExperimentalFeatures()) {
+			for(  Determination deter : this.source.getSource().getSource().getDeterminations()) {
+				String featureName = deter.getPanel().getName()
+						+"_"+deter.getSlicer().getShortenName();
+				featureName = featureName.replace(":", "_");
+//				add sax feature names
+				if (config.isExperimentalSAXFeatures()) {
+					for(int i=0;i < this.SAX_FROM.size(); i++) {
+						String expAttr = String.format(ExperimentalFeatureProcessor.SAX_OUTLIER_TO_OUTLIER_FEATURE_NAME,
+								featureName,
+								this.SAX_FROM.get(i),
+								this.SAX_TO.get(i)
+						);
+						String likelyHandledname = GuardExpression.Factory.transformToVariableIdentifier(
+								DecisionMining.wekaUnescape(
+										WekaUtil.fixVarName(expAttr)));
+						this.converetedNames.put(expAttr, likelyHandledname);
+						classTypes.put(DecisionMining.fixVarName(expAttr), Type.BOOLEAN);
+					}
+				}
+//				add dft feature names
+				if (config.isExperimentalDFTFeatures()) {
+					for(int k=0; k < K_TOP_DFT_COEFICIENTS; k++) {
+	//					add discrete feature for k-freq
+						String expAttr = String.format(ExperimentalFeatureProcessor.TOP_K_DFT_FREQ_FEATURE_NAME,
+								featureName,
+								k+1
+						);
+						String likelyHandledname = GuardExpression.Factory.transformToVariableIdentifier(
+								DecisionMining.wekaUnescape(
+										WekaUtil.fixVarName(expAttr)));
+						this.converetedNames.put(expAttr, likelyHandledname);
+						classTypes.put(DecisionMining.fixVarName(expAttr), Type.DISCRETE);
+	//					add continuous feature for k-power
+						expAttr = String.format(ExperimentalFeatureProcessor.TOP_K_DFT_POWER_FEATURE_NAME,
+								featureName,
+								k+1
+						);
+						likelyHandledname = GuardExpression.Factory.transformToVariableIdentifier(
+								DecisionMining.wekaUnescape(
+										WekaUtil.fixVarName(expAttr)));
+						this.converetedNames.put(expAttr, likelyHandledname);
+						classTypes.put(DecisionMining.fixVarName(expAttr), Type.CONTINUOS);
+					}
+				}
+			}
+		}
+//		handle class types for attributes
 		for (Entry<String, Type> val : this.source.makeClassTypes().entrySet()) {
 			classTypes.put(DecisionMining.fixVarName(val.getKey()), val.getValue());
 			this.converetedNames.put(val.getKey(), DecisionMining.fixVarName(val.getKey()));
 		}
-		Map<String, Set<String>> literalValues = new HashMap<String,Set<String>>();
-				
+//		handle literal values for discrete attributes		
 		for( Entry<String, Set<String>> val : this.source.makeLiteralValues().entrySet() ) {
 			literalValues.put(DecisionMining.fixVarName(val.getKey()), val.getValue());
 		}
-		
+		System.out.println("[InvestigationTask] Using the following attributes "
+				+ "for the classification problem :: " + converetedNames.keySet().toString());
+		System.out.println("[InvestigationTask] Using the following mappings "
+				+ "between attribute and types :: "+ classTypes.toString());
 		
 //		### Pirate Code from DecisionMining:393 ###
 		/*
@@ -124,8 +582,26 @@ public class InvestigationTask extends SwingWorker<DiscoveredPetriNetWithData, I
 			 * place
 			 */
 			FunctionEstimator f;
+			
+			if (this.minerType == MinerType.OVERLAPPING) {
+				f = new OverlappingEstimatorLocalDecisionTree(classTypes, 
+						literalValues, outputValues, this.source.getLog().size(),
+						place.getLabel()
+				);
+			} else if (this.minerType == MinerType.DISCRIMINATING) {
+				f = new DiscriminatingFunctionEstimator(classTypes, literalValues,
+						outputValues, this.source.getLog().size(), place.getLabel()
+				);
+			} else if (this.minerType == MinerType.DECISIONTREE) {
+				f = new DecisionTreeFunctionEstimator(classTypes, literalValues,
+						outputValues, place.getLabel(), this.source.getLog().size()
+					);
+			} else {
+				throw new IllegalArgumentException("[InvestigationTask] Decision"
+						+ " Miner unknown :: " + this.minerType);
+			}
 
-			f = new OverlappingEstimatorLocalDecisionTree(classTypes, literalValues, outputValues, this.source.getLog().size(), place.getLabel());
+			
 
 			/*
 			 * Associate the created FunctionEstimator 'f' with Place 'place' by
@@ -150,8 +626,11 @@ public class InvestigationTask extends SwingWorker<DiscoveredPetriNetWithData, I
 		for (SyncReplayResult alignment : this.source.getAlignment()) {
 			// Count the number of traces encountered in total
 			totalNumTraces += alignment.getTraceIndex().size();
-			// If the alignment's fitness complies with the specified minimum fitness in fitnessThresholdSlider
-			if (alignment.getInfo().get(PNRepResult.TRACEFITNESS).floatValue() >= this.fitnessThreshold) {
+			// If the alignment's fitness complies with the specified minimum 
+//			   fitness in fitnessThresholdSlider
+			if (alignment.getInfo().get(PNRepResult.TRACEFITNESS).floatValue() 
+					>= this.config.getFitnessThreshold()
+				) {
 				// Then for each trace in the alignment
 				for (Integer index : alignment.getTraceIndex()) {
 					/*
@@ -166,8 +645,36 @@ public class InvestigationTask extends SwingWorker<DiscoveredPetriNetWithData, I
 					 * attribute values' pre-values and a transition to be
 					 * executed
 					 */
-					traceFutures.add(this.pool.submit(new TraceProcessor(this.source.getModel(), this.source.getLog().get(index), this.estimators, alignment,
-							this.numberOfExecutions, this.numberOfWritesPerTransition, progress), index));
+					if (config.isExperimentalFeatures()) {
+						traceFutures.add(this.pool.submit(
+								new ExperimentalFeatureProcessor(
+									this.source.getModel(), 
+									this.source.getLog().get(index),
+									this.estimators,
+									alignment,
+									this.numberOfExecutions,
+									this.numberOfWritesPerTransition,
+									progress,
+									config.isExperimentalDFTFeatures(),
+									config.isExperimentalSAXFeatures(),
+									config.isExperimentalEDTTSFeatures()
+									)
+								, index)
+							);
+					} else {
+						traceFutures.add(this.pool.submit(
+							new TraceProcessor(
+								this.source.getModel(), 
+								this.source.getLog().get(index),
+								this.estimators,
+								alignment,
+								this.numberOfExecutions,
+								this.numberOfWritesPerTransition,
+								progress
+								)
+							, index)
+						);
+					}
 				}
 			} else {
 				// The alignment's fitness is lower than the fitness threshold; skip the trace and count the skipped traces
@@ -194,25 +701,61 @@ public class InvestigationTask extends SwingWorker<DiscoveredPetriNetWithData, I
 			FunctionEstimator f = estimators.get(place);
 			if (f != null) {
 				if (f instanceof DecisionTreeBasedFunctionEstimator) {
-					int numInstances = ((DecisionTreeBasedFunctionEstimator) f).getNumInstances();
-					// Set the minimal number of instances per leaf, in per mille (relative to numInstances)
-					((DecisionTreeBasedFunctionEstimator) f)
-							.setMinNumObj((int) (numInstances * this.instancesPerLeaf ));
-					// Prune the tree?
-					((DecisionTreeBasedFunctionEstimator) f).setUnpruned(false);
-//					// Binary split?
-					((DecisionTreeBasedFunctionEstimator) f).setBinarySplit(false);
-					((DecisionTreeBasedFunctionEstimator) f).setCrossValidate(true);
-					System.out.println("[ExogenousInvestigationTask] Setting estimator ("+place.getLabel()+") : "+ f.getNumInstances() +" :min: " +(int) (numInstances * this.instancesPerLeaf ) );
+					DecisionTreeBasedFunctionEstimator ff = (DecisionTreeBasedFunctionEstimator) f;
+					int numInstances = ff.getNumInstances();
+					// Set the minimal number of instances that each leaf should support
+					if (this.config.getInstanceHandling().isREL()) {
+						ff.setMinNumObj( 
+							(int) (numInstances * this.config.getRelativeInstanceLevel())	
+						);
+						System.out.println("[ExogenousInvestigationTask] Setting estimator ("
+								+place.getLabel()+") : "+ ff.getNumInstances() 
+								+" :min: " 
+								+(int) (numInstances * this.config.getRelativeInstanceLevel())
+						);
+					} else if (this.config.getInstanceHandling().isABS()){
+						ff.setMinNumObj( 
+								(int) ( this.config.getAbsoluteInstanceLevel())	
+							);
+						System.out.println("[ExogenousInvestigationTask] Setting estimator ("
+								+place.getLabel()+") : "+ ff.getNumInstances() 
+								+" :min: " 
+								+(int) (this.config.getAbsoluteInstanceLevel())
+						);
+					} else if (this.config.getInstanceHandling().isTHRESHOLD()) {
+						int min = 2;
+						if (numInstances > this.config.getInstanceThreshold()) {
+							min = (int) (this.config.getRelativeInstanceLevel() 
+									* numInstances); 
+						} else {
+							min = (int)this.config.getAbsoluteInstanceLevel();
+						}
+						ff.setMinNumObj(min);
+						System.out.println("[ExogenousInvestigationTask] Setting estimator ("
+								+place.getLabel()+") : "+ ff.getNumInstances() 
+								+" :min: " 
+								+ min
+						);
+					} else {
+//						default to relative
+						ff.setMinNumObj( 
+								(int) (numInstances * this.config.getRelativeInstanceLevel())	
+						);
+					}
+//					other parameters of note
+					ff.setUnpruned(this.config.isUnpruned());
+					ff.setBinarySplit(this.config.isBinarySplit());
+					ff.setCrossValidate(this.config.isCrossValidate());
+					if (ff instanceof AbstractDecisionTreeFunctionEstimator) {
+						((AbstractDecisionTreeFunctionEstimator) ff).setNumFoldCrossValidation(
+								this.config.getCrossValidateFolds()
+						);
+					}
+					ff.setConfidenceFactor(this.config.getConfidenceLevel());
 				}
 			}
 		}
-		
 		System.out.println("[ExogenousInvestigationTask] Configured estimators...");
-		
-		
-		
-		
 		/*
 		 * Collect result for each decision point
 		 */
@@ -225,7 +768,8 @@ public class InvestigationTask extends SwingWorker<DiscoveredPetriNetWithData, I
 
 				public DecisionPointResult call() throws Exception {
 
-					// Calculate the conditions with likelihoods for each target transition of place entry2.getKey()
+//					   Calculate the conditions with likelihoods for each target
+//					   transition of place entry2.getKey()
 					final Map<Object, FunctionEstimation> estimationTransitionExpression = f
 							.getFunctionEstimation(null);
 					
@@ -256,8 +800,11 @@ public class InvestigationTask extends SwingWorker<DiscoveredPetriNetWithData, I
 
 					};
 
-					System.out.println(String.format("[ExogenousInvestigationTask] Generated the conditions for decision point %s with f-score %s",
-								place.getLabel(), result.getQualityMeasure()));
+					System.out.println(String.format("[ExogenousInvestigationTask]"
+							+ " Generated the conditions for decision point %s "
+							+ "with f-score %s",
+							place.getLabel(), result.getQualityMeasure())
+					);
 					progress.inc();
 					return result;
 				}
@@ -266,13 +813,11 @@ public class InvestigationTask extends SwingWorker<DiscoveredPetriNetWithData, I
 			results.put(place, result);
 		}
 		System.out.println("[ExogenousInvestigationTask] Completed training estimators...");
-		
-		/*
-		 * Prepare the mining algorithm's resulting PetriNetWithData.
-		 */
-		String dpnName = String.format("%s (%s, min instances per leaf: %.3f, pruning: %s, binary: %s)", this.source.getModel().getLabel(),
-				"Overlapping Decision Tree", this.instancesPerLeaf, false,
-				false);
+//		Prepare the mining algorithm's resulting PetriNetWithData.
+		String dpnName = String.format("%s (%s, min instances per leaf: %.3f, "
+				+ "pruning: %s, binary: %s)", this.source.getModel().getLabel(),
+				"Overlapping Decision Tree", this.config.getInstanceThreshold(),
+				false, false);
 		final PetriNetWithDataFactory factory = new PetriNetWithDataFactory(this.source.getModel(),
 				new DiscoveredPetriNetWithData(dpnName), false);
 		discoveredDPN = (DiscoveredPetriNetWithData) factory.getRetValue(); // cast if safe
@@ -308,6 +853,47 @@ public class InvestigationTask extends SwingWorker<DiscoveredPetriNetWithData, I
 			String wekaUnescaped = DecisionMining.wekaUnescape(entry.getKey());
 			String saneVariableName = GuardExpression.Factory.transformToVariableIdentifier(wekaUnescaped);
 			discoveredDPN.addVariable(saneVariableName, classType, null, null);
+		}
+		if (config.isExperimentalFeatures()) {
+			for(  Determination deter : this.source.getSource().getSource().getDeterminations()) {
+				String featureName = deter.getPanel().getName()
+						+"_"+deter.getSlicer().getShortenName();
+				featureName = featureName.replace(":", "_");
+//				add sax feature names
+				for(int i=0;i < this.SAX_FROM.size(); i++) {
+					String expAttr = String.format(ExperimentalFeatureProcessor.SAX_OUTLIER_TO_OUTLIER_FEATURE_NAME,
+							featureName,
+							this.SAX_FROM.get(i),
+							this.SAX_TO.get(i)
+					);
+					expAttr = WekaUtil.fixVarName(expAttr);
+					String wekaUnescaped = DecisionMining.wekaUnescape(expAttr);
+					String saneVariableName = GuardExpression.Factory.transformToVariableIdentifier(wekaUnescaped);
+//					System.out.println("Adding var to DPN :: " + saneVariableName);
+					discoveredDPN.addVariable(saneVariableName, Boolean.class, null, null);
+				}
+//				add dft feature names
+				for(int k=0; k < K_TOP_DFT_COEFICIENTS; k++) {
+//					add discrete feature for k-freq
+					String expAttr = String.format(ExperimentalFeatureProcessor.TOP_K_DFT_FREQ_FEATURE_NAME,
+							featureName,
+							k+1
+					);
+					expAttr = WekaUtil.fixVarName(expAttr);
+					String wekaUnescaped = DecisionMining.wekaUnescape(expAttr);
+					String saneVariableName = GuardExpression.Factory.transformToVariableIdentifier(wekaUnescaped);
+					discoveredDPN.addVariable(saneVariableName, long.class, null, null);
+//					add continuous feature for k-power
+					expAttr = String.format(ExperimentalFeatureProcessor.TOP_K_DFT_POWER_FEATURE_NAME,
+							featureName,
+							k+1
+					);
+					expAttr = WekaUtil.fixVarName(expAttr);
+					wekaUnescaped = DecisionMining.wekaUnescape(expAttr);
+					saneVariableName = GuardExpression.Factory.transformToVariableIdentifier(wekaUnescaped);
+					discoveredDPN.addVariable(saneVariableName, Double.class, null, null);
+				}
+			}
 		}
 		
 		//TODO FM, we should not change the default Locale!! What about concurrent operations that rely on the correct Locale? Why is it done anyway?

@@ -12,6 +12,7 @@ public class ExoDotTransition extends DotNode {
 	private String controlFlowId;
 	private String transLabel;
 	private GuardExpressionHandler guard;
+	private boolean highlighted = false;
 
 	private String highlightLabel = "";
 	
@@ -60,15 +61,21 @@ public class ExoDotTransition extends DotNode {
 	}
 	
 	public String makeHighlightLabel(String label) {
-		return label.replaceFirst("BGCOLOR=\".*?\"","COLOR=\"YELLOW\" BGCOLOR=\"YELLOW\"");
+		return label.replaceFirst("BGCOLOR=\".{1,10}\".PORT=\"TITLE\"","BGCOLOR=\"YELLOW\" PORT=\"TITLE\"");
 	}
 	
 	public void highlightNode() {
+		this.highlighted = true;
 		this.setLabel(this.highlightLabel);
 	}
 	
 	public void revertHighlight() {
+		this.highlighted = false;
 		this.setLabel(this.oldLabel);
+	}
+	
+	public boolean isHighlighted() {
+		return this.highlighted;
 	}
 	
 	@Override

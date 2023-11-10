@@ -32,7 +32,11 @@ import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.Pet
 import org.processmining.models.semantics.petrinet.Marking;
 import org.processmining.plugins.petrinet.replayresult.PNRepResult;
 import org.processmining.qut.exogenousaware.data.storage.workers.InvestigationTask;
+import org.processmining.qut.exogenousaware.data.storage.workers.InvestigationTask.InvestigationTaskBuilder;
+import org.processmining.qut.exogenousaware.data.storage.workers.InvestigationTask.MinerConfiguration;
+import org.processmining.qut.exogenousaware.data.storage.workers.InvestigationTask.MinerType;
 import org.processmining.qut.exogenousaware.gui.ExogenousDiscoveryInvestigator;
+import org.processmining.qut.exogenousaware.gui.panels.ExogenousDiscoveryProgresser.ProgressType;
 
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -45,6 +49,7 @@ import lombok.Singular;
 @Data
 public class ExogenousDiscoveryInvestigation {
 
+//	required parameters
 	@NonNull @Singular private List<String> endogenousVariables;
 	@NonNull @Singular private List<String> exogenousVariables;
 	@NonNull private PetriNetWithData model;
@@ -52,7 +57,11 @@ public class ExogenousDiscoveryInvestigation {
 	@NonNull private PNRepResult alignment;
 	@NonNull private ExogenousDiscoveryInvestigator source;
 	
+//	optional parameters
+	@Default private MinerType miner = MinerType.OVERLAPPING; 
+	@Default private MinerConfiguration config = null;
 	
+//	internal states
 	@Getter @Default private DiscoveredPetriNetWithData outcome = null;
 	@Getter @Default private Map<String, GuardExpression> foundExpressions = new HashMap<String, GuardExpression>();
 	@Getter @Default private InvestigationTask task = null;
@@ -68,9 +77,14 @@ public class ExogenousDiscoveryInvestigation {
 		this.progress.setMaximum(100);
 		this.progress.setValue(0);
 		this.main.add(progress);
-		this.task = InvestigationTask.builder()
+		InvestigationTaskBuilder builder = InvestigationTask.builder()
 				.source(this)
 				.progresser(this.source.getProgresser())
+				.minerType(miner);
+		if (config != null) {
+			builder.config(config);
+		}
+		this.task = builder
 				.build()
 				.setup();
 		return this;
@@ -120,7 +134,8 @@ public class ExogenousDiscoveryInvestigation {
 			}
 		}
 		this.transMap = this.task.getTransMap();
-		
+		float fin = this.source.getProgresser().getState(ProgressType.Investigation).getTotal();
+		this.source.getProgresser().getState(ProgressType.Investigation).setCurrent(fin);
 		this.source.createModelView(this.task.getConveretedNames(), this.outcome, this.transMap);
 	
 	}

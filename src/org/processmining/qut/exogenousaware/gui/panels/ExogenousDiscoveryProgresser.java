@@ -138,7 +138,7 @@ public class ExogenousDiscoveryProgresser extends JPanel {
 		@Setter @Getter private int progress;
 		private float step;
 		@Setter private float current;
-		@Setter private float total;
+		@Setter @Getter private float total;
 		@Getter private ProgressType type;
 		
 //		gui widgets
@@ -173,10 +173,11 @@ public class ExogenousDiscoveryProgresser extends JPanel {
 		
 		public boolean update() {
 			boolean changed = step();
-			if (progress > 0) {
-				progressbar.setBackground(Color.blue.darker());
+			float[] weights = computeWeights();
+			if (weights[0] < 0.99) {
+				progressbar.setBackground(Color.red.darker());
 			} else {
-				progressbar.setBackground(null);
+				progressbar.setBackground(Color.blue.darker());
 			}
 			
 			this.caption.setText(this.type.name + String.format("(%.1f %%)", (current/total) * 100.0f) );
@@ -203,13 +204,17 @@ public class ExogenousDiscoveryProgresser extends JPanel {
 		}
 		
 		public boolean step() {
-			if (Math.abs(current - progress) > 0.001f) {
-				if (current < progress) {
-					current = Math.min(this.current + this.step, progress);
-				} else {
-					current = Math.max(this.current + this.step, progress);
+			if (current < total) {
+				if (Math.abs(current - progress) > 0.001f) {
+					if (current < progress) {
+						current = Math.min(this.current + this.step, progress);
+					} else {
+						current = Math.max(this.current + this.step, progress);
+					}
+					return true;
 				}
-				return true;
+			} else {
+				current = total;
 			}
 			return false;
 		}
@@ -233,7 +238,12 @@ public class ExogenousDiscoveryProgresser extends JPanel {
 			
 			
 			progressbar = new JPanel();
-			progressbar.setBackground(Color.blue);
+			if (weights[0] < 0.99) {
+				progressbar.setBackground(Color.red);
+			} else {
+				progressbar.setBackground(Color.blue);
+			}
+			
 			if (weights[0] < 0.01) {
 				c.fill = c.NONE;
 			} else {
@@ -356,9 +366,9 @@ public class ExogenousDiscoveryProgresser extends JPanel {
 	
 	public static enum ProgressType {
 		Alignment("Alignment Precompute"),
-		Stats("Statistics"),
+		Stats("Statistics Precompute"),
 		Investigation("Decision Mining"),
-		Measurements("Decision Point Measurement");
+		Measurements("Data-Aaware Process Conformance");
 		
 		@Getter private String name;
 		

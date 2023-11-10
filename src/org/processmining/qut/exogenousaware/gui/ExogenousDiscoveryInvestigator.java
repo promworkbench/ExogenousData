@@ -34,7 +34,6 @@ import org.processmining.datapetrinets.expression.GuardExpression;
 import org.processmining.datapetrinets.ui.ConfigurationUIHelper;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetGraph;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetNode;
-import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.DataElement;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PNWDTransition;
@@ -45,6 +44,7 @@ import org.processmining.plugins.petrinet.replayer.algorithms.costbasedcomplete.
 import org.processmining.plugins.petrinet.replayresult.PNRepResult;
 import org.processmining.qut.exogenousaware.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousaware.data.storage.ExogenousDiscoveryInvestigation;
+import org.processmining.qut.exogenousaware.gui.dot.ExoDotTransition;
 import org.processmining.qut.exogenousaware.gui.panels.ExogenousDiscoveryProgresser;
 import org.processmining.qut.exogenousaware.gui.panels.ExogenousDiscoveryProgresser.ProgressType;
 import org.processmining.qut.exogenousaware.gui.panels.ExogenousEnhancementGraphInvestigator;
@@ -84,6 +84,7 @@ public class ExogenousDiscoveryInvestigator extends JPanel{
 	@Default public String enhancementSearchViewKey = "E-Search";
 	@Default private int maxConcurrentThreads = Runtime.getRuntime().availableProcessors() > 3 ? Runtime.getRuntime().availableProcessors() - 2 : 1;
 	@Default @Getter private ProcessModelStatistics statistics = null;
+	@Default @Getter private Map<String, GuardExpression> rules = new HashMap();
 	
 //  gui widgets
 	@Default private JButton enhancementButton = new JButton("Open Enhancement");
@@ -113,7 +114,7 @@ public class ExogenousDiscoveryInvestigator extends JPanel{
 		this.c.weightx = 1;
 		this.c.weighty = 1;
 		this.c.gridy= 0;
-		this.c.insets = new Insets(10,15,0,15);
+		this.c.insets = new Insets(10,0,0,0);
 		this.createModelView();
 		this.createProgresser();
 		this.createSelectionPanel();
@@ -233,20 +234,33 @@ public class ExogenousDiscoveryInvestigator extends JPanel{
 		DotOverlay overlay = this.exoDotController.getController().getOverlay();
 		Map<String, DotNode> nodes = this.exoDotController.getVisBuilder().getNodes();
 		for (PetrinetNode node : this.controlflow.getNodes()) {
-			if (node instanceof Place || node instanceof Transition) {
+			if (node instanceof Transition) {
 				DotNode dotNode = nodes.get(node.getId().toString());
 				
-				
 				dotNode.addMouseListener(new MouseAdapter() {
-				
+					
 					public void mouseClicked(MouseEvent e) {
-						DotOverlayInformationDump.builder()
-							.controlNode(node)
-							.node(dotNode)
-							.statistics(statistics)
-							.overlay(overlay)
-							.build()
-							.setup();
+						boolean highlighted = ((ExoDotTransition)dotNode).isHighlighted();
+//						de-highlight other nodes
+						for ( Entry<String, DotNode> other : nodes.entrySet()) {
+							if (other.getValue() instanceof ExoDotTransition) {
+								ExoDotTransition otherNode = (ExoDotTransition)other.getValue();
+								otherNode.revertHighlight();
+							}
+						}
+//						highlight this node
+						if (dotNode instanceof ExoDotTransition && !highlighted) {
+							((ExoDotTransition) dotNode).highlightNode();
+							DotOverlayInformationDump.builder()
+								.controlNode(node)
+								.node(dotNode)
+								.statistics(statistics)
+								.overlay(overlay)
+								.build()
+								.setup();
+						}
+//						update dot vis
+						exoDotController.getVis().changeDot(exoDotController.getVis().getDot(), false);
 					}
 				});
 			}
@@ -345,10 +359,24 @@ public class ExogenousDiscoveryInvestigator extends JPanel{
 //		setup layout manager
 		this.c.gridx = 0;
 		this.c.ipady = 300;
+//		check for pre-existing rules
+		Map<String, GuardExpression> rules= new HashMap();
+		for( Transition T : this.controlflow.getTransitions()) {
+			if (T instanceof PNWDTransition) {
+				PNWDTransition t = (PNWDTransition)T;
+				if (t.hasGuardExpression()) {
+					rules.put(T.getId().toString(), t.getGuardExpression());
+				}
+			}
+		}
+		System.out.println("guards found in existing model :: "+ rules.toString());
+		this.rules = rules;
 //		create panel
 		this.exoDotController = ExogenousInvestigatorDotPanel
 				.builder()
 				.graph(this.controlflow)
+				.swapMap(new HashMap())
+				.rules(this.rules)
 				.build()
 				.setup();
 //		add panel
@@ -393,7 +421,7 @@ public class ExogenousDiscoveryInvestigator extends JPanel{
 			}
 		}
 		
-		
+		this.rules = rules;
 		
 		this.exoDotController.setRules(rules);
 		this.exoDotController.setSwapMap(swapMap);
@@ -413,7 +441,7 @@ public class ExogenousDiscoveryInvestigator extends JPanel{
 		this.c.weighty = 0.0;
 		this.c.fill = c.BOTH;
 		this.c.ipady = 0;
-		this.c.insets = new Insets(3,15,0,15);
+		this.c.insets = new Insets(3,5,0,5);
 //		create progresser
 		this.progresser = ExogenousDiscoveryProgresser.builder()
 				.build()
@@ -427,7 +455,7 @@ public class ExogenousDiscoveryInvestigator extends JPanel{
 		this.c.gridy= 2;
 		this.c.ipady= 25;
 		this.c.weighty = .5;
-		this.c.insets = new Insets(10,15,10,15);
+		this.c.insets = new Insets(30,15,5,15);
 //		create panel
 		this.exoSelectionPanel = ExogenousInvestigatorSelectionPanel.builder()
 				.exoVariables(this.exoVariables)
@@ -452,6 +480,8 @@ public class ExogenousDiscoveryInvestigator extends JPanel{
 			.model(this.controlflow)
 			.exogenousVariables(this.exoSelectionPanel.getSelectedExoVariables().getSelectedValuesList())
 			.endogenousVariables(this.exoSelectionPanel.getSelectedEndoVariables().getSelectedValuesList())
+			.miner(this.exoSelectionPanel.getSelectedMiner().getSelectedValuesList().get(0))
+			.config(this.exoSelectionPanel.getDecisionMinerConfig().makeConfig())
 			.alignment(this.alignment)
 			.log(this.source.getEndogenousLog())
 			.source(this)
@@ -511,7 +541,8 @@ public class ExogenousDiscoveryInvestigator extends JPanel{
 		for ( Entry<String, Double> measure : measures.entrySet()) {
 			this.statistics.addGraphMeasure(measure.getKey(), measure.getValue());
 		}
-		
+		this.exoDotController.update();
+		setupDotNodeListeners();
 		this.repaint();
 	}
 	
