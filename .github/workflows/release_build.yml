@@ -6,9 +6,8 @@ name: Java Release
 on:
   release:
     types: [published]
-    branches:
-      - main
-    workflow_dispatch:
+
+  workflow_dispatch:
   
 jobs:
   build:

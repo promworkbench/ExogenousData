@@ -21,13 +21,13 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
-    - name: Build 
-        run: ant -noinput -buildfile build.xml "Compile Sources"
-        env:
+    - name: Build
+      run: ant -noinput -buildfile build.xml "Compile Sources"
+      env:
           bytecode_format: ${{ vars.BYTECODE_FORMAT }}
           major_minor: ${{ vars.MAJOR_MINOR }}
     - name: Test
-          run: ant -noinput tests/build.xml check
-          env:
+      run: ant -noinput tests/build.xml check
+      env:
             bytecode_format: ${{ vars.BYTECODE_FORMAT }}
             major_minor: ${{ vars.MAJOR_MINOR }}
