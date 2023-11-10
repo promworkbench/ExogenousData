@@ -1,4 +1,4 @@
-[![Java Build](https://github.com/promworkbench/ExogenousData/actions/workflows/test_build.yml/badge.svg)](https://github.com/promworkbench/ExogenousData/actions/workflows/test_build.yml) [![Java Release](https://github.com/promworkbench/ExogenousData/actions/workflows/release_build.yml/badge.svg)](https://github.com/promworkbench/ExogenousData/actions/workflows/release_build.yml)
+[![Java Build](https://github.com/promworkbench/ExogenousData/actions/workflows/test_build.yml/badge.svg)](https://github.com/promworkbench/ExogenousData/actions/workflows/test_build.yml) [![Java Release](https://github.com/promworkbench/ExogenousData/actions/workflows/release_build.yml/badge.svg)](https://github.com/promworkbench/ExogenousData/actions/workflows/release_build.yml) [![Java Tests](https://github.com/promworkbench/ExogenousData/actions/workflows/java_tests.yml/badge.svg)](https://github.com/promworkbench/ExogenousData/actions/workflows/java_tests.yml)
 
 # Exogenous Data ProM Plugin
 
