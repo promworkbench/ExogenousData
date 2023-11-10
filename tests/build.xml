@@ -55,9 +55,10 @@
       	<fileset dir="${home}/ivy/">
         	<include name="**/*.jar"/>
       	</fileset>
-      	<fileset dir="${home}/lib/">
+		<!-- the github action does have a lib? and is causing an error maybe? -->
+      	<!-- <fileset dir="${home}/lib/">
         	<include name="**/*.jar"/>
-      	</fileset>
+      	</fileset> -->
 		<path refid="classpath.prom" />
 		<pathelement location="${dir.test-bin}"/>
 	</path>
@@ -101,8 +102,40 @@
          	destdir="${dir.test-bin}"
          	debug="on" />
 	</target>
+
+	<!-- just run tests -->
+	<target name="checkTests" depends="build-test">
+		<!-- integration tests of invoking plugins in ProM -->
+	    <junit fork="true" dir="${home}" includeantruntime="yes" >
+	    	<!-- parameters to run ProM -->
+	    	<jvmarg value="-ea"/>
+	    	<jvmarg value="-Xmx1G"/>
+	    	<jvmarg value="-XX:MaxPermSize=256m"/>
+	    	<jvmarg value="-Djava.library.path=.//lib"/>
+	    	<!-- fixed location for cobertura to log method calls and generate report from -->
+	    	<jvmarg value="-Dnet.sourceforge.cobertura.datafile=${cobertura.datafile}"/>
+	    	
+	      <!-- class path for code coverage by cobertura -->
+	      <classpath location="${dir.test-instrument}" />
+	      <classpath refid="classpath.cobertura"/>
+
+	      <!-- class path of the code to test and the Junit framework -->
+	      <classpath refid="classpath.test"/>
+	    	
+		  <!-- JUnit: set output format -->
+	      <formatter type="xml"/>
+
+	      <!-- JUnit: test cases to run -->
+    	  <sysproperty key="test.testFileRoot" path="${dir.testfiles}"/>
+	      <batchtest todir="${test.basedir}">
+	    					<fileset dir="${test.basedir}/src-test">
+	    						<include name="**/*Test.java" />
+	    					</fileset>
+	      </batchtest>
+	    </junit>
+	</target>
          		
-	<!-- run tests -->
+	<!-- run tests and coverage -->
 	<target name="check" depends="build-test,prepare-cobertura">
 	
 		<!-- integration tests of invoking plugins in ProM -->

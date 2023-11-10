@@ -22,12 +22,9 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
     - name: Build
-      run: ant -noinput -buildfile build.xml "buildForTest"
+      run: ant -noinput -buildfile build.xml buildForTest
       env:
           bytecode_format: ${{ vars.BYTECODE_FORMAT }}
           major_minor: ${{ vars.MAJOR_MINOR }}
     - name: Test
-      run: ant -noinput -buildfile tests/build.xml check
-      env:
-            bytecode_format: ${{ vars.BYTECODE_FORMAT }}
-            major_minor: ${{ vars.MAJOR_MINOR }}
+      run: ant -noinput -buildfile tests/build.xml checkTests
