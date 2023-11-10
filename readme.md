@@ -1,4 +1,6 @@
-[![ProM Updated](https://github.com/AdamBanham/ExogenousData/actions/workflows/update_prod.yml/badge.svg)](https://github.com/AdamBanham/ExogenousData/actions/workflows/update_prod.yml)
+[![Java Build](https://github.com/promworkbench/ExogenousData/actions/workflows/test_build.yml/badge.svg)](https://github.com/promworkbench/ExogenousData/actions/workflows/test_build.yml)
+
+[![Java Release](https://github.com/promworkbench/ExogenousData/actions/workflows/release_build.yml/badge.svg)](https://github.com/promworkbench/ExogenousData/actions/workflows/release_build.yml)
 
 # Exogenous Data ProM Plugin
 
