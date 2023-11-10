@@ -201,6 +201,9 @@
 	<!-- Target to use to do the downstram build -->
 	<!-- The upstream changes will be copied in preceding this target -->
 	<target name="buildDownstream" depends="compile" />
+
+	<!-- targt used to build a lightweight version for testing -->
+	<target name="buildForTest" depends="clean,resolve,compile" />
 	
 	<!-- Targets for sake of backwards compatibility -->
 	

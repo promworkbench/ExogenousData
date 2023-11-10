@@ -48,16 +48,16 @@
 	<path id="classpath.run">
 		<pathelement location="${bin}"/>
 		<!-- unconmment these lines if the test shall be run against the packaged jars of the build -->
-		<fileset dir="${home}/dist/">
+		<!-- <fileset dir="${home}/dist/">
         	<include name="**/*.jar"/>
-      	</fileset>
-      	<!-- unconmment these for ivy packages -->
-      	<!-- <fileset dir="${home}/ivy/">
+      	</fileset> -->
+      	<!-- unconmment these for unpackage builds -->
+      	<fileset dir="${home}/ivy/">
         	<include name="**/*.jar"/>
       	</fileset>
       	<fileset dir="${home}/lib/">
         	<include name="**/*.jar"/>
-      	</fileset> -->
+      	</fileset>
 		<path refid="classpath.prom" />
 		<pathelement location="${dir.test-bin}"/>
 	</path>
