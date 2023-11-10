@@ -22,4 +22,4 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
     - name: Build and Test Java
-      run: ant -noinput -buildfile tests/build.xml
+      run: ant -noinput -buildfile tests/build.xml check
