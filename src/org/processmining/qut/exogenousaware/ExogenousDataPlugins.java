@@ -47,7 +47,7 @@ import org.processmining.qut.exogenousaware.steps.determination.configs.AIIM2022
  *[1] 	A. Banham, S. J. J. Leemans, M. T. Wynn, R. Andrews, xPM: A framework 
  *       for process mining with exogenous data, in: Process Mining Workshops - 
  *       ICPM 2021 International Workshops, volume 433 of Lecture Notes in 
- *       Business Information Processing, Springer, 2021, pp. 85–97.
+ *       Business Information Processing, Springer, 2021, pp. 85-97.
  *[2]	xPM: Enhancing Exogenous Data Visibility. Adam Banham, Sander J.J. 
  *		 Leemans, Moe T. Wynn, Robert Andrews, Kevin B. Laupland, Lucy Shinners.
  *		 Artificial Intelligence in Medicine 2022 (Accepted as-of 24/09/2022).
@@ -84,17 +84,17 @@ public class ExogenousDataPlugins {
 			email = "adam.banham@hdr.qut.edu.au",
 			pack = "ExogenousData"
 	)
-	public ExogenousAnnotatedLog preperation(UIPluginContext context, 
-			XLog endogenous, XLog[] exogenous) throws Throwable{
-		List<ExogenousDataset> exoLogs = new ArrayList<ExogenousDataset>();
-		for(XLog elog: exogenous) {
+	public ExogenousAnnotatedLog preperation(final UIPluginContext context, 
+			final XLog endogenous, final XLog[] exogenous) throws Throwable{
+		final List<ExogenousDataset> exoLogs = new ArrayList<ExogenousDataset>();
+		for(final XLog elog: exogenous) {
 			ExogenousDataset temp;
 			try {
 				temp = ExogenousDataset.builder()
 						.source(elog)
 						.build()
 						.setup();
-			} catch (CannotConvertException e) {
+			} catch (final CannotConvertException e) {
 				// if log cannot naively be convert to dataset then move on
 				System.out.println(
 					"[ExogenousAnnotatedLog] Cannot convert log='"
@@ -104,7 +104,7 @@ public class ExogenousDataPlugins {
 			}
 			exoLogs.add(temp);
 		}
-		ExogenousAnnotatedLog annotated = ExogenousAnnotatedLog
+		final ExogenousAnnotatedLog annotated = ExogenousAnnotatedLog
 				.builder()
 				.endogenousLog(endogenous)
 				.exogenousDatasets(exoLogs)
@@ -140,17 +140,17 @@ public class ExogenousDataPlugins {
 			email = "adam.banham@hdr.qut.edu.au",
 			pack = "ExogenousData"
 	)
-	public ExogenousAnnotatedLog AIIM2022preperation(UIPluginContext context, 
-			XLog endogenous, XLog[] exogenous) throws Throwable {
-		List<ExogenousDataset> exoLogs = new ArrayList<ExogenousDataset>();
-		for(XLog elog: exogenous) {
+	public ExogenousAnnotatedLog AIIM2022preperation(final UIPluginContext context, 
+			final XLog endogenous, final XLog[] exogenous) throws Throwable {
+		final List<ExogenousDataset> exoLogs = new ArrayList<ExogenousDataset>();
+		for(final XLog elog: exogenous) {
 			ExogenousDataset temp;
 			try {
 				temp = ExogenousDataset.builder()
 						.source(elog)
 						.build()
 						.setup();
-			} catch (CannotConvertException e) {
+			} catch (final CannotConvertException e) {
 				// if log cannot naively be convert to dataset then move on
 				System.out.println("[ExogenousAnnotatedLog] Cannot convert log="
 						+ "'"
@@ -160,7 +160,7 @@ public class ExogenousDataPlugins {
 			}
 			exoLogs.add(temp);
 		}
-		ExogenousAnnotatedLog annotated = ExogenousAnnotatedLog
+		final ExogenousAnnotatedLog annotated = ExogenousAnnotatedLog
 				.builder()
 				.endogenousLog(endogenous)
 				.exogenousDatasets(exoLogs)
@@ -202,8 +202,8 @@ public class ExogenousDataPlugins {
 			pack = "ExogenousData"
 	)
 	@Visualizer
-	public JComponent exogenousAnnotationViewing(UIPluginContext context, 
-			ExogenousAnnotatedLog xlog) throws Throwable {
+	public JComponent exogenousAnnotationViewing(final UIPluginContext context, 
+			final ExogenousAnnotatedLog xlog) throws Throwable {
 		return new ExogenousTraceExplorer().visualise(
 				context
 				,
@@ -240,17 +240,17 @@ public class ExogenousDataPlugins {
 		pack = "ExogenousData"
 	)
 	public ExogenousDiscoveryInvestigator NonExogenousDiscovery_DPN(
-			UIPluginContext context, XLog eventlog,
-			PetriNetWithData dpn) throws Throwable {
+			final UIPluginContext context, final XLog eventlog,
+			final PetriNetWithData dpn) throws Throwable {
 		
-		ExogenousAnnotatedLog xlog = ExogenousAnnotatedLog.builder()
+		final ExogenousAnnotatedLog xlog = ExogenousAnnotatedLog.builder()
 				.endogenousLog(eventlog)
 				.parsed(false)
 				.showConfiguration(false)
 				.build()
 				.setup(context);
 		
-		ExogenousDiscoveryInvestigator edi = ExogenousDiscoveryInvestigator.builder()
+		final ExogenousDiscoveryInvestigator edi = ExogenousDiscoveryInvestigator.builder()
 				.source(xlog)
 				.controlflow(dpn)
 				.context(context)
@@ -285,10 +285,10 @@ public class ExogenousDataPlugins {
 		pack = "ExogenousData"
 	)
 	public ExogenousDiscoveryInvestigator ExogenousDiscovery_DPN(
-			UIPluginContext context, ExogenousAnnotatedLog exogenous,
-			PetriNetWithData dpn) throws Throwable {
+			final UIPluginContext context, final ExogenousAnnotatedLog exogenous,
+			final PetriNetWithData dpn) throws Throwable {
 		
-		ExogenousDiscoveryInvestigator edi = ExogenousDiscoveryInvestigator.builder()
+		final ExogenousDiscoveryInvestigator edi = ExogenousDiscoveryInvestigator.builder()
 				.source(exogenous)
 				.controlflow(dpn)
 				.context(context)
@@ -323,14 +323,14 @@ public class ExogenousDataPlugins {
 		pack = "ExogenousData"
 	)
 	public ExogenousDiscoveryInvestigator ExogenousDiscovery_PN(
-			UIPluginContext context, ExogenousAnnotatedLog exogenous,
-			Petrinet pn) throws Throwable {
+			final UIPluginContext context, final ExogenousAnnotatedLog exogenous,
+			final Petrinet pn) throws Throwable {
 		
-		PetriNetWithDataFactory factory = new PetriNetWithDataFactory(pn, pn.getLabel());
+		final PetriNetWithDataFactory factory = new PetriNetWithDataFactory(pn, pn.getLabel());
 		factory.cloneInitialAndFinalConnection(context);
-		PetriNetWithData dpn = factory.getRetValue();
+		final PetriNetWithData dpn = factory.getRetValue();
 		
-		ExogenousDiscoveryInvestigator edi = ExogenousDiscoveryInvestigator.builder()
+		final ExogenousDiscoveryInvestigator edi = ExogenousDiscoveryInvestigator.builder()
 				.source(exogenous)
 				.controlflow(dpn)
 				.context(context)
@@ -365,21 +365,21 @@ public class ExogenousDataPlugins {
 		pack = "ExogenousData"
 	)
 	public ExogenousDiscoveryInvestigator ExogenousDiscovery_PT(
-			UIPluginContext context, ExogenousAnnotatedLog exogenous,
-			ProcessTree pt) throws Throwable {
+			final UIPluginContext context, final ExogenousAnnotatedLog exogenous,
+			final ProcessTree pt) throws Throwable {
 		
-		PetrinetWithMarkings result = ProcessTree2Petrinet.convert(pt, true);
+		final PetrinetWithMarkings result = ProcessTree2Petrinet.convert(pt, true);
 		
-		Petrinet pn = result.petrinet;
+		final Petrinet pn = result.petrinet;
 		
 		context.addConnection(new InitialMarkingConnection(pn, result.initialMarking));
 		context.addConnection(new FinalMarkingConnection(pn, result.finalMarking));
 		
-		PetriNetWithDataFactory factory = new PetriNetWithDataFactory(pn, pn.getLabel());
+		final PetriNetWithDataFactory factory = new PetriNetWithDataFactory(pn, pn.getLabel());
 		factory.cloneInitialAndFinalConnection(context);
-		PetriNetWithData dpn = factory.getRetValue();
+		final PetriNetWithData dpn = factory.getRetValue();
 		
-		ExogenousDiscoveryInvestigator edi = ExogenousDiscoveryInvestigator.builder()
+		final ExogenousDiscoveryInvestigator edi = ExogenousDiscoveryInvestigator.builder()
 				.source(exogenous)
 				.controlflow(dpn)
 				.context(context)
@@ -399,8 +399,8 @@ public class ExogenousDataPlugins {
 			parameterLabels = { "" }
 	)
 	@Visualizer
-	public JComponent exogenousDiscoveryViewing(UIPluginContext context, 
-			ExogenousDiscoveryInvestigator edi) {
+	public JComponent exogenousDiscoveryViewing(final UIPluginContext context, 
+			final ExogenousDiscoveryInvestigator edi) {
 		return edi;
 	}
 	
@@ -420,8 +420,8 @@ public class ExogenousDataPlugins {
 			email = "adam.banham@hdr.qut.edu.au",
 			pack = "ExogenousData"
 	)
-	public void exogenousEnhancement(UIPluginContext context, 
-			XLog exogenous, PetriNetWithData model) throws Throwable {
+	public void exogenousEnhancement(final UIPluginContext context, 
+			final XLog exogenous, final PetriNetWithData model) throws Throwable {
 		throw new NotImplementedException("Still under construction...");
 	}
 }
