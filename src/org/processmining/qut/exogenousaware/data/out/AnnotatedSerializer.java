@@ -3,7 +3,11 @@ package org.processmining.qut.exogenousaware.data.out;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.deckfour.spex.SXDocument;
 import org.deckfour.spex.SXTag;
@@ -11,12 +15,14 @@ import org.deckfour.xes.classification.XEventAttributeClassifier;
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.extension.XExtension;
 import org.deckfour.xes.logging.XLogging;
+import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XTrace;
 import org.deckfour.xes.out.XesXmlSerializer;
 import org.deckfour.xes.util.XRuntimeUtils;
 import org.deckfour.xes.util.XTokenHelper;
 import org.processmining.qut.exogenousaware.data.ExogenousAnnotatedLog;
+import org.processmining.qut.exogenousaware.steps.transform.data.TransformedAttribute;
 
 public class AnnotatedSerializer extends XesXmlSerializer{
 	
@@ -74,12 +80,29 @@ public class AnnotatedSerializer extends XesXmlSerializer{
 			}
 		}
 		// add log attributes
+		Map<XEvent, SXTag> eventTags = new HashMap();
 		addAttributes(logTag, source.getEndogenousLog().getAttributes().values());
 		for (XTrace trace : source.getEndogenousLog()) {
 			SXTag traceTag = logTag.addChildNode("trace");
 			addAttributes(traceTag, trace.getAttributes().values());
 			for (XEvent event : trace) {
+				// create event tag
 				SXTag eventTag = traceTag.addChildNode("event");
+				// add tag for transformed attributes
+				Set<String> used = new HashSet();
+				for(XAttribute attr : event.getAttributes().values()) {
+					if (attr instanceof TransformedAttribute) {
+						TransformedAttribute tattr = (TransformedAttribute) attr;
+						String exoSource = tattr.getSource().getDataset();
+						if (!used.contains(exoSource)) {
+							SXTag sliceIdentify = eventTag.addChildNode("boolean");
+							sliceIdentify.addAttribute("key", "exogenous:slice:"+exoSource);
+							sliceIdentify.addAttribute("val",true);
+							used.add(exoSource);
+						}
+					}
+				}
+				// add all normal attributes now
 				addAttributes(eventTag, event.getAttributes().values());
 			}
 		}
