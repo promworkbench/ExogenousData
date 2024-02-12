@@ -81,7 +81,7 @@ public class SLPNEDDiscoveryTest {
 				.addEvent("b")
 				.addAttribute("time:timestamp", new Date(2024, 2, 8, 18, 00, 00))
 				.addEvent("d")
-				.addAttribute("time:timestamp", new Date(2024, 2, 8, 1, 00, 00))
+				.addAttribute("time:timestamp", new Date(2024, 2, 9, 1, 00, 00))
 			.build();
 	
 	static List<Determination> deters = new ArrayList<Determination>() {{
