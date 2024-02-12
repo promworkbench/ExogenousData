@@ -35,6 +35,7 @@
     	<dependency org="prom" name="XESAlignmentExtension" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="XESLite" rev="latest" changing="true" transitive="true" />
 		<dependency org="prom" name="PTConversions" rev="latest" changing="true" transitive="true" />
+		<dependency org="prom" name="BasicStochasticMiner" rev="latest" changing="true" transitive="true" />
     	<!-- Third party libraries. These may span multiple lines. -->
     	<dependency org="prom" name="TransitionSystems" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="Log" rev="latest" changing="true" transitive="true" />
