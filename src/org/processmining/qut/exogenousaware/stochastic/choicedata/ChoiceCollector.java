@@ -2,6 +2,7 @@ package org.processmining.qut.exogenousaware.stochastic.choicedata;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Set;
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
+import org.deckfour.xes.model.XAttributeTimestamp;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
@@ -22,6 +24,7 @@ import org.processmining.plugins.connectionfactories.logpetrinet.TransEvClassMap
 import org.processmining.plugins.petrinet.replayer.PNLogReplayer;
 import org.processmining.plugins.petrinet.replayer.algorithms.costbasedcomplete.CostBasedCompleteParam;
 import org.processmining.plugins.petrinet.replayresult.PNRepResult;
+import org.processmining.plugins.petrinet.replayresult.StepTypes;
 import org.processmining.plugins.replayer.replayresult.SyncReplayResult;
 import org.processmining.pnetreplayer.utils.TransEvClassMappingUtils;
 import org.processmining.qut.exogenousaware.data.ExogenousAnnotatedLog;
@@ -30,6 +33,7 @@ import lombok.Builder;
 import nl.tue.astar.AStarException;
 
 public class ChoiceCollector {
+	
 	
 	@Builder
 	public static class ChoiceCollectorParameters {
@@ -81,8 +85,19 @@ public class ChoiceCollector {
 //		traverse each alignment to compute sojourn times between synchronized transitions
 		SojournStatistics sojournStats = new SojournStatistics(net.getNet().getTransitions());
 		for(SyncReplayResult alignment : alignedTraces) {
-			
+			for(int traceIdx : alignment.getTraceIndex()) {
+				XTrace currTrace = xlog.get(traceIdx);
+				System.out.println("looking at an alignment for a trace...");
+				System.out.println("trace ::  " + currTrace
+						.stream()
+						.map( (x) -> {return classifer.getClassIdentity(x);})
+						.reduce("", (ls,nx) -> {return ls + nx;})
+				);
+				System.out.println("moves :: "+alignment.getStepTypes());
+				sojournStats.processAlignment(currTrace, alignment);
+			}
 		}
+		System.out.println("collected sojourn times...");
 //		traverse each alignment and collect choice data.
 		for(SyncReplayResult alignment : alignedTraces) {
 //			for each trace with this control flow alignment
@@ -115,10 +130,64 @@ public class ChoiceCollector {
 			}
 		}
 		
+		public void processAlignment(XTrace trace, SyncReplayResult alignment) {
+			int currIdx = -1;
+			int transitionIdx = -1;
+			StepTypes last_step = null;
+			int lastsync = -1;
+			int lasttrans = -1;
+			for( StepTypes step: alignment.getStepTypes()) {
+//				setup for the first entry
+				if (last_step == null) {
+					last_step = step;
+				}
+//				every other entry
+				else {
+					if (step == StepTypes.LMGOOD) {
+						if (lastsync >= 0) {
+							System.out.println("found pair at ("+lasttrans+","+(transitionIdx+1)+")");
+							Object trans = alignment.getNodeInstance().get(transitionIdx+1);
+							System.out.println(trans.getClass());
+							if (trans instanceof Transition) {
+								Double sojourn = 
+									(extractTime(trace, currIdx+1).getTime() 
+									- 
+									extractTime(trace,lastsync).getTime())/ (1000.0 * 60.0);
+								addTime((Transition) trans, sojourn);
+							}
+						}
+					}
+				}
+//				update trackers
+				if (step == StepTypes.LMGOOD || step == StepTypes.L) {
+					currIdx +=1;
+					if (step == StepTypes.LMGOOD) {
+						lastsync = currIdx;
+					}
+				}
+				if (step == StepTypes.LMGOOD || step == StepTypes.MINVI || step == StepTypes.MREAL) {
+					transitionIdx += 1;
+					if (step == StepTypes.LMGOOD) {
+						lasttrans = transitionIdx;
+					}
+				}
+			}
+		}
+		
 		public void addTime(Transition trans, double time) {
+			System.out.println(trans.toString() + " added time of "+ time);
 			if (transitions.contains(trans)) {
 				this.times.get(trans).add(time);
 			}
+		}
+		
+		private Date extractTime(XTrace trace, int idx) {
+			XAttributeTimestamp time = (XAttributeTimestamp) trace.get(idx).getAttributes().get("time:timestamp");
+			return time.getValue();
+		}
+		
+		public Double[] getSojourns(Transition trans) {
+			return this.times.get(trans).toArray(new Double[0]);
 		}
 		
 	}
