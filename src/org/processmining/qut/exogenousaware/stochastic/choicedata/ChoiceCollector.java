@@ -8,17 +8,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.XAttributeTimestamp;
+import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
+import org.deckfour.xes.model.impl.XTraceImpl;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.framework.util.ui.widgets.helper.UserCancelledException;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
+import org.processmining.models.semantics.IllegalTransitionException;
 import org.processmining.models.semantics.petrinet.Marking;
+import org.processmining.models.semantics.petrinet.PetrinetSemantics;
+import org.processmining.models.semantics.petrinet.impl.PetrinetSemanticsFactory;
 import org.processmining.plugins.astar.petrinet.PetrinetReplayerWithoutILP;
 import org.processmining.plugins.connectionfactories.logpetrinet.TransEvClassMapping;
 import org.processmining.plugins.petrinet.replayer.PNLogReplayer;
@@ -28,8 +34,19 @@ import org.processmining.plugins.petrinet.replayresult.StepTypes;
 import org.processmining.plugins.replayer.replayresult.SyncReplayResult;
 import org.processmining.pnetreplayer.utils.TransEvClassMappingUtils;
 import org.processmining.qut.exogenousaware.data.ExogenousAnnotatedLog;
+import org.processmining.qut.exogenousaware.data.ExogenousDataset;
+import org.processmining.qut.exogenousaware.data.ExogenousUtils;
+import org.processmining.qut.exogenousaware.exceptions.LinkNotFoundException;
+import org.processmining.qut.exogenousaware.steps.slicing.PastOutcomeSlicer;
+import org.processmining.qut.exogenousaware.steps.slicing.Slicer;
+import org.processmining.qut.exogenousaware.steps.transform.type.Transformer;
+import org.processmining.qut.exogenousaware.steps.transform.type.agg.AbsoluteVarianceTransformer;
+import org.processmining.qut.exogenousaware.steps.transform.type.agg.TailingWeightedSubsequencesTransform;
 
+import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.Getter;
 import nl.tue.astar.AStarException;
 
 public class ChoiceCollector {
@@ -38,9 +55,65 @@ public class ChoiceCollector {
 	@Builder
 	public static class ChoiceCollectorParameters {
 		
+		@Default @Getter Slicer eventSlicer = PastOutcomeSlicer.builder().build(); 
+		@Default @Getter Transformer thetaAggerator = TailingWeightedSubsequencesTransform.builder()
+				.aggerator( 
+						AbsoluteVarianceTransformer.builder().build()	
+				)
+				.build();
+		@Default boolean useDefaultAggerator = true;
+		
+		public void adjustAggeratorForPanel(ExogenousDataset dataset) {
+			if (useDefaultAggerator) {
+				double mean = dataset.getMean();
+				double std = dataset.getStd();
+				this.thetaAggerator = TailingWeightedSubsequencesTransform.builder()
+						.aggerator( 
+								AbsoluteVarianceTransformer.builder()
+								.mean(mean).std(std).build()	
+						)
+						.build();
+			}
+		}
+		
+		public double computeTheta(XTrace trace, int eventIndex, ExogenousDataset dataset) throws LinkNotFoundException {
+			adjustAggeratorForPanel(dataset);
+			XTrace simplierTrace = new XTraceImpl(trace.getAttributes());
+			simplierTrace.add(trace.get(eventIndex));
+			XTrace linkage = dataset.findLinkage(simplierTrace).get(0);
+			double theta = thetaAggerator.transform(
+						eventSlicer.slice(simplierTrace, linkage, dataset).get(trace.get(eventIndex))
+				).getRealValue();
+			System.out.println("Computed Theta :: "+ theta);
+			return theta;
+				
+		}
+		
+		public double computeTheta(XTrace trace, int leftIndex, int rightIndex, ExogenousDataset dataset, Double sojourn) throws LinkNotFoundException {
+			adjustAggeratorForPanel(dataset);
+			XTrace simplierTrace = new XTraceImpl(trace.getAttributes());
+			Date newDate = new Date(
+					ExogenousUtils.getEventTimeMillis(trace.get(leftIndex))
+					+Double.doubleToLongBits(sojourn)
+			);
+			XEvent newEvent = (XEvent) trace.get(rightIndex).clone();
+			((XAttributeTimestamp) newEvent.getAttributes().get("time:timestamp")).setValue(newDate);
+			simplierTrace.add(newEvent);
+			XTrace linkage = dataset.findLinkage(simplierTrace).get(0);
+			double theta = thetaAggerator.transform(
+						eventSlicer.slice(simplierTrace, linkage, dataset).get(newEvent)
+				).getRealValue();
+			System.out.println("Computed Theta :: "+ theta);
+			return theta;
+				
+		}
+		
 	}
 
-	public static Map<Set<Transition>, List<ChoiceDataPoint>> collect(ExogenousAnnotatedLog xlog, AcceptingPetriNet net, ChoiceCollectorParameters ccparameters) throws AStarException, UserCancelledException {
+	public static Map<Set<Transition>, List<ChoiceDataPoint>> collect(
+			ExogenousAnnotatedLog xlog, 
+			AcceptingPetriNet net, 
+			ChoiceCollectorParameters ccparameters) throws AStarException, UserCancelledException {
 		
 //		compute an alignment between the given log and net.
 		XEventClassifier classifer = xlog.getEndogenousLog().getClassifiers().get(0);
@@ -100,22 +173,28 @@ public class ChoiceCollector {
 		System.out.println("collected sojourn times...");
 //		traverse each alignment and collect choice data.
 		for(SyncReplayResult alignment : alignedTraces) {
+			System.out.println("looking at an alignment for a trace...");
+			System.out.println("moves :: "+alignment.getStepTypes());
+			ChoiceAlignmentHandler handler = new ChoiceAlignmentHandler(alignment, net, ccparameters);
 //			for each trace with this control flow alignment
 			for(int traceIdx : alignment.getTraceIndex()) {
 				XTrace currTrace = xlog.get(traceIdx);
-				System.out.println("looking at an alignment for a trace...");
 				System.out.println("trace ::  " + currTrace
 						.stream()
 						.map( (x) -> {return classifer.getClassIdentity(x);})
 						.reduce("", (ls,nx) -> {return ls + nx;})
 				);
-				System.out.println("moves :: "+alignment.getStepTypes());
+				handler.generateChoiceData(currTrace, sojournStats, xlog);
 			}
 		}
 		
 		return new HashMap();
 	}
 	
+	/*
+	 * Collects sojourn times between two synchronised moves, 
+	 * towards the right synchronised move.
+	 */
 	public static class SojournStatistics {
 		
 		private List<Transition> transitions;
@@ -190,44 +269,479 @@ public class ChoiceCollector {
 			return this.times.get(trans).toArray(new Double[0]);
 		}
 		
+		public Double[] getSojournsLessThan(Transition trans, double lessThan) {
+			List<Double> keepers = new ArrayList();
+			for(Double pos: this.times.get(trans)) {
+				if (pos <= lessThan) {
+					keepers.add(pos);
+				}
+			}
+			return keepers.toArray(new Double[0]);
+		}
+		
 	}
 	
-	public class ChoiceAlignmentHandler {
+	/*
+	 * 
+	 */
+	public static class ChoiceAlignmentHandler {
 		
+		private ChoiceCollectorParameters params;
+		private AcceptingPetriNet net;
 		private SyncReplayResult alignment;
-		private int generatedPoints;
+		private List<Integer> generators;
+		private PowerHandler[] transformers;
 		
-		public ChoiceAlignmentHandler(SyncReplayResult alignment) {
+		public ChoiceAlignmentHandler(SyncReplayResult alignment, AcceptingPetriNet net, ChoiceCollectorParameters params) {
+			this.params = params;
+			this.net = net;
 			this.alignment = alignment;
+			this.transformers = new PowerHandler[alignment.getStepTypes().size()];
+			this.generators = new ArrayList();
+			prepareThetaOptions();
 		}
 		
 		private void prepareThetaOptions() {
-			
+//			determine how to handle producing a theta component in the alignment
+			List<StepTypes> steps = alignment.getStepTypes();
+			String ret = "";
+			for(int i=0; i < steps.size(); i++) {
+				transformers[i] = determineHanlder(
+					steps.subList(0, i),
+					steps.get(i),
+					steps.subList(i+1, steps.size())
+				);
+				ret += transformers[i].toString() + "->";
+				if (steps.get(i) == StepTypes.LMGOOD || steps.get(i) == StepTypes.MINVI || steps.get(i) == StepTypes.MREAL) {
+					generators.add(i);
+				}
+			}
+			System.out.println("theta operations :: "+ ret);
 		}
 		
-		public ChoiceDataPoint[] generateChoiceData(XTrace xtrace) {
-			
-			return new ChoiceDataPoint[generatedPoints];
+		public ChoiceDataPoint[] generateChoiceData(XTrace xtrace, SojournStatistics sojourns, ExogenousAnnotatedLog xlog) {
+			ChoiceDataPoint[] ret = new ChoiceDataPoint[generators.size()];
+			int powers = xlog.getExogenousDatasets().size();
+			ChoiceExogenousPoint[][] thetas = new ChoiceExogenousPoint[transformers.length][powers];
+//			first pass 
+			for( int i =0; i < transformers.length; i++) {
+				if (transformers[i] instanceof SilientModelPower) {
+					continue;
+				} else {
+					thetas[i] = transformers[i].handle(thetas, xlog, xtrace, this.params, sojourns);
+				}
+			}
+//			second pass (for silent moves)
+			for( int i =0; i < transformers.length; i++) {
+				if (transformers[i] instanceof SilientModelPower) {
+					thetas[i] = transformers[i].handle(thetas, xlog, xtrace, this.params, sojourns);
+				}
+			}
+//			scrape thetas from generators
+			int genIndex = 0;
+			for(int gen : generators) {
+				ChoiceDataPoint point = ChoiceDataPoint.builder()
+						.enabled(findEnabled(gen))
+						.fired(findFired(gen))
+						.powers(thetas[gen])
+						.build();
+				System.out.println(point.toString());
+				ret[genIndex] = point;
+				genIndex++;
+			}
+			return ret;
+		}
+		
+		public PowerHandler determineHanlder(
+				List<StepTypes> left_rem, StepTypes curr, List<StepTypes> right_rem) {
+			System.out.println("left_rem : "+ left_rem);
+			System.out.println("curr :"+curr);
+			System.out.println("right_rem :"+ right_rem);
+			if (curr == StepTypes.L) {
+				System.out.println("determined log power");
+				return new LogPower();
+			} else if (curr == StepTypes.MINVI) {
+				System.out.println("determined silent power");
+				return new SilientModelPower(nextVis(right_rem));
+			} else if (curr == StepTypes.LMGOOD) {
+				System.out.println("determined sync power");
+				return new PowerSynchronistation(findEventIndex(left_rem.size()+1));
+			} else {
+				if (left_rem.contains(StepTypes.LMGOOD)) {
+					if (right_rem.contains(StepTypes.LMGOOD)) {
+						System.out.println("determined betweensync power");
+						return new PowerBetweenSynchronisation(
+							(Transition) alignment.getNodeInstance().get(left_rem.size()),
+							findEventIndex(lastSync(left_rem)+1), 
+							findEventIndex(left_rem.size()+1+nextSync(right_rem))								
+						);
+					} else {
+						System.out.println("determined preceding power");
+						return new PowerPrecedingSynchronisation();
+					}
+				} else if (right_rem.contains(StepTypes.LMGOOD)) {
+					System.out.println("determined proceding power");
+					return new PowerProceedingSynchronisation();
+				} else {
+					System.out.println("determined no power");
+					return new NoPower();
+				}
+			}
+		}
+		
+		public int findTransitionIndex(int stepIndex) {
+			int transIndex = -1;
+			for(StepTypes step : alignment.getStepTypes().subList(0, stepIndex+1)) {
+				if (step == StepTypes.MINVI || step == StepTypes.LMGOOD || step == StepTypes.MREAL) {
+					transIndex++;
+				}
+			}
+			return transIndex;
+		}
+		
+		public int findEventIndex(int stepIndex) {
+			int eventIndex = -1;
+			for(StepTypes step : alignment.getStepTypes().subList(0, stepIndex)) {
+				if (step == StepTypes.L || step == StepTypes.LMGOOD) {
+					eventIndex++;
+				}
+			}
+			return eventIndex;
+		}
+		
+		public int lastSync(List<StepTypes> steps) {
+			int ret = -1;
+			for(int i = steps.size()-1; i >= 0; i--) {
+				if (steps.get(i) == StepTypes.LMGOOD) {
+					ret = i;
+					break;
+				}
+			}
+			return ret;
+		}
+		
+		public int nextSync(List<StepTypes> steps) {
+			int ret = -1;
+			for(int i = 0; i < steps.size(); i++) {
+				if (steps.get(i) == StepTypes.LMGOOD) {
+					ret = i;
+					break;
+				}
+			}
+			return ret;
+		}
+		
+		public int lastVis(List<StepTypes> steps) {
+			int ret = -1;
+			for(int i = 0; i < steps.size(); i++) {
+				if (steps.get(i) == StepTypes.LMGOOD || steps.get(i) == StepTypes.MREAL) {
+					ret = i;
+					break;
+				}
+			}
+			return ret;
+		}
+		
+		public int nextVis(List<StepTypes> steps) {
+			int ret = -1;
+			for(int i = 0; i < steps.size(); i++) {
+				if (steps.get(i) == StepTypes.LMGOOD || steps.get(i) == StepTypes.MREAL) {
+					ret = i;
+					break;
+				}
+			}
+			return ret;
+		}
+		
+		public List<Transition> findFiringSeq(int stepIndex){
+			List<Transition> firing = new ArrayList();
+			int nodeIndex = 0;
+			if (stepIndex > 0) {
+				for(StepTypes step : alignment.getStepTypes().subList(0, stepIndex)) {
+					if (step == StepTypes.LMGOOD || step == StepTypes.MINVI || step == StepTypes.MREAL) {
+						Object node = alignment.getNodeInstance().get(nodeIndex);
+						if (node instanceof Transition) {
+							firing.add( (Transition) node);
+						}
+						nodeIndex++;
+					}
+				}
+			}
+			return firing;
+		}
+		
+		public Set<Transition> findEnabled(int stepIndex){
+			PetrinetSemantics curr = PetrinetSemanticsFactory.regularEfficientPetrinetSemantics(net.getNet());
+			curr.setCurrentState(net.getInitialMarking());
+			for( Transition fired : findFiringSeq(stepIndex)) {
+				try {
+					curr.executeExecutableTransition(fired);
+				} catch (IllegalTransitionException e) {
+					// opps the alignment translation is not sound
+					e.printStackTrace();
+					
+				}
+			}
+			return new HashSet() {{ addAll(curr.getExecutableTransitions()); }};
+		}
+		
+		public Transition findFired(int stepIndex) {
+			int transIndex = findTransitionIndex(stepIndex);
+			Object node = this.alignment.getNodeInstance().get(stepIndex);
+			if (node instanceof Transition) {
+				return (Transition) node;
+			}
+			throw new ValueException("Expected a transition here.");
 		}
 	}
 	
-	public class PowerBetweenSynchronisation {
+	public interface PowerHandler {
+		
+		/*
+		 * Computes the theta for this step of the alignment sequence
+		 */
+		public ChoiceExogenousPoint[]handle(
+				ChoiceExogenousPoint[][]  thetas, 
+				ExogenousAnnotatedLog xlog,
+				XTrace trace,
+				ChoiceCollectorParameters params,
+				SojournStatistics sojourns,
+				Object ...args);
+	}
+	
+	public static class NoPower implements PowerHandler {
+
+		public ChoiceExogenousPoint[] handle(
+				ChoiceExogenousPoint[][] thetas, 
+				ExogenousAnnotatedLog xlog,
+				XTrace trace,
+				ChoiceCollectorParameters params,
+				SojournStatistics sojourns,
+				Object ...args) {
+//			just build an empty power.
+			List<String> xnames = xlog.getExogenousDatasets().stream().map( d -> d.getName()).collect(Collectors.toList());
+			return xnames.stream()
+					.map((name) -> {return ChoiceExogenousPoint.builder().name(name).build();})
+					.collect(Collectors.toList())
+					.toArray(new ChoiceExogenousPoint[0]);
+		}
+		
+		public String toString() {
+			return "NoPower";
+		}
+		
+		
+	}
+	
+	public static class SilientModelPower implements PowerHandler {
+		
+		private int left_target;
+		
+		public SilientModelPower(int target) {
+			this.left_target = target;
+		}
+
+		public ChoiceExogenousPoint[] handle(
+				ChoiceExogenousPoint[][] thetas, 
+				ExogenousAnnotatedLog xlog,
+				XTrace trace,
+				ChoiceCollectorParameters params,
+				SojournStatistics sojourns,
+				Object ...args) {
+//			look at the target and copy its power
+			return thetas[left_target].clone();
+		}
+		
+		public String toString() {
+			return "SilentPower";
+		}
+		
+	}
+	
+	public static class LogPower implements PowerHandler {
+
+		public ChoiceExogenousPoint[] handle(
+				ChoiceExogenousPoint[][] thetas, 
+				ExogenousAnnotatedLog xlog,
+				XTrace trace,
+				ChoiceCollectorParameters params,
+				SojournStatistics sojourns,
+				Object ...args) {
+//			make a skipped power
+			List<String> xnames = xlog.getExogenousDatasets().stream().map( d -> d.getName()).collect(Collectors.toList());
+			return xnames.stream()
+					.map((name) -> {return ChoiceExogenousPoint.builder().name(name).skipped(true).build();})
+					.collect(Collectors.toList())
+					.toArray(new ChoiceExogenousPoint[0]);
+		}
+		
+		public String toString() {
+			return "skipped";
+		}
+		
+		
+	}
+	
+	public static class PowerSynchronistation implements PowerHandler {
+
+		private int eventTarget;
+		
+		public PowerSynchronistation(int target) {
+			this.eventTarget = target;
+		}
+		
+		public ChoiceExogenousPoint[] handle(
+				ChoiceExogenousPoint[][] thetas, 
+				ExogenousAnnotatedLog xlog,
+				XTrace trace,
+				ChoiceCollectorParameters params,
+				SojournStatistics sojourns,
+				Object ...args) {
+//			loop through powers and build ceps 
+			ChoiceExogenousPoint[] powers = new ChoiceExogenousPoint[xlog.getExogenousDatasets().size()];
+			int cepIndex = 0;
+			for(ExogenousDataset dataset : xlog.getExogenousDatasets()) {
+//				does the target exist in the attributes
+				if (dataset.checkLink(trace)) {
+						try {
+							double theta = params.computeTheta(trace, eventTarget, dataset);
+							powers[cepIndex] = ChoiceExogenousPoint.builder()
+									.known(true)
+									.value(theta)
+									.name(dataset.getName())
+									.build();
+						} catch (LinkNotFoundException e) {
+//							already checked, shouldn't happen
+						}
+						
+				} else {
+					powers[cepIndex] = ChoiceExogenousPoint.builder()
+							.name(dataset.getName())
+							.build();
+				}
+				cepIndex++;
+			}
+			return powers;
+		}
+		
+		public String toString() {
+			return "SyncPower";
+		}
+		
+	}
+	
+	public static class PowerBetweenSynchronisation implements PowerHandler{
+		
+		private Transition target;
+		private int leftEventIndex;
+		private int rightEventIndex;
+		
+		public PowerBetweenSynchronisation(Transition target, int leftEvent, int rightEvent) {
+			this.target = target;
+			this.leftEventIndex = leftEvent;
+			this.rightEventIndex = rightEvent;
+		}
+		
+		public ChoiceExogenousPoint[] handle(
+				ChoiceExogenousPoint[][] thetas, 
+				ExogenousAnnotatedLog xlog,
+				XTrace trace,
+				ChoiceCollectorParameters params,
+				SojournStatistics sojourns,
+				Object ...args) {
+//			work out upper limit for sojourns
+			double duration = findDuration(trace);
+			Double[] targetTimes = sojourns.getSojournsLessThan(target, duration);
+//			loop through powers and build ceps 
+			ChoiceExogenousPoint[] powers = new ChoiceExogenousPoint[xlog.getExogenousDatasets().size()];
+			int cepIndex = 0;
+			for(ExogenousDataset dataset : xlog.getExogenousDatasets()) {
+				if (dataset.checkLink(trace)) {
+					double avgTheta = 0.0;
+					for(double time : targetTimes) {
+						try {
+							avgTheta += params.computeTheta(trace, leftEventIndex, rightEventIndex, dataset, time);
+						} catch (LinkNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					avgTheta = avgTheta / targetTimes.length;
+					powers[cepIndex] = ChoiceExogenousPoint.builder()
+							.known(true)
+							.value(avgTheta)
+							.name(dataset.getName())
+							.build();
+				} else {
+					powers[cepIndex] = ChoiceExogenousPoint.builder()
+							.name(dataset.getName())
+							.build();
+				}
+				cepIndex++;
+			}
+			
+			return powers;
+		}
+		
+		public String toString() {
+			return "BetweenSync";
+		}
+		
+		private double findDuration(XTrace trace) {
+			XEvent left = trace.get(leftEventIndex);
+			XEvent right = trace.get(rightEventIndex);
+			return ExogenousUtils.getEventTimeMillis(right) - ExogenousUtils.getEventTimeMillis(left) / 1000.0;
+		}
+		
+	}
+	
+	public static class PowerProceedingSynchronisation implements PowerHandler{
 		
 		private int syncLeft;
 		private int target;
-		private int syncRight;
 		
+		public PowerProceedingSynchronisation() {
+			// TODO Auto-generated constructor stub
+		}
+		
+		public ChoiceExogenousPoint[] handle(
+				ChoiceExogenousPoint[][] thetas, 
+				ExogenousAnnotatedLog xlog,
+				XTrace trace,
+				ChoiceCollectorParameters params,
+				SojournStatistics sojourns,
+				Object ...args) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		public String toString() {
+			return "ProceddingSync";
+		}
 	}
 	
-	public class PowerProceedingSynchronisation {
-		
-		private int syncLeft;
-		private int target;
-	}
-	
-	public class PowerPrecedingSynchronisation {
+	public static class PowerPrecedingSynchronisation implements PowerHandler{
 		
 		private int syncRight;
 		private int target;
+		
+		public PowerPrecedingSynchronisation() {
+			// TODO Auto-generated constructor stub
+		}
+		
+		public ChoiceExogenousPoint[] handle(
+				ChoiceExogenousPoint[][] thetas, 
+				ExogenousAnnotatedLog xlog,
+				XTrace trace,
+				ChoiceCollectorParameters params,
+				SojournStatistics sojourns,
+				Object ...args) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		public String toString() {
+			return "PrecedingSync";
+		}
 	}
 }
