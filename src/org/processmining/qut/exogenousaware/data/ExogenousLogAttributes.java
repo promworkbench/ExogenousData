@@ -32,6 +32,7 @@ public class ExogenousLogAttributes {
 
 	private ExogenousLogAttributes() {};
 	
+	public static String EXOGENOUS_DATASET_NAME = "exogenous:name";
 	public static ExogenousLogAttribute EXOGENOUS_DATASET = ExogenousLogAttribute.EXOGENOUS_DATASET;
 	public static ExogenousLogAttribute EXOGENOUS_DATA_TYPE_DISCRETE = ExogenousLogAttribute.EXOGENOUS_DATA_TYPE_DISCRETE;
 	public static ExogenousLogAttribute EXOGENOUS_DATA_TYPE_NUMERICAL = ExogenousLogAttribute.EXOGENOUS_DATA_TYPE_NUMERICAL;
