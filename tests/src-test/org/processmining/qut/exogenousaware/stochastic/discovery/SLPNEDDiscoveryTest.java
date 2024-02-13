@@ -19,6 +19,7 @@ import org.processmining.models.graphbased.directed.petrinet.impl.PetrinetFactor
 import org.processmining.models.semantics.petrinet.Marking;
 import org.processmining.qut.exogenousaware.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousaware.data.ExogenousDataset;
+import org.processmining.qut.exogenousaware.data.ExogenousDatasetAttributes;
 import org.processmining.qut.exogenousaware.data.ExogenousDatasetLinkType;
 import org.processmining.qut.exogenousaware.data.ExogenousDatasetType;
 import org.processmining.qut.exogenousaware.steps.determination.Determination;
@@ -42,7 +43,25 @@ public class SLPNEDDiscoveryTest {
 					XLogBuilder.newInstance()
 						.startLog("Exogenous Dataset X")
 						.addTrace("xseries_01_a")
-						.addAttribute("exogenous:link", "1")
+						.addAttribute("exogenous:link", "2")
+							.addEvent("exogenous_datapoint_001")
+								.addAttribute("time:timestamp", new Date(2024, 2, 8, 9, 00, 00))
+								.addAttribute(ExogenousDatasetAttributes.EXOEVENTVALUE, 25.0)
+							.addEvent("exogenous_datapoint_002")
+								.addAttribute("time:timestamp", new Date(2024, 2, 8, 9, 15, 00))
+								.addAttribute(ExogenousDatasetAttributes.EXOEVENTVALUE, 20.0)
+							.addEvent("exogenous_datapoint_003")
+								.addAttribute("time:timestamp", new Date(2024, 2, 8, 9, 45, 00))
+								.addAttribute(ExogenousDatasetAttributes.EXOEVENTVALUE, 18.0)
+							.addEvent("exogenous_datapoint_004")
+								.addAttribute("time:timestamp", new Date(2024, 2, 8, 10, 45, 00))
+								.addAttribute(ExogenousDatasetAttributes.EXOEVENTVALUE, 18.0)
+							.addEvent("exogenous_datapoint_005")
+								.addAttribute("time:timestamp", new Date(2024, 2, 8, 11, 7, 00))
+								.addAttribute(ExogenousDatasetAttributes.EXOEVENTVALUE, 16.0)
+							.addEvent("exogenous_datapoint_006")
+								.addAttribute("time:timestamp", new Date(2024, 2, 8, 11, 45, 00))
+								.addAttribute(ExogenousDatasetAttributes.EXOEVENTVALUE, 14.0)
 						.build()
 			)
 			.build();
@@ -79,6 +98,18 @@ public class SLPNEDDiscoveryTest {
 				.addEvent("e")
 				.addAttribute("time:timestamp", new Date(2024, 2, 8, 15, 00, 00))
 				.addEvent("b")
+				.addAttribute("time:timestamp", new Date(2024, 2, 8, 18, 00, 00))
+				.addEvent("d")
+				.addAttribute("time:timestamp", new Date(2024, 2, 9, 1, 00, 00))
+			.addTrace("trace_04")
+			.addAttribute(new XAttributeLiteralImpl("exogenous:link", "4"))
+				.addEvent("a")
+				.addAttribute("time:timestamp", new Date(2024, 2, 8, 10, 00, 00))
+				.addEvent("f")
+				.addAttribute("time:timestamp", new Date(2024, 2, 8, 14, 00, 00))
+				.addEvent("e")
+				.addAttribute("time:timestamp", new Date(2024, 2, 8, 15, 00, 00))
+				.addEvent("z")
 				.addAttribute("time:timestamp", new Date(2024, 2, 8, 18, 00, 00))
 				.addEvent("d")
 				.addAttribute("time:timestamp", new Date(2024, 2, 9, 1, 00, 00))
