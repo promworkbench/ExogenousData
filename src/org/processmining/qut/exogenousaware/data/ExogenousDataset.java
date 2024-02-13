@@ -3,6 +3,7 @@ package org.processmining.qut.exogenousaware.data;
 import java.awt.Color;
 import java.util.List;
 
+import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.qut.exogenousaware.exceptions.CannotConvertException;
@@ -11,6 +12,7 @@ import org.processmining.qut.exogenousaware.exceptions.LinkNotFoundException;
 import org.processmining.qut.exogenousaware.gui.colours.ColourScheme;
 import org.processmining.qut.exogenousaware.steps.linking.Linker;
 
+import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -27,6 +29,12 @@ public class ExogenousDataset {
 	@Default @Getter @Setter Color colourBase = ColourScheme.green;
 	@Default @Getter Linker linker = null;
 	@Default private Boolean setupCompleted = false;
+	
+//	stats
+	private double mean;
+	@Default private boolean computedMean = false;
+	private double std;
+	@Default private boolean computedStd = false;
 
 
 
@@ -101,6 +109,54 @@ public class ExogenousDataset {
 			}
 		}
 		return name;
+	}
+		
+	public double getMean() {
+		if (!computedMean) {
+			if (dataType == ExogenousDatasetType.NUMERICAL) {
+				double mean = 0;
+				int total = 0;
+				for( XTrace xseries : source) {
+					for(XEvent ev : xseries) {
+						mean += (double) ExogenousDatasetAttributes.extractExogenousValue(ev);
+						total += 1;
+					}
+					
+				}
+				this.mean = mean / total;
+				this.computedMean = true;
+				return this.mean;
+			} else {
+				throw new ValueException("Unable to compute mean on non-numerical datasets.");
+			}
+		} else {
+			return this.mean;
+		}
+		
+	}
+	
+	public double getStd() {
+		if (!computedStd) {
+			if (dataType == ExogenousDatasetType.NUMERICAL) {
+				double mean = getMean();
+				double std = 0;
+				int total = 0;
+				for( XTrace xseries : source) {
+					for(XEvent ev : xseries) {
+						std += Math.pow(((double) ExogenousDatasetAttributes.extractExogenousValue(ev)) - mean, 2.0);
+						total += 1;
+					}
+					
+				}
+				this.std = Math.sqrt(std / total);
+				this.computedStd = true;
+				return this.std;
+			} else {
+				throw new ValueException("Unable to compute mean on non-numerical datasets.");
+			}
+		} else {
+			return this.std;
+		}		
 	}
 
 	@Override
