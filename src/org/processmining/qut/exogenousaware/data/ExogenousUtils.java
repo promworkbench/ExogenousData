@@ -1,7 +1,10 @@
 package org.processmining.qut.exogenousaware.data;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
+import org.deckfour.xes.model.XAttributeTimestamp;
+import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.processmining.qut.exogenousaware.exceptions.ExogenousAttributeNotFoundException;
 import org.processmining.qut.exogenousaware.steps.linking.AttributeLinker;
@@ -16,6 +19,20 @@ import org.processmining.qut.exogenousaware.steps.linking.Linker;
 public class ExogenousUtils {
 
 	private ExogenousUtils() {};
+	
+	/**
+	 * Extracts the timestamp of the given event in miliseconds from epoch.
+	 * @param ev
+	 * @return time in miliseconds.
+	 * @throws NoSuchElementException
+	 */
+	public static long getEventTimeMillis(XEvent ev) throws NoSuchElementException {
+		if (ev.getAttributes().containsKey("time:timestamp")) {
+			return ( (XAttributeTimestamp) ev.getAttributes().get("time:timestamp")).getValueMillis();
+		} else {
+			throw new NoSuchElementException("Unable to find suitable attribute for event to describe time.");
+		}
+	};
 	
 	/**
 	 * Finds an exogenous data type for a given exogenous log.
