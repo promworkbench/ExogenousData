@@ -26,9 +26,9 @@ public class ChoiceExogenousPoint {
 		if (skipped) {
 			return ">>";
 		} else if (! known) {
-			return "\bot";
+			return new String("?");
 		} else {
-			return Double.toString(value);
+			return String.format("%.4f", value);
 		}
 	}
 }

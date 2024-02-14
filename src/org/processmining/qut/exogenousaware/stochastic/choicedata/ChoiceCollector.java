@@ -84,9 +84,21 @@ public class ChoiceCollector {
 			double theta = thetaAggerator.transform(
 						eventSlicer.slice(simplierTrace, linkage, dataset).get(trace.get(eventIndex))
 				).getRealValue();
-			System.out.println("Computed Theta :: "+ theta);
+//			System.out.println("Computed Theta :: "+ theta);
 			return theta;
 				
+		}
+		
+		public double computeProceedingTheta(XTrace trace, XEvent posEvent, ExogenousDataset dataset) throws LinkNotFoundException {
+			adjustAggeratorForPanel(dataset);
+			XTrace simplierTrace = new XTraceImpl(trace.getAttributes());
+			simplierTrace.add(posEvent);
+			XTrace linkage = dataset.findLinkage(simplierTrace).get(0);
+			double theta = thetaAggerator.transform(
+						eventSlicer.slice(simplierTrace, linkage, dataset).get(posEvent)
+				).getRealValue();
+//			System.out.println("Computed Theta :: "+ theta);
+			return theta;
 		}
 		
 		public double computeTheta(XTrace trace, int leftIndex, int rightIndex, ExogenousDataset dataset, Double sojourn) throws LinkNotFoundException {
@@ -103,14 +115,14 @@ public class ChoiceCollector {
 			double theta = thetaAggerator.transform(
 						eventSlicer.slice(simplierTrace, linkage, dataset).get(newEvent)
 				).getRealValue();
-			System.out.println("Computed Theta :: "+ theta);
+//			System.out.println("Computed Theta :: "+ theta);
 			return theta;
 				
 		}
 		
 	}
 
-	public static Map<Set<Transition>, List<ChoiceDataPoint>> collect(
+	public static Map<ChoiceDataPoint, List<ChoiceDataPoint>> collect(
 			ExogenousAnnotatedLog xlog, 
 			AcceptingPetriNet net, 
 			ChoiceCollectorParameters ccparameters) throws AStarException, UserCancelledException {
@@ -172,6 +184,7 @@ public class ChoiceCollector {
 		}
 		System.out.println("collected sojourn times...");
 //		traverse each alignment and collect choice data.
+		Map<ChoiceDataPoint, List<ChoiceDataPoint>> storage = new HashMap();
 		for(SyncReplayResult alignment : alignedTraces) {
 			System.out.println("looking at an alignment for a trace...");
 			System.out.println("moves :: "+alignment.getStepTypes());
@@ -184,11 +197,20 @@ public class ChoiceCollector {
 						.map( (x) -> {return classifer.getClassIdentity(x);})
 						.reduce("", (ls,nx) -> {return ls + nx;})
 				);
-				handler.generateChoiceData(currTrace, sojournStats, xlog);
+				for( ChoiceDataPoint point : handler.generateChoiceData(currTrace, sojournStats, xlog)) {
+					if (storage.containsKey(point)) {
+						storage.get(point).add(point);
+					} else {
+						List<ChoiceDataPoint> lister = new ArrayList();
+						lister.add(point);
+						storage.put(point, lister);
+					}
+				}
+				
 			}
 		}
 		
-		return new HashMap();
+		return storage;
 	}
 	
 	/*
@@ -316,6 +338,7 @@ public class ChoiceCollector {
 					generators.add(i);
 				}
 			}
+			ret = ret.substring(0, ret.length()-2);
 			System.out.println("theta operations :: "+ ret);
 		}
 		
@@ -344,6 +367,7 @@ public class ChoiceCollector {
 						.enabled(findEnabled(gen))
 						.fired(findFired(gen))
 						.powers(thetas[gen])
+						.firingSeq(findFiringSeq(gen))
 						.build();
 				System.out.println(point.toString());
 				ret[genIndex] = point;
@@ -377,11 +401,19 @@ public class ChoiceCollector {
 						);
 					} else {
 						System.out.println("determined preceding power");
-						return new PowerPrecedingSynchronisation();
+						int leftIndex = lastSync(left_rem);
+						return new PowerPrecedingSynchronisation(
+								findEventIndex(leftIndex),
+								(Transition) alignment.getNodeInstance().get(left_rem.size())
+						);
 					}
 				} else if (right_rem.contains(StepTypes.LMGOOD)) {
 					System.out.println("determined proceding power");
-					return new PowerProceedingSynchronisation();
+					int rightIndex = left_rem.size() + 1 + nextSync(right_rem);
+					return new PowerProceedingSynchronisation(
+							findEventIndex(rightIndex),
+							(Transition) alignment.getNodeInstance().get(rightIndex)
+					);
 				} else {
 					System.out.println("determined no power");
 					return new NoPower();
@@ -463,8 +495,8 @@ public class ChoiceCollector {
 						if (node instanceof Transition) {
 							firing.add( (Transition) node);
 						}
-						nodeIndex++;
 					}
+					nodeIndex++;
 				}
 			}
 			return firing;
@@ -697,11 +729,12 @@ public class ChoiceCollector {
 	
 	public static class PowerProceedingSynchronisation implements PowerHandler{
 		
-		private int syncLeft;
-		private int target;
+		private int eventRight;
+		private Transition target;
 		
-		public PowerProceedingSynchronisation() {
-			// TODO Auto-generated constructor stub
+		public PowerProceedingSynchronisation(int eventRight, Transition target) {
+			this.eventRight = eventRight;
+			this.target = target;
 		}
 		
 		public ChoiceExogenousPoint[] handle(
@@ -711,8 +744,45 @@ public class ChoiceCollector {
 				ChoiceCollectorParameters params,
 				SojournStatistics sojourns,
 				Object ...args) {
-			// TODO Auto-generated method stub
-			return null;
+			// get sojourns of right
+			Double[] times = sojourns.getSojourns(target);
+//			get event
+			XEvent ev = trace.get(eventRight);
+			List<ExogenousDataset> datasets = xlog.getExogenousDatasets();
+			ChoiceExogenousPoint[] powers = new ChoiceExogenousPoint[datasets.size()];
+//			for all times, compute theta
+			int cepIndex = 0;
+			for(ExogenousDataset dataset : datasets) {
+				if (dataset.checkLink(trace)) {
+					double avgTheta = 0;
+					for(Double time : times) {
+						Date newDate = new Date(
+								ExogenousUtils.getEventTimeMillis(ev)
+								-Double.doubleToLongBits(time)
+						);
+						XEvent newEvent = (XEvent) ev.clone();
+						((XAttributeTimestamp) newEvent.getAttributes().get("time:timestamp")).setValue(newDate);
+						try {
+							avgTheta += params.computeProceedingTheta(trace, newEvent, dataset);
+						} catch (LinkNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					avgTheta = avgTheta / times.length;
+					powers[cepIndex] = ChoiceExogenousPoint.builder()
+							.known(true)
+							.value(avgTheta)
+							.name(dataset.getName())
+							.build();
+				} else {
+					powers[cepIndex] = ChoiceExogenousPoint.builder()
+							.name(dataset.getName())
+							.build();
+				}
+				cepIndex++;
+			}
+			return powers;
 		}
 		
 		public String toString() {
@@ -722,11 +792,12 @@ public class ChoiceCollector {
 	
 	public static class PowerPrecedingSynchronisation implements PowerHandler{
 		
-		private int syncRight;
-		private int target;
+		private int eventLeft;
+		private Transition target;
 		
-		public PowerPrecedingSynchronisation() {
-			// TODO Auto-generated constructor stub
+		public PowerPrecedingSynchronisation(int eventLeft, Transition target) {
+			this.eventLeft = eventLeft;
+			this.target = target;
 		}
 		
 		public ChoiceExogenousPoint[] handle(
@@ -736,8 +807,50 @@ public class ChoiceCollector {
 				ChoiceCollectorParameters params,
 				SojournStatistics sojourns,
 				Object ...args) {
-			// TODO Auto-generated method stub
-			return null;
+//			grab the target event
+			XEvent leftev = trace.get(eventLeft);
+//			grab sojourns for target
+			Double[] times = sojourns.getSojourns(target);
+//			build powers
+			List<ExogenousDataset> datasets = xlog.getExogenousDatasets();
+			ChoiceExogenousPoint[] powers = new ChoiceExogenousPoint[datasets.size()];
+//			loop through datasets and construct powers
+			int cepIndex = 0;
+			for(ExogenousDataset dataset : datasets) {
+//				check for linkage
+				if (dataset.checkLink(trace)) {
+//					compute an average of the sojourns
+					double avgTheta = 0;
+					for(Double time : times) {
+//						bake a new event
+						Date newDate = new Date(
+								ExogenousUtils.getEventTimeMillis(leftev)
+								+ Double.doubleToLongBits(time)
+						);
+						XEvent newEvent = (XEvent) leftev.clone();
+						((XAttributeTimestamp) newEvent.getAttributes().get("time:timestamp")).setValue(newDate);
+						try {
+							avgTheta += params.computeProceedingTheta(trace, newEvent, dataset);
+						} catch (LinkNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					avgTheta = avgTheta / times.length;
+					powers[cepIndex] = ChoiceExogenousPoint.builder()
+							.known(true)
+							.value(avgTheta)
+							.name(dataset.getName())
+							.build();
+				} else {
+					powers[cepIndex] = ChoiceExogenousPoint.builder()
+							.name(dataset.getName())
+							.build();
+				}
+				cepIndex += 1;
+			}
+			
+			return powers;
 		}
 		
 		public String toString() {
