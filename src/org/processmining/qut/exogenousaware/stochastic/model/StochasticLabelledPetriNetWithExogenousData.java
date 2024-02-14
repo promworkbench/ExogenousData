@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
+import org.processmining.basicstochasticminer.solver.Function;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetEdge;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetNode;
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
@@ -32,7 +33,10 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 	private int noAdjuster;
 	private Map<String, Integer> adjusters;
 	
-	public StochasticLabelledPetriNetWithExogenousData(AcceptingPetriNet net) {
+	public StochasticLabelledPetriNetWithExogenousData(
+			AcceptingPetriNet net,
+			Map<Function, Double> solvedVariables
+	) {
 //		setup variables
 		this.net = net;
 		this.noAdjuster = 0;
