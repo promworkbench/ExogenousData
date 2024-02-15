@@ -5,13 +5,10 @@ import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginCategory;
-import org.processmining.framework.util.ui.widgets.helper.UserCancelledException;
 import org.processmining.qut.exogenousaware.ExogenousDataPlugins;
 import org.processmining.qut.exogenousaware.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousaware.stochastic.discovery.SLPNEDDiscovery;
 import org.processmining.qut.exogenousaware.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
-
-import nl.tue.astar.AStarException;
 
 public class StochasticExogenousDepenencies {
 	
@@ -19,9 +16,9 @@ public class StochasticExogenousDepenencies {
 	
 	@Plugin(
 			name = "Discover Stochastic Exogenous Depenencies in a Petri Net.",
-			parameterLabels = {"Exogenous Annotated Log", "Petri net"},
+			parameterLabels = {"Exogenous Annotated Log", "Accepting Petri net"},
 			returnLabels = {"Stochastic Labelled Petri Net with Exogenous Dependencies"},
-			returnTypes = {void.class},
+			returnTypes = {StochasticLabelledPetriNetWithExogenousData.class},
 			help="Discovers adjustment and base weights based on the following paper [x] (TODO)"
 					+ version,
 			categories={PluginCategory.Analytics, PluginCategory.Enhancement},
@@ -35,7 +32,7 @@ public class StochasticExogenousDepenencies {
 	)
 	public StochasticLabelledPetriNetWithExogenousData discoverySLPNED(final UIPluginContext context,
 			final ExogenousAnnotatedLog xlog, final AcceptingPetriNet net) 
-	throws AStarException, UserCancelledException {
+	throws Exception {
 		return SLPNEDDiscovery.discover(xlog, net);
 	}
 
