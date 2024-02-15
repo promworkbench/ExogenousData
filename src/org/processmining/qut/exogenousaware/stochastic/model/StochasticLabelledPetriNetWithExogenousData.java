@@ -1,5 +1,8 @@
 package org.processmining.qut.exogenousaware.stochastic.model;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -7,12 +10,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.basicstochasticminer.solver.Function;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetEdge;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetNode;
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
+import org.processmining.qut.exogenousaware.ab.jobs.Tuple;
+import org.processmining.qut.exogenousaware.data.ExogenousDataset;
+import org.processmining.qut.exogenousaware.stochastic.equalities.EqualitiesFactory.SLPNEDVarType;
+import org.processmining.qut.exogenousaware.stochastic.equalities.EqualitiesFactory.SLPNEDVariable;
+import org.processmining.qut.exogenousaware.stochastic.equalities.EqualitiesFactory.SLPNEDVariablePower;
 import org.processmining.stochasticlabelledpetrinets.StochasticLabelledPetriNet;
 
 import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
@@ -22,6 +31,7 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 	private AcceptingPetriNet net;
 	private Map<Transition, Integer> transitions;
 	private Map<Place, Integer> places;
+	private Map<String, Integer> datasets;
 	private Map<Integer, int[]> input_transitions;
 	private Map<Integer, int[]> output_transitions;
 	private Map<Integer, int[]> input_places;
@@ -29,39 +39,74 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 	private Map<Integer, Double> base_weights;
 	private Map<Integer, Double[]> adjustments;
 	private Map<Integer, Double[]> not_adjustments;
+	private int[] initial_marking;
 	private List<String> adjustment_names;
-	private int noAdjuster;
-	private Map<String, Integer> adjusters;
+	
+	public StochasticLabelledPetriNetWithExogenousData() {
+//		setup variables
+		prepareVars();
+	}
 	
 	public StochasticLabelledPetriNetWithExogenousData(
 			AcceptingPetriNet net,
-			Map<Function, Double> solvedVariables
-	) {
+			Map<Function, Double> solvedVariables,
+			Collection<ExogenousDataset> datasets
+	) throws Exception {
 //		setup variables
-		this.net = net;
-		this.noAdjuster = 0;
-		this.transitions = new HashMap();
-		this.places = new HashMap();
-		this.input_transitions = new HashMap();
-		this.output_transitions = new HashMap();
-		this.input_places = new HashMap();
-		this.output_places = new HashMap();
-		this.base_weights = new HashMap();
-		this.adjustments = new HashMap();
-		this.not_adjustments = new HashMap();
-		this.adjustment_names = new ArrayList();
+		prepareVars(net, solvedVariables, datasets);
+//		stardardise the ordering of datasets
+		int indexer = 0;
+		for(ExogenousDataset dataset : datasets) {
+			String dname = dataset.getName();
+			this.datasets.put(dname, indexer);
+			this.adjustment_names.add(dname);
+			indexer++;
+		}
+		System.out.println(this.datasets.toString());
 //		initialise the weights
-		int indexer = 1;
+		int numPowers = indexer;
+		indexer = 0;
 		for(Transition trans : net.getNet().getTransitions()) {
 			this.transitions.put(trans, indexer);
 			this.base_weights.put(indexer, 1.0);
-			this.adjustments.put(indexer, new Double[0]);
-			this.not_adjustments.put(indexer, new Double[0]);
+			this.adjustments.put(indexer, new Double[numPowers]);
+			this.not_adjustments.put(indexer, new Double[numPowers]);
 			indexer++;
 		}
-		indexer = 1;
+//		load in variables 
+		for(Function var: solvedVariables.keySet()) {
+			int varIndex =-1;
+			int adjIndex =-1;
+			SLPNEDVarType type;
+			if (var instanceof SLPNEDVariable) {
+				SLPNEDVariable slpnedVar = (SLPNEDVariable) var;
+				varIndex = this.transitions.get(slpnedVar.getTransition());
+				type = slpnedVar.getType();
+				if (type != SLPNEDVarType.BASE) {
+					adjIndex = this.datasets.get(slpnedVar.getDataset());
+				}
+			} else if (var instanceof SLPNEDVariablePower) {
+				SLPNEDVariablePower slpnedVar = (SLPNEDVariablePower) var;
+				varIndex = this.transitions.get(slpnedVar.getTransition());
+				type = slpnedVar.getType();
+				adjIndex = this.datasets.get(slpnedVar.getDataset());
+			} else {
+				throw new Exception("variable not of known type for constructing slpned.");
+			}
+			if (type == SLPNEDVarType.BASE) {
+				this.base_weights.put(varIndex, solvedVariables.get(var));
+			} else if (type == SLPNEDVarType.EXOADJ) {
+				if (solvedVariables.get(var) != null) {
+					this.adjustments.get(varIndex)[adjIndex] = solvedVariables.get(var);
+				}
+			} else if (type == SLPNEDVarType.NOTEXOADJ) {
+				this.not_adjustments.get(varIndex)[adjIndex] = solvedVariables.get(var);
+			}
+		}
+		indexer = 0;
 		for(Place place : net.getNet().getPlaces()) {
 			this.places.put(place, indexer);
+			this.initial_marking[indexer] = net.getInitialMarking().contains(place) ? 1: 0;
 			indexer++;
 		}
 //		find input/output for transitions
@@ -85,45 +130,66 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 			this.output_transitions.put(tranid, outplaces);
 		}
 		
-		
+//		set up initial places
 	}
 	
-	public void setBaseWeight(Transition transition, double weight) {
-		setBaseWeight(this.transitions.get(transition), weight);
+	private void prepareVars() {
+//		setup variables
+		this.transitions = new HashMap();
+		this.places = new HashMap();
+		this.input_transitions = new HashMap();
+		this.output_transitions = new HashMap();
+		this.input_places = new HashMap();
+		this.output_places = new HashMap();
+		this.base_weights = new HashMap();
+		this.adjustments = new HashMap();
+		this.not_adjustments = new HashMap();
+		this.adjustment_names = new ArrayList();
+		this.datasets = new HashMap();
+		this.initial_marking = new int[0];
 	}
 	
-	public void setBaseWeight(int transition, double weight) {
-		this.base_weights.put(transition, weight);
+	private void prepareVars(AcceptingPetriNet net,
+			Map<Function, Double> solvedVariables,
+			Collection<ExogenousDataset> datasets) {
+//		setup variables
+		this.net = net;
+		this.transitions = new HashMap();
+		this.places = new HashMap();
+		this.input_transitions = new HashMap();
+		this.output_transitions = new HashMap();
+		this.input_places = new HashMap();
+		this.output_places = new HashMap();
+		this.base_weights = new HashMap();
+		this.adjustments = new HashMap();
+		this.not_adjustments = new HashMap();
+		this.adjustment_names = new ArrayList();
+		this.datasets = new HashMap();
+		this.initial_marking = new int[net.getNet().getPlaces().size()];
 	}
 	
-	public void addExogenousFactor(String name) {
-		if (adjustment_names.contains(name)) {
-			adjustment_names.add(name);
-			adjusters.put(name, noAdjuster);
-//			adjust the lengths for adjusters
-			for(int trans : transitions.values()) {
-				Double[] old_adjustments = this.adjustments.get(trans);
-				Double[] new_adjustments = new Double[old_adjustments.length+1];
-				Double[] old_not_adjustments = this.not_adjustments.get(trans);
-				Double[] new_not_adjustments = new Double[old_not_adjustments.length+1];
-				for(int i=0; i < old_adjustments.length; i++) {
-					new_adjustments[i] = old_adjustments[i];
-					new_not_adjustments[i] = old_not_adjustments[i];
-				}
-				new_adjustments[old_adjustments.length] = 1.0;
-				new_not_adjustments[old_not_adjustments.length] = 1.0;
-				this.adjustments.replace(trans, new_adjustments);
-				this.not_adjustments.replace(trans, new_not_adjustments);
-			}
+	
+	public double getBaseWeight(int transition) {
+		return base_weights.get(transition);
+	}
+	
+	public Map<String, Tuple<Double,Double>> getAdjustments(int transition){
+		Map<String, Tuple<Double,Double>> ret = new HashMap();
+		for(String adjuster : adjustment_names) {
+			int index = datasets.get(adjuster);
+			double xadjust = adjustments.get(transition)[index];
+			double not_xadjust = not_adjustments.get(transition)[index];
+			ret.put(adjuster, new Tuple(xadjust, not_xadjust));
 		}
+		return ret;
 	}
 
 	public int getNumberOfTransitions() {
-		return this.net.getNet().getTransitions().size();
+		return this.transitions.values().size();
 	}
 
 	public int getNumberOfPlaces() {
-		return this.net.getNet().getPlaces().size();
+		return this.initial_marking.length;
 	}
 
 	public String getTransitionLabel(int transition) {
@@ -145,14 +211,10 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 	}
 
 	public int isInInitialMarking(int place) {
-		for( Entry<Place, Integer> entry : places.entrySet()) {
-			if (entry.getValue() == place) {
-				return this.net.getInitialMarking() 
-					   .contains(entry.getKey()) 
-					   ? 1 : 0;
-			}
+		if (place < initial_marking.length) {
+			return initial_marking[place];
 		}
-		throw new ValueException("transition id ("+place+") not known.");
+		throw new ValueException("place id ("+place+") not known.");
 	}
 
 	public int[] getInputPlaces(int transition) {
@@ -176,5 +238,164 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 	public SLPNEDSemantics getDefaultSemantics() {
 		return new SLPNEDSemantics(this);
 	}
+	
+//	export functions
+	public void exportNet(File outstream) throws IOException {
+			PrintWriter w = null;
+			try {
+				w = new PrintWriter(outstream);
+				
+				w.println("# adjusters");
+				w.println(adjustment_names.size());
+				
+				w.println("# adjusters");
+				for(String adjuster : adjustment_names) {
+					w.println(adjuster);
+				}
+				
+				w.println("# number of places");
+				w.println(getNumberOfPlaces());
 
+				w.println("# initial marking");
+				for (int place = 0; place < getNumberOfPlaces(); place++) {
+					w.println(isInInitialMarking(place));
+				}
+
+				w.println("# number of transitions");
+				w.println(getNumberOfTransitions());
+				for (int transition = 0; transition < getNumberOfTransitions(); transition++) {
+					w.println("# transition " + transition);
+					if (isTransitionSilent(transition)) {
+						w.println("silent");
+					} else {
+						w.println("label " + StringEscapeUtils.escapeJava(getTransitionLabel(transition)));
+					}
+					w.println("# base weight ");
+					w.println(getBaseWeight(transition));
+					
+					Map<String, Tuple<Double,Double>> adjusters = getAdjustments(transition);
+					w.println("# adjustments for exogenous data");
+					for(String adjuster : adjustment_names) {
+						w.println(adjusters.get(adjuster).getLeft());
+					}
+					
+					w.println("# adjustments without exogenous data");
+					for(String adjuster : adjustment_names) {
+						w.println(adjusters.get(adjuster).getRight());
+					}
+
+					w.println("# number of input places");
+					w.println(getInputPlaces(transition).length);
+					for (int place : getInputPlaces(transition)) {
+						w.println(place);
+					}
+
+					w.println("# number of output places");
+					w.println(getOutputPlaces(transition).length);
+					for (int place : getOutputPlaces(transition)) {
+						w.println(place);
+					}
+				}
+			} finally {
+				if (w != null) {
+					w.close();
+				}
+			}
+		}
+
+//	import functions
+	public void addPlace() {
+		int newPlaceId = 1;
+		if (places.values().size() > 0) {
+			newPlaceId = places.values().stream().reduce(Integer::max).get()+1;
+		}
+		Place place = new Place("p"+newPlaceId, null);
+		places.put(place, newPlaceId);
+//		extend initial and final marking
+		int[] old_initial = initial_marking;
+		initial_marking = new int[newPlaceId];
+		for(int i = 0; i < old_initial.length; i++) {
+			initial_marking[i] = old_initial[i];
+		}
+	}
+	
+	public void addPlaceToInitial(int place) {
+		initial_marking[place] = 1;
+	}
+	
+	public void addTransition(double bweight, Double[] adjusters, Double[] notadjusters) {
+		int newTransId = 0;
+		if (transitions.values().size() > 0) {
+			newTransId = transitions.values().stream().reduce(Integer::max).get()+1;
+		}
+		String label = "tau "+newTransId;
+		addTransition(label, bweight, adjusters, notadjusters);
+	}
+	
+	public void addTransition(String label, double bweight, Double[] adjusters, Double[] notadjusters) {
+		int newTransId = 0;
+		if (transitions.values().size() > 0) {
+			newTransId = transitions.values().stream().reduce(Integer::max).get()+1;
+		}
+//		make new transition
+		Transition trans = new Transition(label, null);
+		trans.setInvisible(label.startsWith("tau"));
+//		introduce transition
+		this.transitions.put(trans, newTransId);
+		this.base_weights.put(newTransId, bweight);
+		this.adjustments.put(newTransId, adjusters);
+		this.not_adjustments.put(newTransId, notadjusters);
+		this.input_transitions.put(newTransId, new int[0]);
+		this.output_transitions.put(newTransId, new int[0]);
+	}
+	
+	public void addPlaceTransitionArc(int place ,int transition) {
+		int[] oldinput = this.input_transitions.get(transition);
+		int[] newinput = new int[oldinput.length+1];
+		for (int i=0; i < oldinput.length; i++) {
+			newinput[i] = oldinput[i];
+		}
+		newinput[newinput.length-1] = place;
+		this.input_transitions.put(transition, newinput);
+	}
+	
+	public void addTransitionPlaceArc(int transition, int place) {
+		int[] oldinput = this.output_transitions.get(transition);
+		int[] newinput = new int[oldinput.length+1];
+		for (int i=0; i < oldinput.length; i++) {
+			newinput[i] = oldinput[i];
+		}
+		newinput[newinput.length-1] = place;
+		this.output_transitions.put(transition, newinput);
+	}
+	
+	public void setBaseWeight(Transition transition, double weight) {
+		setBaseWeight(this.transitions.get(transition), weight);
+	}
+	
+	public void setBaseWeight(int transition, double weight) {
+		this.base_weights.put(transition, weight);
+	}
+	
+	public void addExogenousFactor(String name) {
+		if (!adjustment_names.contains(name)) {
+			adjustment_names.add(name);
+			datasets.put(name, adjustment_names.size()-1);
+//			adjust the lengths for adjusters
+			for(int trans : transitions.values()) {
+				Double[] old_adjustments = this.adjustments.get(trans);
+				Double[] new_adjustments = new Double[old_adjustments.length+1];
+				Double[] old_not_adjustments = this.not_adjustments.get(trans);
+				Double[] new_not_adjustments = new Double[old_not_adjustments.length+1];
+				for(int i=0; i < old_adjustments.length; i++) {
+					new_adjustments[i] = old_adjustments[i];
+					new_not_adjustments[i] = old_not_adjustments[i];
+				}
+				new_adjustments[old_adjustments.length] = 1.0;
+				new_not_adjustments[old_not_adjustments.length] = 1.0;
+				this.adjustments.replace(trans, new_adjustments);
+				this.not_adjustments.replace(trans, new_not_adjustments);
+			}
+		}
+	}
 }
