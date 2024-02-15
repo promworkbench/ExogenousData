@@ -10,7 +10,6 @@ import org.deckfour.xes.model.impl.XAttributeLiteralImpl;
 import org.junit.Test;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.acceptingpetrinet.models.impl.AcceptingPetriNetImpl;
-import org.processmining.framework.util.ui.widgets.helper.UserCancelledException;
 import org.processmining.log.utils.XLogBuilder;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
@@ -26,8 +25,6 @@ import org.processmining.qut.exogenousaware.steps.determination.Determination;
 import org.processmining.qut.exogenousaware.steps.linking.AttributeLinker;
 import org.processmining.qut.exogenousaware.steps.slicing.PastOutcomeSlicer;
 import org.processmining.qut.exogenousaware.steps.transform.type.StochasticTransformer;
-
-import nl.tue.astar.AStarException;
 
 public class SLPNEDDiscoveryTest {
 	
@@ -398,12 +395,10 @@ public class SLPNEDDiscoveryTest {
 					new XEventNameClassifier()
 			);
 			SLPNEDDiscovery.discover(xlog, buildNet());
-		} catch (AStarException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (UserCancelledException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			org.junit.Assert.fail();
 		}
 	}
 
