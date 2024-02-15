@@ -20,12 +20,17 @@ public class AbsoluteVarianceTransformer implements Transformer {
 	@Default private String name = "abs:variance";
 
 	public TransformedAttribute transform(SubSeries subtimeseries) {
-		double var = 
-				subtimeseries.getYSeries()
-				.stream()
-				.map( y -> (Math.abs(y-mean)/std))
-				.reduce(Double::sum).get();
-//		System.out.println("computed variance :: " + var);
+		double var;
+		if (std > 0) {
+			var = 
+					subtimeseries.getYSeries()
+					.stream()
+					.map( y -> (Math.abs(y-mean)/std))
+					.reduce(Double::sum).get();
+//			System.out.println("computed variance :: " + var +" using "+std);
+		} else {
+			var = 0;
+		}
 		return new TransformedAttribute(subtimeseries.getAbvSlicingName()+":abs:variance", var);
 	}
 
