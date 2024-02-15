@@ -60,17 +60,17 @@ public class EqualitiesFactory {
 	}
 	
 	public static String getBaseWeightName(Transition trans) {
-		String transName = trans.getLabel().toString().replace(" ", "_");
+		String transName = trans.getId().toString().replace(" ", "_");
 		return String.format(BASE_WEIGHT, transName);
 	}
 	
 	public static String getExogenousAdjust(Transition trans, ChoiceExogenousPoint point) {
-		String transName = trans.getLabel().toString().replace(" ", "_");
+		String transName = trans.getId().toString().replace(" ", "_");
 		return String.format(EXO_WEIGHT, transName, point.getName().replace(" ", "_"));
 	}
 	
 	public static String getNotExogenousAdjust(Transition trans, ChoiceExogenousPoint point) {
-		String transName = trans.getLabel().toString().replace(" ", "_");
+		String transName = trans.getId().toString().replace(" ", "_");
 		return String.format(NOT_EXO_WEIGHT, transName, point.getName().replace(" ", "_"));
 	}
 	
@@ -86,22 +86,23 @@ public class EqualitiesFactory {
 			Collection<Transition> transitions) {
 //		loop through transitions, creating for each one a base weight
 		for(Transition trans : transitions) {
-			String transName = trans.getLabel().toString().replace(" ", "_");
-			createVarIfNeeded(String.format(BASE_WEIGHT, transName), varlookup, variables, vcounter, trans);
+			String transName = trans.getId().toString().replace(" ", "_");
+			createVarIfNeeded(String.format(BASE_WEIGHT, transName), varlookup, variables, vcounter, trans, null);
 //			then for each dataset, create two adjusters
 			for(ExogenousDataset dataset : datasets) {
 				createVarIfNeeded(
 						String.format(EXO_WEIGHT, transName, dataset.getName().replace(" ", "_")), 
-						varlookup, variables, vcounter, trans);
+						varlookup, variables, vcounter, trans, dataset.getName());
 				createVarIfNeeded(
 						String.format(NOT_EXO_WEIGHT, transName, dataset.getName().replace(" ", "_")),
-						varlookup, variables, vcounter, trans);
+						varlookup, variables, vcounter, trans, dataset.getName());
 			}
 		}
 //		debug out variables
 		for(Function var : variables) {
 			System.out.println("created variable :: "+var.toString());
 		}
+		assert( variables.size() == transitions.size() * datasets.size() * 2 + transitions.size());
 		
 	}
 	
@@ -117,7 +118,7 @@ public class EqualitiesFactory {
 //		get functions for variables
 		Function b1 = createVarIfNeeded(
 				getBaseWeightName(point.getFired()),
-				varlookup, variables, vcounter, point.getFired());
+				varlookup, variables, vcounter, point.getFired(), null);
 		Function x1 = null;
 		ChoiceExogenousPoint[] powers = point.getPowers();
 		for(int i=0 ; i < powers.length; i++) {
@@ -128,7 +129,7 @@ public class EqualitiesFactory {
 				getExogenousAdjust(point.getFired(), power) :
 				getNotExogenousAdjust(point.getFired(), power);
 			double ajpower = knower ? power.getValue() : 1;
-			Function adjuster = createVarIfNeeded(ajname, varlookup, variables, vcounter, point.getFired() ,ajpower);
+			Function adjuster = createVarIfNeeded(ajname, varlookup, variables, vcounter, point.getFired() ,power.getName(), ajpower);
 			if (x1 == null) {
 //				first adjustment
 				x1 = adjuster;
@@ -149,7 +150,7 @@ public class EqualitiesFactory {
 					getExogenousAdjust(trans, powers[i]) :
 					getNotExogenousAdjust(trans, powers[i]);
 				double apower = knower ? powers[i].getValue() : 1;
-				Function  adjuster = createVarIfNeeded(ajname, varlookup, variables, vcounter, trans, apower);
+				Function  adjuster = createVarIfNeeded(ajname, varlookup, variables, vcounter, trans, powers[i].getName(), apower );
 				if (adjusters == null) {
 					adjusters = adjuster;
 				} else {
@@ -158,13 +159,13 @@ public class EqualitiesFactory {
 			}
 			if (bottom == null) {
 				bottom = new Sum(new Product( 
-						createVarIfNeeded(botBase, varlookup, variables, vcounter, trans),
+						createVarIfNeeded(botBase, varlookup, variables, vcounter, trans, null),
 						adjusters
 				));
 			} else {
 				bottom = new Sum(bottom,
 						new Product( 
-								createVarIfNeeded(botBase, varlookup, variables, vcounter, trans),
+								createVarIfNeeded(botBase, varlookup, variables, vcounter, trans, null),
 								adjusters
 						)
 					);
@@ -209,8 +210,9 @@ public class EqualitiesFactory {
 			Map<String, Tuple<Function,Integer>> varlookup, 
 			List<Function> variables, 
 			VariableCounter vcounter,
-			Transition trans){
-		return createVarIfNeeded(varName, varlookup, variables, vcounter, trans, 1);
+			Transition trans,
+			String dname){
+		return createVarIfNeeded(varName, varlookup, variables, vcounter, trans, dname, 1);
 	}
 	
 	/**
@@ -229,6 +231,7 @@ public class EqualitiesFactory {
 			List<Function> variables, 
 			VariableCounter vcounter,
 			Transition trans,
+			String dname,
 			double power) {
 		Function out;
 		
@@ -239,19 +242,21 @@ public class EqualitiesFactory {
 						varlookup.get(varName).getRight(), 
 						varName, 
 						power, 
-						trans
+						trans,
+						dname
 				);
 			} else {
 				out = new SLPNEDVariable(
 						varlookup.get(varName).getRight(), 
 						varName,
-						trans);
+						trans,
+						dname);
 			}
 		} else {
 			if (power != 1) {
-			out = new SLPNEDVariablePower(vcounter.get(), varName, power, trans);
+			out = new SLPNEDVariablePower(vcounter.get(), varName, power, trans, dname);
 			} else {
-				out = new SLPNEDVariable(vcounter.get(), varName, trans);
+				out = new SLPNEDVariable(vcounter.get(), varName, trans, dname);
 			}
 			varlookup.put(varName, new Tuple<>(out, vcounter.get()));
 			variables.add(out);
@@ -261,6 +266,30 @@ public class EqualitiesFactory {
 		return out;
 	}
 	
+	public static enum SLPNEDVarType {
+		BASE("BW_"),
+		EXOADJ("AX_"),
+		NOTEXOADJ("NAX_"),
+		UNKNOWN("");
+		
+		public String startsWith;
+		
+		private SLPNEDVarType(String startsWith) {
+			this.startsWith = startsWith;
+		}
+		
+		public static SLPNEDVarType findType(String varName) {
+			if (varName.startsWith(BASE.startsWith)) {
+				return BASE;
+			} else if (varName.startsWith(EXOADJ.startsWith)) {
+				return EXOADJ;
+			} else if (varName.startsWith(NOTEXOADJ.startsWith)) {
+				return NOTEXOADJ;
+			}
+			return UNKNOWN;
+		}
+	}
+	
 	/**
 	 * Minor wrapper to keep track of the transition that the variable relates to.
 	 * @author Adam Banham
@@ -268,28 +297,61 @@ public class EqualitiesFactory {
 	public static class SLPNEDVariablePower extends VariablePower {
 		
 		private Transition trans;
+		private SLPNEDVarType type;
+		private String dataset;
 		
-		public SLPNEDVariablePower(int parameterIndex, String name, double power, Transition trans) {
+		public SLPNEDVariablePower(int parameterIndex, String name, double power, Transition trans, String dname) {
 			super(parameterIndex, name, power);
 			this.trans = trans;
+			this.type = SLPNEDVarType.findType(name);
+			if (dname != null) {
+				this.dataset = dname;
+			} else {
+				this.dataset = "unsure";
+			}
+			
 		}
 		
 		public Transition getTransition() {
 			return this.trans;
+		}
+		
+		public SLPNEDVarType getType() {
+			return this.type;
+		}
+		
+		public String getDataset() {
+			return this.dataset;
 		}
 	}
 	
 	public static class SLPNEDVariable extends Variable {
 		
 		private Transition trans;
+		private SLPNEDVarType type;
+		private String dataset;
 
-		public SLPNEDVariable(int parameterIndex, String name, Transition trans) {
+		public SLPNEDVariable(int parameterIndex, String name, Transition trans, String dname) {
 			super(parameterIndex, name);
 			this.trans = trans;
+			this.type = SLPNEDVarType.findType(name);
+			if (dname != null) {
+				this.dataset = dname;
+			} else {
+				this.dataset = "unsure";
+			}
 		}
 		
 		public Transition getTransition() {
 			return this.trans;
+		}
+		
+		public SLPNEDVarType getType() {
+			return this.type;
+		}
+		
+		public String getDataset() {
+			return this.dataset;
 		}
 	}
 	
