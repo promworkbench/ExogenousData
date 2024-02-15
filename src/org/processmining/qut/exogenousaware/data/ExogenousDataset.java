@@ -118,13 +118,19 @@ public class ExogenousDataset {
 				int total = 0;
 				for( XTrace xseries : source) {
 					for(XEvent ev : xseries) {
-						mean += (double) ExogenousDatasetAttributes.extractExogenousValue(ev);
+						Object val = ExogenousDatasetAttributes.extractExogenousValue(ev);
+						if (val instanceof Integer) {
+							mean+= (int) val;
+						} else if (val instanceof Double) {
+							mean+= (double) val;
+						}
 						total += 1;
 					}
 					
 				}
 				this.mean = mean / total;
 				this.computedMean = true;
+				System.out.println("Dataset ("+getName()+") mean computed :: "+mean);
 				return this.mean;
 			} else {
 				throw new ValueException("Unable to compute mean on non-numerical datasets.");
@@ -143,7 +149,12 @@ public class ExogenousDataset {
 				int total = 0;
 				for( XTrace xseries : source) {
 					for(XEvent ev : xseries) {
-						std += Math.pow(((double) ExogenousDatasetAttributes.extractExogenousValue(ev)) - mean, 2.0);
+						Object val = ExogenousDatasetAttributes.extractExogenousValue(ev);
+						if (val instanceof Integer) {
+							std += Math.pow(((int) ExogenousDatasetAttributes.extractExogenousValue(ev)) - mean, 2.0);
+						} else if (val instanceof Double) {
+							std += Math.pow(((double) ExogenousDatasetAttributes.extractExogenousValue(ev)) - mean, 2.0);
+						}
 						total += 1;
 					}
 					
