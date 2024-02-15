@@ -31,4 +31,10 @@ public class ChoiceExogenousPoint {
 			return String.format("%.4f", value);
 		}
 	}
+	
+	protected Object clone() throws CloneNotSupportedException {
+		// TODO Auto-generated method stub
+		return this.copy();
+				
+	}
 }
