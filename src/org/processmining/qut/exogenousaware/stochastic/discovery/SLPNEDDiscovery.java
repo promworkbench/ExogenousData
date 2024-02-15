@@ -7,7 +7,6 @@ import java.util.Map;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.basicstochasticminer.solver.Equation;
 import org.processmining.basicstochasticminer.solver.Function;
-import org.processmining.framework.util.ui.widgets.helper.UserCancelledException;
 import org.processmining.qut.exogenousaware.ab.jobs.Tuple;
 import org.processmining.qut.exogenousaware.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousaware.stochastic.choicedata.ChoiceCollector;
@@ -16,11 +15,12 @@ import org.processmining.qut.exogenousaware.stochastic.equalities.EqualitiesFact
 import org.processmining.qut.exogenousaware.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.qut.exogenousaware.stochastic.solver.Solver;
 
-import nl.tue.astar.AStarException;
-
 public class SLPNEDDiscovery {
 	
-	public static StochasticLabelledPetriNetWithExogenousData discover(ExogenousAnnotatedLog xlog, AcceptingPetriNet net) throws AStarException, UserCancelledException
+	public static StochasticLabelledPetriNetWithExogenousData discover(
+			ExogenousAnnotatedLog xlog, 
+			AcceptingPetriNet net) 
+	throws Exception
 	{
 //		collect choice data
 		System.out.println("building choice data...");
@@ -55,7 +55,7 @@ public class SLPNEDDiscovery {
 		}
 		System.out.println("creating slpned...");
 		StochasticLabelledPetriNetWithExogenousData outnet = 
-				new StochasticLabelledPetriNetWithExogenousData(net, solvedVariables);
+				new StochasticLabelledPetriNetWithExogenousData(net, solvedVariables, xlog.getExogenousDatasets());
 		System.out.println("returning slpned...");
 		return outnet;
 	}
