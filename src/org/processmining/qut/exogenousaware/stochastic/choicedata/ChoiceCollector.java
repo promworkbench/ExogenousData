@@ -386,7 +386,12 @@ public class ChoiceCollector {
 				return new LogPower();
 			} else if (curr == StepTypes.MINVI) {
 				System.out.println("determined silent power");
-				return new SilientModelPower(nextVis(right_rem));
+				int nexterVis = nextVis(right_rem);
+				if (nexterVis < 0) {
+					return new SilientModelPower(-1, false);
+				} else {
+					return new SilientModelPower(left_rem.size()+ 1+ nexterVis, true);
+				}
 			} else if (curr == StepTypes.LMGOOD) {
 				System.out.println("determined sync power");
 				return new PowerSynchronistation(findEventIndex(left_rem.size()+1));
@@ -568,9 +573,11 @@ public class ChoiceCollector {
 	public static class SilientModelPower implements PowerHandler {
 		
 		private int left_target;
+		private boolean foundVis;
 		
-		public SilientModelPower(int target) {
+		public SilientModelPower(int target, boolean foundVis) {
 			this.left_target = target;
+			this.foundVis = foundVis;
 		}
 
 		public ChoiceExogenousPoint[] handle(
@@ -581,7 +588,16 @@ public class ChoiceCollector {
 				SojournStatistics sojourns,
 				Object ...args) {
 //			look at the target and copy its power
-			return thetas[left_target].clone();
+			System.out.println("cloning target :: " + left_target);
+			ChoiceExogenousPoint[] ret;
+			if (!foundVis) {
+				System.out.println("No next visible step found, reverting to no power.");
+				NoPower handler = new NoPower();
+				ret = handler.handle(thetas, xlog, trace, params, sojourns, args);
+			} else {
+				ret = thetas[left_target].clone();
+			}
+			return ret;
 		}
 		
 		public String toString() {
