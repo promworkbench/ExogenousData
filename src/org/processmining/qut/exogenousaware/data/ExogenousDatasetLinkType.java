@@ -4,7 +4,8 @@ import org.deckfour.xes.model.XLog;
 
 public enum ExogenousDatasetLinkType {
 	TRACE_ATTRIBUTE_MATCH("match"),
-	EVENT_ATTRIBUTE_MATCH("ematch");
+	EVENT_ATTRIBUTE_MATCH("ematch"),
+	ANY_MATCH("any");
 	
 	private String id;
 	
