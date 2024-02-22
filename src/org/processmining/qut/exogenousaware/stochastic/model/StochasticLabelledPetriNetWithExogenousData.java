@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.IntStream;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
@@ -114,17 +116,14 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 			Integer tranid = transitions.get(trans);
 			Collection<PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode>> inedges = net.getNet().getInEdges(trans);
 			Collection<PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode>> outedges = net.getNet().getOutEdges(trans);
-			int[] inplaces = new int[inedges.size()];
-			int[] outplaces = new int[outedges.size()];
-			indexer = 0;
+			int[] inplaces = new int[this.initial_marking.length];
+			int[] outplaces = new int[this.initial_marking.length];
 			for( PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : inedges) {
-				inplaces[indexer] = this.places.get(edge.getSource());
-				indexer++;
+				inplaces[this.places.get(edge.getSource())] = 1;
 			}
 			indexer = 0;
 			for( PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : outedges) {
-				outplaces[indexer] = this.places.get(edge.getTarget());
-				indexer++;
+				outplaces[this.places.get(edge.getTarget())] = 1;
 			}
 			this.input_transitions.put(tranid, inplaces);
 			this.output_transitions.put(tranid, outplaces);
@@ -183,6 +182,51 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 		}
 		return ret;
 	}
+	
+	public double calcBaseWeight(int transition) {
+		return getBaseWeight(transition);
+	}
+	
+	public double calcWeight(int transition) {
+		int[] known = new int[getNumberOfExogenousFactors()];
+		double[] powers = new double[getNumberOfExogenousFactors()];
+		return calcWeight(transition, powers, known);
+	}
+	
+	public double calcWeight(int transition, double[] powers) {
+		int[] known = new int[getNumberOfExogenousFactors()];
+		Arrays.setAll(known, i -> 1);
+		return calcWeight(transition, powers, known);
+	}
+	
+	public double calcWeight(int transition, double[] powers, int[] known) {
+		double weight = calcBaseWeight(transition);
+		Map<String, Tuple<Double, Double>> adjusters = getAdjustments(transition);
+		for(String adjuster : adjustment_names) {
+			int x = datasets.get(adjuster);
+			Tuple<Double, Double> adjustments = adjusters.get(adjuster);
+			if (known[x] == 1) {
+				weight *= Math.pow(adjustments.getLeft(),powers[x]);
+			} else {
+				weight *= adjustments.getRight();
+			}
+		}
+		return weight;
+	}
+	
+	public int getNumberOfExogenousFactors() {
+		return this.adjustment_names.size();
+	}
+	
+	public String getExogenousLabel(int factor) {
+		for(String adjuster : adjustment_names) {
+			int x = datasets.get(adjuster);
+			if (x == factor) {
+				return adjuster;
+			}
+		}
+		return "unknown";
+	}
 
 	public int getNumberOfTransitions() {
 		return this.transitions.values().size();
@@ -218,11 +262,17 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 	}
 
 	public int[] getInputPlaces(int transition) {
-		return this.input_transitions.get(transition);
+		int [] iplaces = this.input_transitions.get(transition);
+		return 	IntStream.rangeClosed(0, iplaces.length-1)
+				.filter(i -> iplaces[i] > 0)
+				.toArray();
 	}
 
 	public int[] getOutputPlaces(int transition) {
-		return this.output_transitions.get(transition);
+		int[] oplaces = this.output_transitions.get(transition);
+		return 	IntStream.rangeClosed(0, oplaces.length-1)
+				.filter(i -> oplaces[i] > 0)
+				.toArray();
 	}
 
 	public int[] getInputTransitions(int place) {
@@ -345,28 +395,18 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 		this.base_weights.put(newTransId, bweight);
 		this.adjustments.put(newTransId, adjusters);
 		this.not_adjustments.put(newTransId, notadjusters);
-		this.input_transitions.put(newTransId, new int[0]);
-		this.output_transitions.put(newTransId, new int[0]);
+		this.input_transitions.put(newTransId, new int[initial_marking.length]);
+		this.output_transitions.put(newTransId, new int[initial_marking.length]);
 	}
 	
 	public void addPlaceTransitionArc(int place ,int transition) {
-		int[] oldinput = this.input_transitions.get(transition);
-		int[] newinput = new int[oldinput.length+1];
-		for (int i=0; i < oldinput.length; i++) {
-			newinput[i] = oldinput[i];
-		}
-		newinput[newinput.length-1] = place;
-		this.input_transitions.put(transition, newinput);
+		int[] iplaces = this.input_transitions.get(transition);
+		iplaces[place] += 1;
 	}
 	
 	public void addTransitionPlaceArc(int transition, int place) {
-		int[] oldinput = this.output_transitions.get(transition);
-		int[] newinput = new int[oldinput.length+1];
-		for (int i=0; i < oldinput.length; i++) {
-			newinput[i] = oldinput[i];
-		}
-		newinput[newinput.length-1] = place;
-		this.output_transitions.put(transition, newinput);
+		int[] oplaces = this.output_transitions.get(transition);
+		oplaces[place] += 1;
 	}
 	
 	public void setBaseWeight(Transition transition, double weight) {
