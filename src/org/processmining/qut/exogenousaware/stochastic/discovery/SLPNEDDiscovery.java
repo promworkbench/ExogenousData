@@ -86,6 +86,9 @@ public class SLPNEDDiscovery {
 		StochasticLabelledPetriNetWithExogenousData outnet = 
 				new StochasticLabelledPetriNetWithExogenousData(net, solvedVariables, datasets);
 		System.out.println("returning slpned...");
+		System.out.println("but not before exporting visualisation data.");
+//		TODO
+		
 		return outnet;
 	}
 

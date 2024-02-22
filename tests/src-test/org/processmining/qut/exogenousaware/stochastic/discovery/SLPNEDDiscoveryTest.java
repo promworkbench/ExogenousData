@@ -25,10 +25,11 @@ import org.processmining.qut.exogenousaware.steps.determination.Determination;
 import org.processmining.qut.exogenousaware.steps.linking.AttributeLinker;
 import org.processmining.qut.exogenousaware.steps.slicing.PastOutcomeSlicer;
 import org.processmining.qut.exogenousaware.steps.transform.type.StochasticTransformer;
+import org.processmining.qut.exogenousaware.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 
 public class SLPNEDDiscoveryTest {
 	
-	static ExogenousDataset Y = ExogenousDataset.builder()
+	static public ExogenousDataset Y = ExogenousDataset.builder()
 			.dataType(ExogenousDatasetType.NUMERICAL)
 			.linker( 
 				AttributeLinker.builder()
@@ -103,7 +104,7 @@ public class SLPNEDDiscoveryTest {
 			)
 			.build();
 	
-	static ExogenousDataset Z = ExogenousDataset.builder()
+	static public ExogenousDataset Z = ExogenousDataset.builder()
 			.dataType(ExogenousDatasetType.NUMERICAL)
 			.linker( 
 				AttributeLinker.builder()
@@ -129,7 +130,7 @@ public class SLPNEDDiscoveryTest {
 			)
 			.build();
 	
-	static ExogenousDataset X = ExogenousDataset.builder()
+	static public ExogenousDataset X = ExogenousDataset.builder()
 			.dataType(ExogenousDatasetType.NUMERICAL)
 			.linker( 
 				AttributeLinker.builder()
@@ -253,7 +254,7 @@ public class SLPNEDDiscoveryTest {
 			.build();
 	
 	@SuppressWarnings("deprecation")
-	static XLog endogLog = XLogBuilder.newInstance()
+	static public XLog endogLog = XLogBuilder.newInstance()
 			.startLog("Paper Example")
 			.addTrace("trace_01")
 			.addAttribute(new XAttributeLiteralImpl("exogenous:link", "1"))
@@ -316,7 +317,7 @@ public class SLPNEDDiscoveryTest {
 					.addAttribute("time:timestamp", new Date(2024, 2, 9, 1, 00, 00))
 			.build();
 	
-	static List<Determination> deters = new ArrayList<Determination>() {{
+	static public List<Determination> deters = new ArrayList<Determination>() {{
 		add(Determination.builder()
 			.linker(
 					AttributeLinker.builder()
@@ -347,7 +348,7 @@ public class SLPNEDDiscoveryTest {
 				.build());
 	}};
 	
-	static ExogenousAnnotatedLog xlog = ExogenousAnnotatedLog.builder()
+	static public ExogenousAnnotatedLog xlog = ExogenousAnnotatedLog.builder()
 			.parsed(false)
 			.exogenousDataset(X)
 			.exogenousDataset(Y)
@@ -358,7 +359,7 @@ public class SLPNEDDiscoveryTest {
 	
 	
 	
-	public AcceptingPetriNet buildNet() {
+	public static AcceptingPetriNet buildNet() {
 		Petrinet pnet = PetrinetFactory.newPetrinet("example_net");
 		Place p1 = pnet.addPlace("p1");
 		Place p2 = pnet.addPlace("p2");
@@ -400,6 +401,13 @@ public class SLPNEDDiscoveryTest {
 			e.printStackTrace();
 			org.junit.Assert.fail();
 		}
+	}
+	
+	public static StochasticLabelledPetriNetWithExogenousData getNet() throws Exception {
+			xlog.getEndogenousLog().getClassifiers().add(
+					new XEventNameClassifier()
+			);
+			return SLPNEDDiscovery.discoverFromLog(xlog, buildNet());
 	}
 
 }

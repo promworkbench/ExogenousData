@@ -66,9 +66,14 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 	}
 	
 	private List<Double> transformToVariance(List<Double> values, double mean, double std){
+		
 		List<Double> ret = new ArrayList();
 		double curr = 0;
 		for(double val : values) {
+			if (std == 0) {
+				ret.add(0.0);
+				continue;
+			}
 			double now = (Math.abs(val - mean) / std);
 			ret.add(now);
 			curr += now;

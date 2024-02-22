@@ -60,6 +60,7 @@ public class ExogenousDataState implements DataState{
 	
 	protected Map<Integer, Factor> state;
 	int size;
+	private int hash = -1;
 	
 	public ExogenousDataState(ExogenousDataset[] factors) {
 		this.state = new HashMap();
@@ -154,7 +155,8 @@ public class ExogenousDataState implements DataState{
 	}
 
 	public DataState makeStateImmutable() {
-		return new ExogenousDataState(state);
+		hash = hashCode();
+		return this;
 	}
 
 	public DataState deepCopy() {
@@ -163,6 +165,9 @@ public class ExogenousDataState implements DataState{
 	}
 	
 	public int hashCode() {
+		if (hash > 0) {
+			return hash;
+		}
 		HashCodeBuilder hasher = new HashCodeBuilder(17, 37);
 		for(int i=0; i < (size/2); i++) {
 			hasher.append(state.get(i).hashCode());
