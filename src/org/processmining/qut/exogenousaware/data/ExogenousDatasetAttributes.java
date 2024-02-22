@@ -3,6 +3,8 @@ package org.processmining.qut.exogenousaware.data;
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XAttributeBoolean;
 import org.deckfour.xes.model.XAttributeContinuous;
+import org.deckfour.xes.model.XAttributeDiscrete;
+import org.deckfour.xes.model.XAttributeLiteral;
 import org.deckfour.xes.model.XAttributeMap;
 import org.deckfour.xes.model.XEvent;
 
@@ -25,6 +27,10 @@ public class ExogenousDatasetAttributes {
 				return  ((XAttributeContinuous) attr).getValue();
 			} else if (attr instanceof XAttributeBoolean) {
 				return ((XAttributeBoolean) attr).getValue() ? 1 : 0;
+			} else if (attr instanceof XAttributeDiscrete) {
+				return (int) ((XAttributeDiscrete) attr).getValue();
+			} else if (attr instanceof XAttributeLiteral) {
+				return ((XAttributeLiteral) attr).getValue();
 			}
 		}
 		return 0;
