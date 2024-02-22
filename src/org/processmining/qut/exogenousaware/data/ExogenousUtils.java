@@ -9,6 +9,7 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.qut.exogenousaware.exceptions.ExogenousAttributeNotFoundException;
 import org.processmining.qut.exogenousaware.steps.linking.AttributeLinker;
 import org.processmining.qut.exogenousaware.steps.linking.ChainAttributeLinker;
+import org.processmining.qut.exogenousaware.steps.linking.GrabFristLinker;
 import org.processmining.qut.exogenousaware.steps.linking.Linker;
 
 /**
@@ -60,6 +61,8 @@ public class ExogenousUtils {
 			return ExogenousDatasetLinkType.TRACE_ATTRIBUTE_MATCH;
 		} else if (ExogenousLogAttributes.EXOGENOUS_LINK_TYPE_EVENTATTRS.check(elog)) {
 			return ExogenousDatasetLinkType.EVENT_ATTRIBUTE_MATCH;
+		} else if (ExogenousLogAttributes.EXOGENOUS_LINK_TYPE_ANY.check(elog)) {
+			return ExogenousDatasetLinkType.ANY_MATCH;
 		} else {
 			throw new ExogenousAttributeNotFoundException(ExogenousDatasetLinkType.class);
 		}
@@ -85,6 +88,8 @@ public class ExogenousUtils {
 		} else if (edata.linkType.equals(ExogenousDatasetLinkType.EVENT_ATTRIBUTE_MATCH)) {
 //			TODO need to make a event based linker
 			return AttributeLinker.builder().attributeName("foo").build();
+		} else if (edata.linkType.equals(ExogenousDatasetLinkType.ANY_MATCH)) {
+			return GrabFristLinker.builder().build();
 		} else {
 	//		return a dummy attribute linker in the otherwise case
 			return AttributeLinker.builder().attributeName("foo").build();
