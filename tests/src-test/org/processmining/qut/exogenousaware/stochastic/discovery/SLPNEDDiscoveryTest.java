@@ -394,7 +394,7 @@ public class SLPNEDDiscoveryTest {
 			xlog.getEndogenousLog().getClassifiers().add(
 					new XEventNameClassifier()
 			);
-			SLPNEDDiscovery.discover(xlog, buildNet());
+			SLPNEDDiscovery.discoverFromLog(xlog, buildNet());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
