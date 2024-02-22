@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.processmining.basicstochasticminer.solver.Division;
 import org.processmining.basicstochasticminer.solver.Equation;
@@ -25,7 +24,7 @@ public class EqualitiesFactory {
 	private EqualitiesFactory() {};
 	
 	public static Tuple<List<Equation>,List<Function>> construct(
-			Map<ChoiceDataPoint, List<ChoiceDataPoint>> choiceData,
+			Map<ChoiceDataPoint, Map<String,Integer>> frequencies,
 			Collection<ExogenousDataset> datasets,
 			Collection<Transition> transitions) {
 //		make tmp storages
@@ -37,20 +36,22 @@ public class EqualitiesFactory {
 		prepareVariables(variables, varlookup, vcounter, datasets, transitions);
 		System.out.println("prepared variables...");
 //		for each competition space, construct an equality between outcomes
-		for(ChoiceDataPoint comp : choiceData.keySet()) {
-			List<ChoiceDataPoint> points = choiceData.get(comp);
-			System.out.println("working on "+ comp.toString() + " with size of "+ points.size());
+		for(ChoiceDataPoint comp : frequencies.keySet()) {
+			Map<String, Integer> points = frequencies.get(comp);
+			int totalPoints = points.values().stream().reduce(0,Integer::sum);
+			System.out.println("working on "+ comp.toString() + " with size of "+ totalPoints);
+			if (totalPoints < 1) {
+				continue;
+			}
 			for(Transition op : comp.getEnabled()) {
-				List<ChoiceDataPoint> subpoints = points
-						.stream()
-						.filter(x -> {return x.getFired() == op;})
-						.collect(Collectors.toList());
-				if (subpoints.isEmpty()) {
+				String label = op.getId().toString();
+				if (!points.containsKey(label)) {
 					continue;
 				}
+				int subpoints = points.get(label);
 				Equation eq = createTypeEquality(
-						(subpoints.size() * 1.0) / (points.size() * 1.0), 
-						subpoints.size(), subpoints.get(0), varlookup, variables, vcounter
+						(subpoints * 1.0) / (totalPoints * 1.0), 
+						subpoints, op, comp, varlookup, variables, vcounter
 				);
 				System.out.println("constructed :: "+eq.toString());
 				equations.add(eq);
@@ -109,6 +110,7 @@ public class EqualitiesFactory {
 	public static Equation createTypeEquality(
 			double sumsTo,
 			int occurances,
+			Transition fired,
 			ChoiceDataPoint point,
 			Map<String, Tuple<Function,Integer>> varlookup, 
 			List<Function> variables, 
@@ -117,8 +119,8 @@ public class EqualitiesFactory {
 //		build top (always the same)
 //		get functions for variables
 		Function b1 = createVarIfNeeded(
-				getBaseWeightName(point.getFired()),
-				varlookup, variables, vcounter, point.getFired(), null);
+				getBaseWeightName(fired),
+				varlookup, variables, vcounter, fired, null);
 		Function x1 = null;
 		ChoiceExogenousPoint[] powers = point.getPowers();
 		for(int i=0 ; i < powers.length; i++) {
@@ -126,10 +128,10 @@ public class EqualitiesFactory {
 			ChoiceExogenousPoint power = powers[i];
 			boolean knower = power.isKnown();
 			String ajname = knower ?
-				getExogenousAdjust(point.getFired(), power) :
-				getNotExogenousAdjust(point.getFired(), power);
+				getExogenousAdjust(fired, power) :
+				getNotExogenousAdjust(fired, power);
 			double ajpower = knower ? power.getValue() : 1;
-			Function adjuster = createVarIfNeeded(ajname, varlookup, variables, vcounter, point.getFired() ,power.getName(), ajpower);
+			Function adjuster = createVarIfNeeded(ajname, varlookup, variables, vcounter, fired ,power.getName(), ajpower);
 			if (x1 == null) {
 //				first adjustment
 				x1 = adjuster;

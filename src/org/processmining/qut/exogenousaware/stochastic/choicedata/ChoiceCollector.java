@@ -1,10 +1,12 @@
 package org.processmining.qut.exogenousaware.stochastic.choicedata;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +35,6 @@ import org.processmining.plugins.petrinet.replayresult.PNRepResult;
 import org.processmining.plugins.petrinet.replayresult.StepTypes;
 import org.processmining.plugins.replayer.replayresult.SyncReplayResult;
 import org.processmining.pnetreplayer.utils.TransEvClassMappingUtils;
-import org.processmining.qut.exogenousaware.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousaware.data.ExogenousDataset;
 import org.processmining.qut.exogenousaware.data.ExogenousUtils;
 import org.processmining.qut.exogenousaware.exceptions.LinkNotFoundException;
@@ -51,6 +52,39 @@ import nl.tue.astar.AStarException;
 
 public class ChoiceCollector {
 	
+//	public static Progressor progress = null;
+//	
+//	public static Progressor setProgress(Progressor progress) {
+//		ChoiceCollector.progress = progress;
+//	}
+//	
+//	public static boolean hasProgressor() {
+//		return ChoiceCollector.progress != null;
+//	}
+//	
+//	public static void incrProgress() {
+//		if (hasProgressor()) {
+//			
+//		}
+//	}
+//	
+//	public static void incrProgress(int progress) {
+//		if (hasProgressor()) {
+//			
+//		}
+//	}
+//	
+//	public static void adjustProgressLimit(int limit) {
+//		if (hasProgressor()) {
+//			
+//		}
+//	}
+//	
+//	public static void clearProgress() {
+//		if (hasProgressor()) {
+//			ChoiceCollector.progress = null;
+//		}
+//	}
 	
 	@Builder
 	public static class ChoiceCollectorParameters {
@@ -122,16 +156,17 @@ public class ChoiceCollector {
 		
 	}
 
-	public static Map<ChoiceDataPoint, List<ChoiceDataPoint>> collect(
-			ExogenousAnnotatedLog xlog, 
+	public static Iterator<ChoiceDataPoint> collect(
+			XLog xlog, 
+			List<ExogenousDataset> datasets,
 			AcceptingPetriNet net, 
 			ChoiceCollectorParameters ccparameters) throws AStarException, UserCancelledException {
 		
 //		compute an alignment between the given log and net.
-		XEventClassifier classifer = xlog.getEndogenousLog().getClassifiers().get(0);
+		XEventClassifier classifer = xlog.getClassifiers().get(0);
 		
 		XLogInfo logInfo = XLogInfoFactory.createLogInfo(
-				(XLog) xlog.getEndogenousLog().clone(), classifer
+				(XLog) xlog, classifer
 		);
 		
 		TransEvClassMapping mapping = TransEvClassMappingUtils
@@ -162,7 +197,7 @@ public class ChoiceCollector {
 		PNRepResult alignedTraces = new PNLogReplayer().replayLog(
 				null,
 				net.getNet(),
-				xlog.getEndogenousLog(),
+				xlog,
 				mapping,
 				new PetrinetReplayerWithoutILP(),
 				parameters
@@ -183,35 +218,105 @@ public class ChoiceCollector {
 			}
 		}
 		System.out.println("collected sojourn times...");
-//		traverse each alignment and collect choice data.
-		Map<ChoiceDataPoint, List<ChoiceDataPoint>> storage = new HashMap();
-		for(SyncReplayResult alignment : alignedTraces) {
-			System.out.println("looking at an alignment for a trace...");
-			System.out.println("moves :: "+alignment.getStepTypes());
-			ChoiceAlignmentHandler handler = new ChoiceAlignmentHandler(alignment, net, ccparameters);
-//			for each trace with this control flow alignment
-			for(int traceIdx : alignment.getTraceIndex()) {
-				XTrace currTrace = xlog.get(traceIdx);
-				System.out.println("trace ::  " + currTrace
-						.stream()
-						.map( (x) -> {return classifer.getClassIdentity(x);})
-						.reduce("", (ls,nx) -> {return ls + nx;})
-				);
-				for( ChoiceDataPoint point : handler.generateChoiceData(currTrace, sojournStats, xlog)) {
-					if (storage.containsKey(point)) {
-						storage.get(point).add(point);
+		int maxProcess = xlog.size();
+//		traverse each alignment and collect choice data in a lazy manner
+		return new Iterator<ChoiceDataPoint>() {
+			
+			private int curr = 0;
+			private Iterator<SyncReplayResult> alignments = alignedTraces.iterator();
+			private SyncReplayResult currResult = null;
+			private ChoiceAlignmentHandler currHandler = null;
+			private Iterator<Integer> currTraces = null;
+			private int currTraceIndex = -1;
+			private Iterator<ChoiceDataPoint> currPoints = null;
+			private long timebetween = -1;
+
+			public boolean hasNext() {
+				return curr < maxProcess && alignments.hasNext();
+			}
+
+			public ChoiceDataPoint next() {
+				if (currTraces != null && !currTraces.hasNext()) {
+					currResult = null;
+				}
+				if (!alignments.hasNext()) {
+					return null;
+				}
+				// get result and handler if needed
+				if (currResult == null) {
+					currResult = alignments.next();
+					currHandler = new ChoiceAlignmentHandler(currResult, net, ccparameters);
+					currTraces = currResult.getTraceIndex().iterator();
+				}
+				// check for intermediate result, if so return them
+				if (currPoints != null && currPoints.hasNext()) {
+					return currPoints.next();
+				}
+				// begin generating points
+				currTraceIndex = currTraces.next();
+				currPoints = 
+						Arrays.stream(
+								currHandler.generateChoiceData(
+										xlog.get(currTraceIndex),
+										sojournStats,
+										datasets))
+						.iterator()
+						;
+				// print some progress out
+				curr += 1;
+				if (curr % 10 == 0) {
+					System.out.println("processed traces into choice data :: "+curr+"/"+maxProcess);
+					if (timebetween < 0) {
+						timebetween = System.currentTimeMillis();
 					} else {
-						List<ChoiceDataPoint> lister = new ArrayList();
-						lister.add(point);
-						storage.put(point, lister);
+						timebetween = System.currentTimeMillis() - timebetween;
+						double seconds = Double.longBitsToDouble(timebetween) / (1000.0* 60.0);
+						double intervals = (maxProcess - curr) * 1.0;
+						intervals = intervals / 10.0;
+						intervals = seconds * intervals;
+						System.out.println(
+							String.format("likely time left itering choice data :: %.1f minutes", intervals)
+						);
 					}
+				}
+				if (currPoints.hasNext()) {
+					return currPoints.next();
+				} else {
+					return next();
 				}
 				
 			}
-		}
-		
-		return storage;
+			
+		};
 	}
+//		for(SyncReplayResult alignment : alignedTraces) {
+//			System.out.println("looking at an alignment for a trace...");
+//			System.out.println("moves :: "+alignment.getStepTypes());
+//			ChoiceAlignmentHandler handler = new ChoiceAlignmentHandler(alignment, net, ccparameters);
+////			for each trace with this control flow alignment
+//			for(int traceIdx : alignment.getTraceIndex()) {
+//				XTrace currTrace = xlog.get(traceIdx);
+////				System.out.println("trace ::  " + currTrace
+////						.stream()
+////						.map( (x) -> {return classifer.getClassIdentity(x);})
+////						.reduce("", (ls,nx) -> {return ls + nx;})
+////				);
+//				for( ChoiceDataPoint point : handler.generateChoiceData(currTrace, sojournStats, datasets)) {
+//					if (storage.containsKey(point)) {
+//						storage.get(point).add(point);
+//					} else {
+//						List<ChoiceDataPoint> lister = new ArrayList();
+//						lister.add(point);
+//						storage.put(point, lister);
+//					}
+//				}
+//				
+//				
+//			}
+//		}
+//		
+//		return storage;
+//	}
 	
 	/*
 	 * Collects sojourn times between two synchronised moves, 
@@ -342,22 +447,25 @@ public class ChoiceCollector {
 			System.out.println("theta operations :: "+ ret);
 		}
 		
-		public ChoiceDataPoint[] generateChoiceData(XTrace xtrace, SojournStatistics sojourns, ExogenousAnnotatedLog xlog) {
+		public ChoiceDataPoint[] generateChoiceData(
+				XTrace xtrace, 
+				SojournStatistics sojourns,
+				List<ExogenousDataset> datasets) {
 			ChoiceDataPoint[] ret = new ChoiceDataPoint[generators.size()];
-			int powers = xlog.getExogenousDatasets().size();
+			int powers = datasets.size();
 			ChoiceExogenousPoint[][] thetas = new ChoiceExogenousPoint[transformers.length][powers];
 //			first pass 
 			for( int i =0; i < transformers.length; i++) {
 				if (transformers[i] instanceof SilientModelPower) {
 					continue;
 				} else {
-					thetas[i] = transformers[i].handle(thetas, xlog, xtrace, this.params, sojourns);
+					thetas[i] = transformers[i].handle(thetas, datasets, xtrace, this.params, sojourns);
 				}
 			}
 //			second pass (for silent moves)
 			for( int i =0; i < transformers.length; i++) {
 				if (transformers[i] instanceof SilientModelPower) {
-					thetas[i] = transformers[i].handle(thetas, xlog, xtrace, this.params, sojourns);
+					thetas[i] = transformers[i].handle(thetas, datasets, xtrace, this.params, sojourns);
 				}
 			}
 //			scrape thetas from generators
@@ -369,7 +477,7 @@ public class ChoiceCollector {
 						.powers(thetas[gen])
 						.firingSeq(findFiringSeq(gen))
 						.build();
-				System.out.println(point.toString());
+//				System.out.println(point.toString());
 				ret[genIndex] = point;
 				genIndex++;
 			}
@@ -539,7 +647,7 @@ public class ChoiceCollector {
 		 */
 		public ChoiceExogenousPoint[]handle(
 				ChoiceExogenousPoint[][]  thetas, 
-				ExogenousAnnotatedLog xlog,
+				List<ExogenousDataset> datasets,
 				XTrace trace,
 				ChoiceCollectorParameters params,
 				SojournStatistics sojourns,
@@ -550,13 +658,13 @@ public class ChoiceCollector {
 
 		public ChoiceExogenousPoint[] handle(
 				ChoiceExogenousPoint[][] thetas, 
-				ExogenousAnnotatedLog xlog,
+				List<ExogenousDataset> datasets,
 				XTrace trace,
 				ChoiceCollectorParameters params,
 				SojournStatistics sojourns,
 				Object ...args) {
 //			just build an empty power.
-			List<String> xnames = xlog.getExogenousDatasets().stream().map( d -> d.getName()).collect(Collectors.toList());
+			List<String> xnames = datasets.stream().map( d -> d.getName()).collect(Collectors.toList());
 			return xnames.stream()
 					.map((name) -> {return ChoiceExogenousPoint.builder().name(name).build();})
 					.collect(Collectors.toList())
@@ -582,18 +690,18 @@ public class ChoiceCollector {
 
 		public ChoiceExogenousPoint[] handle(
 				ChoiceExogenousPoint[][] thetas, 
-				ExogenousAnnotatedLog xlog,
+				List<ExogenousDataset> datasets,
 				XTrace trace,
 				ChoiceCollectorParameters params,
 				SojournStatistics sojourns,
 				Object ...args) {
 //			look at the target and copy its power
-			System.out.println("cloning target :: " + left_target);
+//			System.out.println("cloning target :: " + left_target);
 			ChoiceExogenousPoint[] ret;
 			if (!foundVis) {
-				System.out.println("No next visible step found, reverting to no power.");
+//				System.out.println("No next visible step found, reverting to no power.");
 				NoPower handler = new NoPower();
-				ret = handler.handle(thetas, xlog, trace, params, sojourns, args);
+				ret = handler.handle(thetas, datasets, trace, params, sojourns, args);
 			} else {
 				ret = thetas[left_target].clone();
 			}
@@ -610,13 +718,13 @@ public class ChoiceCollector {
 
 		public ChoiceExogenousPoint[] handle(
 				ChoiceExogenousPoint[][] thetas, 
-				ExogenousAnnotatedLog xlog,
+				List<ExogenousDataset> datasets,
 				XTrace trace,
 				ChoiceCollectorParameters params,
 				SojournStatistics sojourns,
 				Object ...args) {
 //			make a skipped power
-			List<String> xnames = xlog.getExogenousDatasets().stream().map( d -> d.getName()).collect(Collectors.toList());
+			List<String> xnames = datasets.stream().map( d -> d.getName()).collect(Collectors.toList());
 			return xnames.stream()
 					.map((name) -> {return ChoiceExogenousPoint.builder().name(name).skipped(true).build();})
 					.collect(Collectors.toList())
@@ -640,15 +748,15 @@ public class ChoiceCollector {
 		
 		public ChoiceExogenousPoint[] handle(
 				ChoiceExogenousPoint[][] thetas, 
-				ExogenousAnnotatedLog xlog,
+				List<ExogenousDataset> datasets,
 				XTrace trace,
 				ChoiceCollectorParameters params,
 				SojournStatistics sojourns,
 				Object ...args) {
 //			loop through powers and build ceps 
-			ChoiceExogenousPoint[] powers = new ChoiceExogenousPoint[xlog.getExogenousDatasets().size()];
+			ChoiceExogenousPoint[] powers = new ChoiceExogenousPoint[datasets.size()];
 			int cepIndex = 0;
-			for(ExogenousDataset dataset : xlog.getExogenousDatasets()) {
+			for(ExogenousDataset dataset : datasets) {
 //				does the target exist in the attributes
 				if (dataset.checkLink(trace)) {
 						try {
@@ -692,7 +800,7 @@ public class ChoiceCollector {
 		
 		public ChoiceExogenousPoint[] handle(
 				ChoiceExogenousPoint[][] thetas, 
-				ExogenousAnnotatedLog xlog,
+				List<ExogenousDataset> datasets,
 				XTrace trace,
 				ChoiceCollectorParameters params,
 				SojournStatistics sojourns,
@@ -701,9 +809,9 @@ public class ChoiceCollector {
 			double duration = findDuration(trace);
 			Double[] targetTimes = sojourns.getSojournsLessThan(target, duration);
 //			loop through powers and build ceps 
-			ChoiceExogenousPoint[] powers = new ChoiceExogenousPoint[xlog.getExogenousDatasets().size()];
+			ChoiceExogenousPoint[] powers = new ChoiceExogenousPoint[datasets.size()];
 			int cepIndex = 0;
-			for(ExogenousDataset dataset : xlog.getExogenousDatasets()) {
+			for(ExogenousDataset dataset : datasets) {
 				if (dataset.checkLink(trace)) {
 					double avgTheta = 0.0;
 					for(double time : targetTimes) {
@@ -755,7 +863,7 @@ public class ChoiceCollector {
 		
 		public ChoiceExogenousPoint[] handle(
 				ChoiceExogenousPoint[][] thetas, 
-				ExogenousAnnotatedLog xlog,
+				List<ExogenousDataset> datasets,
 				XTrace trace,
 				ChoiceCollectorParameters params,
 				SojournStatistics sojourns,
@@ -764,7 +872,6 @@ public class ChoiceCollector {
 			Double[] times = sojourns.getSojourns(target);
 //			get event
 			XEvent ev = trace.get(eventRight);
-			List<ExogenousDataset> datasets = xlog.getExogenousDatasets();
 			ChoiceExogenousPoint[] powers = new ChoiceExogenousPoint[datasets.size()];
 //			for all times, compute theta
 			int cepIndex = 0;
@@ -818,7 +925,7 @@ public class ChoiceCollector {
 		
 		public ChoiceExogenousPoint[] handle(
 				ChoiceExogenousPoint[][] thetas, 
-				ExogenousAnnotatedLog xlog,
+				List<ExogenousDataset> datasets,
 				XTrace trace,
 				ChoiceCollectorParameters params,
 				SojournStatistics sojourns,
@@ -828,7 +935,6 @@ public class ChoiceCollector {
 //			grab sojourns for target
 			Double[] times = sojourns.getSojourns(target);
 //			build powers
-			List<ExogenousDataset> datasets = xlog.getExogenousDatasets();
 			ChoiceExogenousPoint[] powers = new ChoiceExogenousPoint[datasets.size()];
 //			loop through datasets and construct powers
 			int cepIndex = 0;
