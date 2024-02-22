@@ -160,6 +160,7 @@ public class ExogenousDataset {
 					
 				}
 				this.std = Math.sqrt(std / total);
+				System.out.println("Dataset ("+getName()+") std computed :: "+this.std);
 				this.computedStd = true;
 				return this.std;
 			} else {
