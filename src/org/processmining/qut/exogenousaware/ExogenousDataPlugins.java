@@ -424,4 +424,27 @@ public class ExogenousDataPlugins {
 			final XLog exogenous, final PetriNetWithData model) throws Throwable {
 		throw new NotImplementedException("Still under construction...");
 	}
+	
+	@Plugin(
+			name = "Make Log into Exogenous Dataset",
+			parameterLabels = {"Dataset Log",},
+			categories={PluginCategory.Analytics},
+			help="This plugin allows users to build an exogneous dataset from a log."
+					+ version,
+			returnLabels = {"Exogenous Dataset"}, returnTypes = {ExogenousDataset.class}, 
+			userAccessible = true
+	)
+	@UITopiaVariant(
+			affiliation = "QUT",
+			author = "A. Banham",
+			email = "adam.banham@hdr.qut.edu.au",
+			pack = "ExogenousData"
+	)
+	public ExogenousDataset createDataset(final UIPluginContext context, 
+			final XLog datasetLog) throws Throwable {
+		return ExogenousDataset.builder()
+				.source(datasetLog)
+				.build()
+				.setup();
+	}
 }
