@@ -235,6 +235,10 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 	public int getNumberOfPlaces() {
 		return this.initial_marking.length;
 	}
+	
+	public int findTransitionId(Transition trans) {
+		return transitions.get(trans);
+	}
 
 	public String getTransitionLabel(int transition) {
 		for( Entry<Transition, Integer> entry : transitions.entrySet()) {

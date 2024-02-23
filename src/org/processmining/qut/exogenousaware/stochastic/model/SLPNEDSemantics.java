@@ -133,7 +133,9 @@ public class SLPNEDSemantics implements StochasticLabelledPetriNetSemantics {
 		BitSet enabled = getEnabledTransitions();
 		double weight = 0;
 		for( int t=0; t < getNumberOfTransitions(); t++) {
-			weight += getTransitionWeight(t, powers, known);
+			if (enabled.get(t)) {
+				weight += getTransitionWeight(t, powers, known);
+			}
 		}
 		return weight;
 	}

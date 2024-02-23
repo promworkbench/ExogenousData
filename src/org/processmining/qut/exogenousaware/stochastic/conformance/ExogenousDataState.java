@@ -56,6 +56,16 @@ public class ExogenousDataState implements DataState{
 			this.known = false;
 			this.value = 0.0;
 		}
+		
+		public String toString() {
+			String ret = "";
+			if (known) {
+				ret += Double.toString(value);
+			} else {
+				ret += "?";
+			}
+			return ret;
+		}
 	}
 	
 	protected Map<Integer, Factor> state;
@@ -64,7 +74,7 @@ public class ExogenousDataState implements DataState{
 	
 	public ExogenousDataState(ExogenousDataset[] factors) {
 		this.state = new HashMap();
-		this.size = factors.length * 2;
+		this.size = factors.length;
 		for(int f=0; f < factors.length; f++) {
 			state.put(f, new Factor(factors[f].getName()));
 		}
@@ -72,23 +82,19 @@ public class ExogenousDataState implements DataState{
 	
 	public ExogenousDataState(Map<Integer, Factor> state ) {
 		this.state = new HashMap();
-		this.size = state.keySet().size() * 2;
+		this.size = state.keySet().size();
 		for(int key : state.keySet()) {
 			this.state.put(key, state.get(key).clone());
 		}
 	}
 	
 	public Factor findIndex(int varIdx) {
-		return state.get(varIdx/2);
+		return state.get(varIdx);
 	}
 
 	public void putDouble(int varIdx, double value) {
 		Factor fact = findIndex(varIdx);
-		if (varIdx % 2 == 0) {
-			fact.set(fact.isKnown() > 0, value);;
-		}
-		fact.set(value < 0, value);
-		
+		fact.set(value > 0, value);		
 	}
 
 	public void putLong(int varIdx, long value) {
@@ -177,6 +183,31 @@ public class ExogenousDataState implements DataState{
 	
 	public Map<Integer, Factor> getState(){
 		return this.state;
+	}
+	
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final ExogenousDataState other = (ExogenousDataState) obj;
+		return this.hashCode() == other.hashCode();
+	}
+	
+	public String toString() {
+		String ret = "(";
+		for( int key=0; key < size(); key++) {
+			ret += state.get(key).toString() +",";
+		}
+		ret = ret.substring(0, ret.length()-1);
+		ret += ")";
+		return ret;
 	}
 
 }
