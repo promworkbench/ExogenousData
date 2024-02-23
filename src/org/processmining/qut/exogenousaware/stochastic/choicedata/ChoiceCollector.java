@@ -13,8 +13,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.deckfour.xes.classification.XEventClassifier;
+import org.deckfour.xes.classification.XEventNameClassifier;
 import org.deckfour.xes.info.XLogInfo;
 import org.deckfour.xes.info.XLogInfoFactory;
+import org.deckfour.xes.model.XAttributeMap;
 import org.deckfour.xes.model.XAttributeTimestamp;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
@@ -120,7 +122,18 @@ public class ChoiceCollector {
 				).getRealValue();
 //			System.out.println("Computed Theta :: "+ theta);
 			return theta;
-				
+		}
+		
+		public double computeEventTheta(XEvent event, XAttributeMap traceAttrs, ExogenousDataset dataset) throws LinkNotFoundException {
+			adjustAggeratorForPanel(dataset);
+			XTrace simplierTrace = new XTraceImpl(traceAttrs);
+			simplierTrace.add(event);
+			XTrace linkage = dataset.findLinkage(simplierTrace).get(0);
+			double theta = thetaAggerator.transform(
+						eventSlicer.slice(simplierTrace, linkage, dataset).get(event)
+				).getRealValue();
+			System.out.println("Computed event Theta :: "+ theta);
+			return theta;
 		}
 		
 		public double computeProceedingTheta(XTrace trace, XEvent posEvent, ExogenousDataset dataset) throws LinkNotFoundException {
@@ -163,7 +176,7 @@ public class ChoiceCollector {
 			ChoiceCollectorParameters ccparameters) throws AStarException, UserCancelledException {
 		
 //		compute an alignment between the given log and net.
-		XEventClassifier classifer = xlog.getClassifiers().get(0);
+		XEventClassifier classifer = new XEventNameClassifier();
 		
 		XLogInfo logInfo = XLogInfoFactory.createLogInfo(
 				(XLog) xlog, classifer
@@ -230,6 +243,7 @@ public class ChoiceCollector {
 			private int currTraceIndex = -1;
 			private Iterator<ChoiceDataPoint> currPoints = null;
 			private long timebetween = -1;
+			private int predictInterval = 25;
 
 			public boolean hasNext() {
 				return curr < maxProcess && alignments.hasNext();
@@ -264,19 +278,20 @@ public class ChoiceCollector {
 						;
 				// print some progress out
 				curr += 1;
-				if (curr % 10 == 0) {
+				if (curr % predictInterval == 0) {
 					System.out.println("processed traces into choice data :: "+curr+"/"+maxProcess);
 					if (timebetween < 0) {
 						timebetween = System.currentTimeMillis();
 					} else {
-						timebetween = System.currentTimeMillis() - timebetween;
-						double seconds = Double.longBitsToDouble(timebetween) / (1000.0* 60.0);
+						long ms = System.currentTimeMillis() - timebetween;
+						timebetween = System.currentTimeMillis();
 						double intervals = (maxProcess - curr) * 1.0;
-						intervals = intervals / 10.0;
-						intervals = seconds * intervals;
+						intervals = intervals / predictInterval;
+						intervals = (ms * intervals) /(1000.0* 60.0);
 						System.out.println(
-							String.format("likely time left itering choice data :: %.1f minutes", intervals)
+							String.format("likely time left itering choice data :: %.3f minutes", intervals)
 						);
+						
 					}
 				}
 				if (currPoints.hasNext()) {
@@ -876,22 +891,27 @@ public class ChoiceCollector {
 //			for all times, compute theta
 			int cepIndex = 0;
 			for(ExogenousDataset dataset : datasets) {
-				if (dataset.checkLink(trace)) {
-					double avgTheta = 0;
-					for(Double time : times) {
-						Date newDate = new Date(
-								ExogenousUtils.getEventTimeMillis(ev)
-								-Double.doubleToLongBits(time)
-						);
-						XEvent newEvent = (XEvent) ev.clone();
-						((XAttributeTimestamp) newEvent.getAttributes().get("time:timestamp")).setValue(newDate);
-						try {
-							avgTheta += params.computeProceedingTheta(trace, newEvent, dataset);
-						} catch (LinkNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
+				if (dataset.checkLink(trace)) {		
+					
+					double avgTheta = Arrays.stream(times)
+							.parallel()
+							.map(
+							 time -> {
+								 Date newDate = new Date(
+											ExogenousUtils.getEventTimeMillis(ev)
+											-Double.doubleToLongBits(time)
+									);
+									XEvent newEvent = (XEvent) ev.clone();
+									((XAttributeTimestamp) newEvent.getAttributes().get("time:timestamp")).setValue(newDate);
+									try {
+										return new Double(params.computeProceedingTheta(trace, newEvent, dataset));
+									} catch (LinkNotFoundException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+									return 0.0;
+							 }
+							).reduce(0.0, Double::sum);
 					avgTheta = avgTheta / times.length;
 					powers[cepIndex] = ChoiceExogenousPoint.builder()
 							.known(true)
@@ -942,22 +962,25 @@ public class ChoiceCollector {
 //				check for linkage
 				if (dataset.checkLink(trace)) {
 //					compute an average of the sojourns
-					double avgTheta = 0;
-					for(Double time : times) {
-//						bake a new event
-						Date newDate = new Date(
-								ExogenousUtils.getEventTimeMillis(leftev)
-								+ Double.doubleToLongBits(time)
-						);
-						XEvent newEvent = (XEvent) leftev.clone();
-						((XAttributeTimestamp) newEvent.getAttributes().get("time:timestamp")).setValue(newDate);
-						try {
-							avgTheta += params.computeProceedingTheta(trace, newEvent, dataset);
-						} catch (LinkNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
+					double avgTheta = Arrays.stream(times)
+							.parallel()
+							.map(
+							 time -> {
+								 Date newDate = new Date(
+											ExogenousUtils.getEventTimeMillis(leftev)
+											+ Double.doubleToLongBits(time)
+									);
+									XEvent newEvent = (XEvent) leftev.clone();
+									((XAttributeTimestamp) newEvent.getAttributes().get("time:timestamp")).setValue(newDate);
+									try {
+										return new Double(params.computeProceedingTheta(trace, newEvent, dataset));
+									} catch (LinkNotFoundException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+									return 0.0;
+							 }
+							).reduce(0.0, Double::sum);
 					avgTheta = avgTheta / times.length;
 					powers[cepIndex] = ChoiceExogenousPoint.builder()
 							.known(true)
