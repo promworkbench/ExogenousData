@@ -304,7 +304,7 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 				
 				w.println("# adjusters");
 				for(String adjuster : adjustment_names) {
-					w.println(adjuster);
+					w.println(adjuster.replace("#", "&#35;"));
 				}
 				
 				w.println("# number of places");
@@ -322,7 +322,7 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 					if (isTransitionSilent(transition)) {
 						w.println("silent");
 					} else {
-						w.println("label " + StringEscapeUtils.escapeJava(getTransitionLabel(transition)));
+						w.println("label " + StringEscapeUtils.escapeJava(getTransitionLabel(transition).replace("#", "&#35;")));
 					}
 					w.println("# base weight ");
 					w.println(getBaseWeight(transition));
