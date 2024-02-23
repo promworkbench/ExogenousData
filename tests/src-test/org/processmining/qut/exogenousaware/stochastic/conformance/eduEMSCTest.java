@@ -33,12 +33,14 @@ public class eduEMSCTest {
 			// TODO Auto-generated catch block
 //			e.getCause().printStackTrace();
 			e.printStackTrace();
-			fail("Not yet implemented");
+			fail("lpsolve problem.");
+		} catch (ArrayIndexOutOfBoundsException e) {
+			e.printStackTrace();
+			fail("Exogenous DataState problem.");
 		} catch (Exception e) {
 			// TODO Auto-generated catch bloc
-			System.out.println(e.getMessage());
 			e.printStackTrace();
-			fail("Not yet implemented");
+			fail("Unknown or unexpected error.");
 		}
 		
 	}
