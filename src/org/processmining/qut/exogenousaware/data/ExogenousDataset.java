@@ -86,9 +86,9 @@ public class ExogenousDataset {
 	 */
 	public List<XTrace> findLinkage(XTrace trace) throws LinkNotFoundException {
 		//		check for link
-		//		if (!checkLink(trace)) {
-		//			throw new LinkNotFoundException();
-		//		}
+				if (!checkLink(trace)) {
+					throw new LinkNotFoundException();
+				}
 		//		otherwise, find links
 		return linker.link(trace, source);
 	}
