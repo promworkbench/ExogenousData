@@ -61,7 +61,7 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 //			agg += w;
 //		}
 		agg = Math.log(espilion+agg);
-		System.out.println("finished tailing weight ("+agg+").");
+//		System.out.println("finished tailing weight ("+agg+").");
 		return new TransformedAttribute(subtimeseries.getAbvSlicingName()+"tailagg"+aggerator.getName(), agg);
 	}
 	
