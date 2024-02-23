@@ -1,22 +1,32 @@
 package org.processmining.qut.exogenousaware.stochastic.discovery;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import org.deckfour.xes.model.XLog;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.basicstochasticminer.solver.Equation;
 import org.processmining.basicstochasticminer.solver.Function;
+import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.qut.exogenousaware.ab.jobs.Tuple;
 import org.processmining.qut.exogenousaware.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousaware.data.ExogenousDataset;
 import org.processmining.qut.exogenousaware.stochastic.choicedata.ChoiceCollector;
 import org.processmining.qut.exogenousaware.stochastic.choicedata.ChoiceDataPoint;
+import org.processmining.qut.exogenousaware.stochastic.choicedata.ChoiceExogenousPoint;
 import org.processmining.qut.exogenousaware.stochastic.equalities.EqualitiesFactory;
+import org.processmining.qut.exogenousaware.stochastic.model.SLPNEDSemantics;
 import org.processmining.qut.exogenousaware.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.qut.exogenousaware.stochastic.solver.Solver;
+
+import cern.colt.Arrays;
 
 public class SLPNEDDiscovery {
 	
@@ -87,9 +97,117 @@ public class SLPNEDDiscovery {
 				new StochasticLabelledPetriNetWithExogenousData(net, solvedVariables, datasets);
 		System.out.println("returning slpned...");
 		System.out.println("but not before exporting visualisation data.");
-//		TODO
-		
+		dumpSampleData(frequencies, outnet);
+		System.out.println("finished exporting sample data.");
 		return outnet;
+	}
+
+	public static void dumpSampleData(
+			Map<ChoiceDataPoint, Map<String,Integer>> frequencies,
+			StochasticLabelledPetriNetWithExogenousData outnet
+		) throws FileNotFoundException {
+		
+		PrintWriter w = new PrintWriter(
+				new File("C:\\Users\\Adam_\\OneDrive - Queensland University of Technology\\phd\\mypapers\\2023\\B\\sample\\swarm vis\\vis.datadum")
+		);
+		
+		w.println("comp,fired,powers,real,bprob,prob,freq");
+		
+		for( ChoiceDataPoint p : frequencies.keySet()) {
+			SLPNEDSemantics sem = outnet.getDefaultSemantics();
+			for (Transition fired : p.getFiringSeq()) {
+				sem.executeTransition(outnet.findTransitionId(fired));
+			}
+			String line = "";
+			BitSet enabled = sem.getEnabledTransitions();
+			for(int trans = 0;  trans < sem.getNumberOfTransitions(); trans++) {
+				if (enabled.get(trans)) {
+					line += sem.getTransitionLabel(trans) + "|";
+				}
+			}
+			line = line.substring(0, line.length()-1);
+			line += ",";
+			
+			double baseTotal = 0.0;
+			for(Transition fired : p.getEnabled()) {
+				baseTotal += outnet.calcBaseWeight(outnet.findTransitionId(fired));
+			}
+			
+			double[] powers = new double[p.getPowers().length];
+			int[] known = new int[p.getPowers().length];
+			int powerIndex = 0;
+			for (ChoiceExogenousPoint power : p.getPowers()) {
+				powers[powerIndex] = power.getValue();
+				known[powerIndex] = power.isKnown() ? 1 :0;
+				powerIndex++;
+			}
+			double weightTotal = sem.getTotalWeightOfEnabledTransitions(powers, known);
+			Map<String, Integer> pmap = frequencies.get(p);
+			for(Transition fired : p.getEnabled()) {
+				String subline = fired.getLabel()+",";
+				
+				subline += Arrays.toString(p.getPowers()).replace(",",";")+",";
+				
+				subline += "true,";
+				
+				subline += Double.toString(outnet.calcBaseWeight(outnet.findTransitionId(fired)) / baseTotal) + ",";
+				
+				subline += Double.toString(outnet.calcWeight(outnet.findTransitionId(fired), powers, known) / weightTotal) + ",";
+				
+				if (pmap.containsKey(fired.getId().toString())) {
+					subline += Integer.toString(pmap.get(fired.getId().toString()));
+				} else {
+					subline += "" + 0 + "";
+				}
+				
+				w.println(line+subline);
+			}
+			
+			if (IntStream.of(known).reduce(0, Integer::sum) >= 1) {
+				for (int flip  : IntStream.rangeClosed(0, known.length-1)
+					.filter(i -> known[i] == 1)
+					.toArray()) {
+					known[flip] = 0;
+					for(Transition fired : p.getEnabled()) {
+						String subline = fired.getLabel()+",";
+						
+						subline += "[";
+						for(int i : IntStream.rangeClosed(0, known.length-1).toArray()) {
+							if (known[i] == 1) {
+								subline += Double.toString(powers[i]) +";";
+							} else {
+								subline +="?;";
+							}
+						}
+						subline = subline.substring(0, subline.length()-1);
+						subline += "],";
+						
+						subline += "false,";
+						
+						subline += Double.toString(outnet.calcBaseWeight(outnet.findTransitionId(fired)) / baseTotal) + ",";
+						
+						weightTotal = sem.getTotalWeightOfEnabledTransitions(powers, known);
+						System.out.println("non real weight ::" +sem.getTransitionWeight(outnet.findTransitionId(fired), powers, known));
+						System.out.println("total :: "+weightTotal);
+						subline += 
+								Double.toString(
+										sem.getTransitionWeight(outnet.findTransitionId(fired), powers, known)
+										/ weightTotal
+								) + ",";
+						
+						if (pmap.containsKey(fired.getId().toString())) {
+							subline += Integer.toString(pmap.get(fired.getId().toString()));
+						} else {
+							subline += "" + 0 + "";
+						}
+						
+						w.println(line+subline);
+					}
+				}
+			}
+		}
+		
+		w.close();
 	}
 
 }
