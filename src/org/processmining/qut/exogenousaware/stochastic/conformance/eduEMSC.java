@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.model.XLog;
+import org.deckfour.xes.model.XTrace;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.qut.exogenousaware.data.ExogenousDataset;
 import org.processmining.qut.exogenousaware.stochastic.model.SLPNEDSemantics;
@@ -18,6 +19,8 @@ import org.processmining.stochasticlabelleddatapetrinet.probability.TraceProbabl
 
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.strategy.HashingStrategy;
 import lpsolve.LpSolveException;
 
 public class eduEMSC extends duEMSC {
@@ -76,6 +79,59 @@ public class eduEMSC extends duEMSC {
 		return BigDecimal.ONE.subtract(sum).doubleValue();
 	}
 	
+	public static TObjectIntMap<String[]> getActivitySequences(XLog log, XEventClassifier classifier) {
+		TObjectIntMap<String[]> activitySequences = new TObjectIntCustomHashMap<>(new HashingStrategy<String[]>() {
+			private static final long serialVersionUID = 1L;
+
+			public int computeHashCode(String[] object) {
+				return Arrays.hashCode(object);
+			}
+
+			public boolean equals(String[] o1, String[] o2) {
+				return Arrays.equals(o1, o2);
+			}
+		});
+		int processed = 0;
+		for (XTrace trace : log) {
+			String[] activityTrace = TraceProbablility.getActivitySequence(trace, classifier);
+			activitySequences.adjustOrPutValue(activityTrace, 1, 1);
+			processed +=1;
+			if (processed % 25 == 0) {
+				System.out.println(
+						"[eduEMSC] handled activity sequences :: " + processed + "/" + log.size()
+				);
+			}
+		}
+		return activitySequences;
+	}
+	
+	public static TObjectIntMap<DataState[]> getDataSequences(XLog log, DataStateLogAdapter logAdapter,
+			int maxTraceLength) {
+		TObjectIntMap<DataState[]> dataSequences = new TObjectIntCustomHashMap<>(new HashingStrategy<DataState[]>() {
+			private static final long serialVersionUID = 1L;
+
+			public int computeHashCode(DataState[] object) {
+				return Arrays.hashCode(object);
+			}
+
+			public boolean equals(DataState[] o1, DataState[] o2) {
+				return Arrays.equals(o1, o2);
+			}
+		});
+		int processed = 0;
+		for (XTrace trace : log) {
+			DataState[] dataTrace = TraceProbablility.getDataSequence(trace, logAdapter, maxTraceLength);
+			dataSequences.adjustOrPutValue(dataTrace, 1, 1);
+			processed +=1;
+			if (processed % 25 == 0) {
+				System.out.println(
+						"[eduEMSC] handled data sequences :: " + processed + "/" + log.size()
+				);
+			}
+		}
+		return dataSequences;
+	}
+	
 	private static BigDecimal queryModelForTrace(SLPNEDSemantics semantics,
 			ProMCanceller canceller, MathContext mc, String[] activitySequence,
 			TObjectIntMap<DataState[]> dataSequences, int logSize) throws LpSolveException {
@@ -93,7 +149,7 @@ public class eduEMSC extends duEMSC {
 			//get the model probability
 			BigDecimal probabilityConditionalModel = BigDecimal.valueOf(
 					TraceProbablility.getTraceProbability(semantics.getduEMSCSemantics(), activitySequence, dataSequence, canceller));
-
+			System.out.println("computed a conditional model prob.");
 			sum = sum.add(probabilityConditionalModel.multiply(dataSequenceProbabilityLog));
 
 			//			System.out.println("    trace+data done");

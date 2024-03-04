@@ -132,7 +132,7 @@ public class ChoiceCollector {
 			double theta = thetaAggerator.transform(
 						eventSlicer.slice(simplierTrace, linkage, dataset).get(event)
 				).getRealValue();
-			System.out.println("Computed event Theta :: "+ theta);
+//			System.out.println("Computed event Theta :: "+ theta);
 			return theta;
 		}
 		

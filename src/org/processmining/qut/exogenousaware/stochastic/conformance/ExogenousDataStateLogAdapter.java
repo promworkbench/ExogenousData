@@ -34,7 +34,7 @@ public class ExogenousDataStateLogAdapter implements DataStateLogAdapter {
 			}
 			varIdx++;
 		}
-		System.out.println("made new ds from event :: "+state.toString());
+//		System.out.println("made new ds from event :: "+state.toString());
 		return state;
 	}
 
