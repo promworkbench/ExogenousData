@@ -13,6 +13,10 @@ For thoses that are interested in seeing what the xPM framework can do or want t
 
 See the following write up for more infomation on the exemplar use case [here](exemplar/readme.md).
 
+## Runner configuration
+
+-Djava.library.path=C:\Users\Adam_\OneDrive\Desktop\ProM\ProM-nightly-20240208-1.8\ProM-nightly-20240208-1.8\packages\lpsolve-5.5.4\lib\win64
+
 ## Features 
 
 The following features have been implemented and can be accessed within ProM via the appropriate plugin. Each the following sections outline the plugin functions and outcomes.
@@ -99,8 +103,8 @@ To get in contact, see https://www.adambanham.io/contact for my current email ad
 
 # References
 
-[1] F. Mannhardt, M. de Leoni, H. A. Reijers, and W. M. P. van der Aalst, “Decision Mining Revisited - Discovering Overlapping Rules,” in Advanced Information Systems Engineering, Cham, 2016, pp. 377–392.
+[1] F. Mannhardt, M. de Leoni, H. A. Reijers, and W. M. P. van der Aalst, â€œDecision Mining Revisited - Discovering Overlapping Rules,â€� in Advanced Information Systems Engineering, Cham, 2016, pp. 377â€“392.
 <br>
 or 
 <br>
-F. Mannhardt, M. De Leoni, and H. A. Reijers, “The multi-perspective process explorer,” in CEUR Workshop Proceedings, Innsbruck, Austria, Sep. 2015, vol. 1418, pp. 130–134.
+F. Mannhardt, M. De Leoni, and H. A. Reijers, â€œThe multi-perspective process explorer,â€� in CEUR Workshop Proceedings, Innsbruck, Austria, Sep. 2015, vol. 1418, pp. 130â€“134.
