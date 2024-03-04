@@ -105,22 +105,27 @@ public class ExogenousDataState implements DataState{
 	}
 	
 	protected Map<Integer, Factor> state;
+	protected Map<String, Integer> datasets;
 	int size;
 	private int hash = -1;
 	
 	public ExogenousDataState(ExogenousDataset[] factors) {
 		this.state = new HashMap();
+		this.datasets = new HashMap();
 		this.size = factors.length;
 		for(int f=0; f < factors.length; f++) {
 			state.put(f, new Factor(factors[f].getName()));
+			datasets.put(factors[f].getName(), f);
 		}
 	}
 	
 	public ExogenousDataState(Map<Integer, Factor> state ) {
 		this.state = new HashMap();
+		this.datasets = new HashMap();
 		this.size = state.keySet().size();
 		for(int key : state.keySet()) {
 			this.state.put(key, state.get(key).clone());
+			this.datasets.put(state.get(key).name, key);
 		}
 	}
 	
@@ -206,16 +211,25 @@ public class ExogenousDataState implements DataState{
 		return new ExogenousDataState(state);
 	}
 	
-//	public int hashCode() {
-//		if (hash > 0) {
-//			return hash;
-//		}
-//		HashCodeBuilder hasher = new HashCodeBuilder(17, 37);
-//		for(int i=0; i < (size/2); i++) {
-//			hasher.append(state.get(i).hashCode());
-//		}
-//		return hasher.hashCode();
-//	}
+	public int[] getKnowns(Map<String,Integer> translation) {
+		int[] knowns = new int[translation.keySet().size()];
+		for(String name: translation.keySet()) {
+			Factor factor = state.get(datasets.get(name));
+			int idx = translation.get(name);
+			knowns[idx] = factor.isKnown();
+		}
+		return knowns;
+	}
+	
+	public double[] getPowers(Map<String,Integer> translation) {
+		double[] powers = new double[translation.keySet().size()];
+		for(String name: translation.keySet()) {
+			Factor factor = state.get(datasets.get(name));
+			int idx = translation.get(name);
+			powers[idx] = factor.value;
+		}
+		return powers;
+	}
 	
 	public Map<Integer, Factor> getState(){
 		return this.state;

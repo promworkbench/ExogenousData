@@ -2,6 +2,7 @@ package org.processmining.qut.exogenousaware.stochastic.model;
 
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Map;
 
 import org.processmining.stochasticlabelledpetrinets.StochasticLabelledPetriNetSemantics;
 
@@ -22,6 +23,10 @@ public class SLPNEDSemantics implements StochasticLabelledPetriNetSemantics {
 	
 	public int getNumberOfExogenousFactors() {
 		return net.getNumberOfExogenousFactors();
+	}
+	
+	public Map<String, Integer> getFactorTranslation() {
+		return net.getDatasetIndexes();
 	}
 	
 	public String getExogenousLabel(int factor) {

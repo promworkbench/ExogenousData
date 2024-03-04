@@ -2,6 +2,7 @@ package org.processmining.qut.exogenousaware.stochastic.model;
 
 import java.util.BitSet;
 
+import org.processmining.qut.exogenousaware.stochastic.conformance.ExogenousDataState;
 import org.processmining.stochasticlabelleddatapetrinet.StochasticLabelledDataPetriNet.VariableType;
 import org.processmining.stochasticlabelleddatapetrinet.StochasticLabelledDataPetriNetSemantics;
 import org.processmining.stochasticlabelleddatapetrinet.datastate.DataState;
@@ -55,15 +56,26 @@ public class SLPNEDSemanticsForduEMSC implements StochasticLabelledDataPetriNetS
 	}
 
 	public double getTransitionWeight(int transition) {
-		double weight = realSemenatics.getTransitionWeight(transition);
+//		double weight = 0.0;
+		ExogenousDataState xstate = null;
+		if (state instanceof ExogenousDataState) {
+			xstate = (ExogenousDataState) state;
+		}
+		double [] powers = xstate.getPowers(realSemenatics.getFactorTranslation());
+		int [] known = xstate.getKnowns(realSemenatics.getFactorTranslation());
 //		System.out.println("calling weight :: "+weight);
-		return weight;
+		return realSemenatics.getTransitionWeight(transition, powers, known);
 	}
 
 	public double getTotalWeightOfEnabledTransitions() {
-		double totalWeight =realSemenatics.getTotalWeightOfEnabledTransitions();
+		ExogenousDataState xstate = null;
+		if (state instanceof ExogenousDataState) {
+			xstate = (ExogenousDataState) state;
+		}
+		double [] powers = xstate.getPowers(realSemenatics.getFactorTranslation());
+		int [] known = xstate.getKnowns(realSemenatics.getFactorTranslation());
 //		System.out.println("calling total weight :: "+totalWeight);
-		return totalWeight;
+		return realSemenatics.getTotalWeightOfEnabledTransitions(powers, known);
 	}
 
 	public SLPNEDSemanticsForduEMSC clone() {

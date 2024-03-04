@@ -167,6 +167,9 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 		this.initial_marking = new int[net.getNet().getPlaces().size()];
 	}
 	
+	public Map<String, Integer> getDatasetIndexes() {
+		return this.datasets;
+	}
 	
 	public double getBaseWeight(int transition) {
 		return base_weights.get(transition);
