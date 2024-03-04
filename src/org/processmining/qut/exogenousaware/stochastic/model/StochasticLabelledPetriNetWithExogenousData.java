@@ -171,6 +171,10 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 		return this.datasets;
 	}
 	
+	public String getName() {
+		return net.getNet().getLabel();
+	}
+	
 	public double getBaseWeight(int transition) {
 		return base_weights.get(transition);
 	}
