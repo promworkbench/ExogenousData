@@ -107,8 +107,10 @@ public class SLPNEDDiscovery {
 			StochasticLabelledPetriNetWithExogenousData outnet
 		) throws FileNotFoundException {
 		
+		
+		
 		PrintWriter w = new PrintWriter(
-				new File("C:\\Users\\Adam_\\OneDrive - Queensland University of Technology\\phd\\mypapers\\2023\\B\\sample\\swarm vis\\vis.datadum")
+				new File("C:\\Users\\nobody\\Desktop\\adam\\data\\swarm vis\\" + outnet.getName() + ".datadum")
 		);
 		
 		w.println("comp,fired,powers,real,bprob,prob,freq");
@@ -120,10 +122,19 @@ public class SLPNEDDiscovery {
 			}
 			String line = "";
 			BitSet enabled = sem.getEnabledTransitions();
+			boolean hasTau = false;
 			for(int trans = 0;  trans < sem.getNumberOfTransitions(); trans++) {
 				if (enabled.get(trans)) {
-					line += sem.getTransitionLabel(trans) + "|";
+					if (!sem.isTransitionSilent(trans)) {
+						line += sem.getTransitionLabel(trans) + "|";
+					} else {
+						hasTau = true;
+					}
+					
 				}
+			}
+			if (hasTau) {
+				line += "tau|";
 			}
 			line = line.substring(0, line.length()-1);
 			line += ",";
@@ -144,11 +155,13 @@ public class SLPNEDDiscovery {
 			double weightTotal = sem.getTotalWeightOfEnabledTransitions(powers, known);
 			Map<String, Integer> pmap = frequencies.get(p);
 			for(Transition fired : p.getEnabled()) {
-				String subline = fired.getLabel()+",";
+				
+				String label = fired.isInvisible() ? "tau" : fired.getLabel();
+				String subline = label+",";
 				
 				subline += Arrays.toString(p.getPowers()).replace(",",";")+",";
 				
-				subline += "true,";
+				subline += fired.equals(p.getFired()) ? "true," : "false,";
 				
 				subline += Double.toString(outnet.calcBaseWeight(outnet.findTransitionId(fired)) / baseTotal) + ",";
 				
@@ -169,7 +182,8 @@ public class SLPNEDDiscovery {
 					.toArray()) {
 					known[flip] = 0;
 					for(Transition fired : p.getEnabled()) {
-						String subline = fired.getLabel()+",";
+						String label = fired.isInvisible() ? "tau" : fired.getLabel();
+						String subline = label+",";
 						
 						subline += "[";
 						for(int i : IntStream.rangeClosed(0, known.length-1).toArray()) {

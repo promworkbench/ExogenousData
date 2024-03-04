@@ -1,5 +1,7 @@
 package org.processmining.qut.exogenousaware.stochastic.choicedata;
 
+import java.util.Objects;
+
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -37,4 +39,23 @@ public class ChoiceExogenousPoint {
 		return this.copy();
 				
 	}
+
+	public int hashCode() {
+		return Objects.hash(known, name, skipped, value);
+	}
+
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ChoiceExogenousPoint other = (ChoiceExogenousPoint) obj;
+		return known == other.known && Objects.equals(name, other.name) && skipped == other.skipped
+				&& Double.doubleToLongBits(value) == Double.doubleToLongBits(other.value);
+	}
+
+	
+	
 }

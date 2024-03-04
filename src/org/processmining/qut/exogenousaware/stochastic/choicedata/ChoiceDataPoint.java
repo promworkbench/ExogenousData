@@ -1,7 +1,9 @@
 package org.processmining.qut.exogenousaware.stochastic.choicedata;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
@@ -41,8 +43,25 @@ public class ChoiceDataPoint {
 		ret += ")";
 		return ret;
 	}
-	
+
 	public int hashCode() {
-		return enabled.hashCode() + powers.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(powers);
+		result = prime * result + Objects.hash(enabled);
+		return result;
 	}
+
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ChoiceDataPoint other = (ChoiceDataPoint) obj;
+		return Objects.equals(enabled, other.enabled) && Arrays.equals(powers, other.powers);
+	}
+	
+	
 }
