@@ -16,6 +16,7 @@ See the following write up for more infomation on the exemplar use case [here](e
 ## Runner configuration
 
 -Djava.library.path=C:\Users\Adam_\OneDrive\Desktop\ProM\ProM-nightly-20240208-1.8\ProM-nightly-20240208-1.8\packages\lpsolve-5.5.4\lib\win64
+-Djava.system.class.loader=org.processmining.framework.util.ProMClassLoader
 
 ## Features 
 
