@@ -35,8 +35,8 @@ public class SLPNEDSemantics implements StochasticLabelledPetriNetSemantics {
 	}
 
 	public void executeTransition(int transition) {
-		System.out.println("firing trans ::"+ getTransitionLabel(transition) +" or "+transition);
-		System.out.println("current marking ::"+ Arrays.toString(markedPlaces));
+//		System.out.println("firing trans ::"+ getTransitionLabel(transition) +" or "+transition);
+//		System.out.println("current marking ::"+ Arrays.toString(markedPlaces));
 //		if (!getEnabledTransitions().get(transition)) {
 //			System.out.print(
 //					"Tried to fired transition that is not enabled ("
@@ -54,12 +54,12 @@ public class SLPNEDSemantics implements StochasticLabelledPetriNetSemantics {
 		for (int place : net.getOutputPlaces(transition)) {
 			markedPlaces[place] += 1;
 		}
-		System.out.println("new marking ::"+ Arrays.toString(markedPlaces));
+//		System.out.println("new marking ::"+ Arrays.toString(markedPlaces));
 
 	}
 
 	public BitSet getEnabledTransitions() {
-		System.out.println("current marking ::"+ Arrays.toString(markedPlaces));
+//		System.out.println("current marking ::"+ Arrays.toString(markedPlaces));
 		BitSet enabled = new BitSet(getNumberOfTransitions());
 		enabled.clear();
 		for (int t=0; t < getNumberOfTransitions(); t++) {
@@ -73,17 +73,17 @@ public class SLPNEDSemantics implements StochasticLabelledPetriNetSemantics {
 				enabled.set(t);
 			}
 		}
-		System.out.println("returning enabled :: " + enabled.toString());
+//		System.out.println("returning enabled :: " + enabled.toString());
 		return enabled;
 	}
 
 	public boolean isFinalState() {
-		System.out.println("checking in final.");
+//		System.out.println("checking in final.");
 		if (getEnabledTransitions().cardinality() == 0) {
-			System.out.println("in final");
+//			System.out.println("in final");
 			return true;
 		} else {
-			System.out.println("not in final");
+//			System.out.println("not in final");
 			return false;
 		}
 	}
@@ -93,7 +93,7 @@ public class SLPNEDSemantics implements StochasticLabelledPetriNetSemantics {
 		for (int p=0; p < markedPlaces.length; p++) {
 			state[p] = (byte) (markedPlaces[p] > 0 ? 1: 0);
 		}
-		System.out.println("returning state of : " +Arrays.toString(state));
+//		System.out.println("returning state of : " +Arrays.toString(state));
 		return state;
 	}
 

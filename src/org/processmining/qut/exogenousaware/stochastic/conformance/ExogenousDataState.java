@@ -3,7 +3,6 @@ package org.processmining.qut.exogenousaware.stochastic.conformance;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.processmining.qut.exogenousaware.data.ExogenousDataset;
 import org.processmining.stochasticlabelleddatapetrinet.datastate.DataState;
 
@@ -29,7 +28,11 @@ public class ExogenousDataState implements DataState{
 		
 		public void set(boolean known, double value) {
 			this.known = known;
-			this.value = value;
+			if (!known) {
+				this.value = -1;
+			} else {
+				this.value = value;
+			}
 		}
 		
 		public int isKnown() {
@@ -44,19 +47,52 @@ public class ExogenousDataState implements DataState{
 			return new Factor(name, known, value);
 		}
 		
-		public int hashCode() {
-			return new HashCodeBuilder(17, 31)
-					.append(name)
-					.append(known)
-					.append(known ? value : -1)
-					.hashCode();
-		}
+//		public int hashCode() {
+//			return new HashCodeBuilder(17, 31)
+//					.append(name)
+//					.append(known)
+//					.append(known ? value : -1)
+//					.hashCode();
+//		}
+		
+		
 		
 		public void reset() {
 			this.known = false;
 			this.value = 0.0;
 		}
 		
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + (known ? 1231 : 1237);
+			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			long temp;
+			temp = Double.doubleToLongBits(value);
+			result = prime * result + (int) (temp ^ (temp >>> 32));
+			return result;
+		}
+
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Factor other = (Factor) obj;
+			if (known != other.known)
+				return false;
+			if (name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!name.equals(other.name))
+				return false;
+			if (Double.doubleToLongBits(value) != Double.doubleToLongBits(other.value))
+				return false;
+			return true;
+		}
+
 		public String toString() {
 			String ret = "";
 			if (known) {
@@ -170,36 +206,63 @@ public class ExogenousDataState implements DataState{
 		return new ExogenousDataState(state);
 	}
 	
-	public int hashCode() {
-		if (hash > 0) {
-			return hash;
-		}
-		HashCodeBuilder hasher = new HashCodeBuilder(17, 37);
-		for(int i=0; i < (size/2); i++) {
-			hasher.append(state.get(i).hashCode());
-		}
-		return hasher.hashCode();
-	}
+//	public int hashCode() {
+//		if (hash > 0) {
+//			return hash;
+//		}
+//		HashCodeBuilder hasher = new HashCodeBuilder(17, 37);
+//		for(int i=0; i < (size/2); i++) {
+//			hasher.append(state.get(i).hashCode());
+//		}
+//		return hasher.hashCode();
+//	}
 	
 	public Map<Integer, Factor> getState(){
 		return this.state;
 	}
 	
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final ExogenousDataState other = (ExogenousDataState) obj;
-		return this.hashCode() == other.hashCode();
-	}
 	
+	
+//	@Override
+//	public boolean equals(final Object obj) {
+//		if (this == obj) {
+//			return true;
+//		}
+//		if (obj == null) {
+//			return false;
+//		}
+//		if (getClass() != obj.getClass()) {
+//			return false;
+//		}
+//		final ExogenousDataState other = (ExogenousDataState) obj;
+//		return this.hashCode() == other.hashCode();
+//	}
+	
+
+
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((state == null) ? 0 : state.hashCode());
+		return result;
+	}
+
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ExogenousDataState other = (ExogenousDataState) obj;
+		if (state == null) {
+			if (other.state != null)
+				return false;
+		} else if (!state.equals(other.state))
+			return false;
+		return true;
+	}
+
 	public String toString() {
 		String ret = "(";
 		for( int key=0; key < size(); key++) {
