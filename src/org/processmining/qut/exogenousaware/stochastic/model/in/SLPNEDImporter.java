@@ -42,7 +42,7 @@ public class SLPNEDImporter extends AbstractImportPlugin{
 		
 		int numberOfAdjusters = Integer.parseInt(getNextLine(r));
 		for(int adj=0; adj < numberOfAdjusters; adj++) {
-			result.addExogenousFactor(getNextLine(r));
+			result.addExogenousFactor(getNextLine(r).replace("&#35;","#"));
 		}
 		
 		int numberOfPlaces = Integer.parseInt(getNextLine(r));
