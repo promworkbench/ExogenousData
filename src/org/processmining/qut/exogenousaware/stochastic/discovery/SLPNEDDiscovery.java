@@ -30,6 +30,12 @@ import cern.colt.Arrays;
 
 public class SLPNEDDiscovery {
 	
+	private static String dumpLoc = "";
+	
+	public static void setDumpLoc(String loc) {
+		dumpLoc = loc;
+	}
+	
 	public static StochasticLabelledPetriNetWithExogenousData discoverFromLog(
 			ExogenousAnnotatedLog xlog, 
 			AcceptingPetriNet net) throws Exception {
@@ -75,6 +81,7 @@ public class SLPNEDDiscovery {
 						net.getNet().getTransitions()
 				);
 		System.out.println("constructed equalities...");
+		System.out.println("constructed "+equalities.getLeft().size()+" equalities....");
 		int[] fixed = new int[equalities.getRight().size()];
 		int[] nonzero = new int[equalities.getRight().size()];
 		double[] inital = new double[equalities.getRight().size()];
@@ -110,7 +117,7 @@ public class SLPNEDDiscovery {
 		
 		
 		PrintWriter w = new PrintWriter(
-				new File("C:\\Users\\nobody\\Desktop\\adam\\data\\swarm vis\\" + outnet.getName() + ".datadum")
+				new File(dumpLoc + outnet.getName() + ".datadum")
 		);
 		
 		w.println("comp,fired,powers,real,bprob,prob,freq");
@@ -164,8 +171,10 @@ public class SLPNEDDiscovery {
 				subline += fired.equals(p.getFired()) ? "true," : "false,";
 				
 				subline += Double.toString(outnet.calcBaseWeight(outnet.findTransitionId(fired)) / baseTotal) + ",";
-				
-				subline += Double.toString(outnet.calcWeight(outnet.findTransitionId(fired), powers, known) / weightTotal) + ",";
+				double likelihood = sem.getTransitionWeight(outnet.findTransitionId(fired), powers, known)
+						/ weightTotal;
+//				System.out.println("[SamplerExporter] firing likelihood :: "+likelihood);
+				subline += Double.toString(likelihood) + ",";
 				
 				if (pmap.containsKey(fired.getId().toString())) {
 					subline += Integer.toString(pmap.get(fired.getId().toString()));
@@ -201,12 +210,12 @@ public class SLPNEDDiscovery {
 						subline += Double.toString(outnet.calcBaseWeight(outnet.findTransitionId(fired)) / baseTotal) + ",";
 						
 						weightTotal = sem.getTotalWeightOfEnabledTransitions(powers, known);
-						System.out.println("non real weight ::" +sem.getTransitionWeight(outnet.findTransitionId(fired), powers, known));
-						System.out.println("total :: "+weightTotal);
+						double likelihood = sem.getTransitionWeight(outnet.findTransitionId(fired), powers, known)
+								/ weightTotal;
+//						System.out.println("[SamplerExporter] firing likelihood :: "+likelihood);
 						subline += 
 								Double.toString(
-										sem.getTransitionWeight(outnet.findTransitionId(fired), powers, known)
-										/ weightTotal
+										likelihood
 								) + ",";
 						
 						if (pmap.containsKey(fired.getId().toString())) {
