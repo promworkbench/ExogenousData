@@ -37,24 +37,54 @@ public class EqualitiesFactory {
 		System.out.println("prepared variables...");
 //		for each competition space, construct an equality between outcomes
 		for(ChoiceDataPoint comp : frequencies.keySet()) {
+//			if this space is about an enablement with only one option then skip
+			if (comp.getEnabled().size() == 1) {
+				continue;
+			}
 			Map<String, Integer> points = frequencies.get(comp);
 			int totalPoints = points.values().stream().reduce(0,Integer::sum);
 			System.out.println("working on "+ comp.toString() + " with size of "+ totalPoints);
 			if (totalPoints < 1) {
 				continue;
 			}
-			for(Transition op : comp.getEnabled()) {
-				String label = op.getId().toString();
-				if (!points.containsKey(label)) {
-					continue;
+//			(a) if the competition space contains at least one observation for each enabled then,
+//			one term can be removed
+			if (points.keySet().size() == comp.getEnabled().size()) {
+				int point = 1;
+				for(Transition op : comp.getEnabled()) {
+					String label = op.getId().toString();
+					if (!points.containsKey(label)) {
+						continue;
+					}
+					int subpoints = points.get(label);
+					Equation eq = createTypeEquality(
+							(subpoints * 1.0) / (totalPoints * 1.0), 
+							subpoints, op, comp, varlookup, variables, vcounter
+					);
+					System.out.println("(skipped term) constructed :: "+eq.toString());
+					equations.add(eq);
+					point += 1;
+					if (point >= comp.getEnabled().size()) {
+						break;
+					}
 				}
-				int subpoints = points.get(label);
-				Equation eq = createTypeEquality(
-						(subpoints * 1.0) / (totalPoints * 1.0), 
-						subpoints, op, comp, varlookup, variables, vcounter
-				);
-				System.out.println("constructed :: "+eq.toString());
-				equations.add(eq);
+			}
+			else {
+//			(b) otherwise, we can drop all options that are not observation
+//			(a + b) cannot be done, only one
+				for(Transition op : comp.getEnabled()) {
+					String label = op.getId().toString();
+					if (!points.containsKey(label)) {
+						continue;
+					}
+					int subpoints = points.get(label);
+					Equation eq = createTypeEquality(
+							(subpoints * 1.0) / (totalPoints * 1.0), 
+							subpoints, op, comp, varlookup, variables, vcounter
+					);
+					System.out.println("(zero removed) constructed :: "+eq.toString());
+					equations.add(eq);
+				}
 			}
 		}
 		return new Tuple(equations, variables);
