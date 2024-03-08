@@ -131,6 +131,7 @@ public class SLPNEDSemantics implements StochasticLabelledPetriNetSemantics {
 		double [] powers = new double[net.getNumberOfExogenousFactors()];
 		int [] known = new int[net.getNumberOfExogenousFactors()];
 		Arrays.setAll(known, x -> 0);
+		Arrays.setAll(powers, x -> 1.0);
 		return getTotalWeightOfEnabledTransitions(powers, known);
 	}
 	
