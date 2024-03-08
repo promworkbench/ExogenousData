@@ -7,7 +7,6 @@ import java.util.Arrays;
 
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.model.XLog;
-import org.deckfour.xes.model.XTrace;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.qut.exogenousaware.data.ExogenousDataset;
 import org.processmining.qut.exogenousaware.stochastic.model.SLPNEDSemantics;
@@ -32,7 +31,7 @@ public class eduEMSC extends duEMSC {
 			StochasticLabelledPetriNetWithExogenousData model, boolean debug,
 			ProMCanceller canceller) throws LpSolveException {
 		
-//		handle log so we have approperiate transformed values
+//		handle log so we have appropriate transformed values
 		eduEMSC.debug = debug;
 
 		SLPNEDSemantics semantics = model.getDefaultSemantics();
@@ -53,6 +52,8 @@ public class eduEMSC extends duEMSC {
 
 		BigDecimal sum = BigDecimal.ZERO;
 
+		int jobs = activitySequences.size();
+		int curr = 1;
 		for (TObjectIntIterator<String[]> itAs = activitySequences.iterator(); itAs.hasNext();) {
 			itAs.advance();
 
@@ -68,11 +69,12 @@ public class eduEMSC extends duEMSC {
 					.max(BigDecimal.ZERO);
 			
 			if (eduEMSC.debug) {
-				System.out.println("log: " + activitySequenceProbabilityLog + " model: " + activitySequenceProbabilityModel
+				System.out.println("("+curr+"/" + jobs + ") log: " 
+						+ activitySequenceProbabilityLog + " model: " + activitySequenceProbabilityModel
 						+ " difference: " + difference + " trace " + Arrays.toString(activitySequence));
 			}
 
-
+			curr += 1;
 			sum = sum.add(difference);
 		}
 
@@ -92,16 +94,23 @@ public class eduEMSC extends duEMSC {
 			}
 		});
 		int processed = 0;
-		for (XTrace trace : log) {
-			String[] activityTrace = TraceProbablility.getActivitySequence(trace, classifier);
-			activitySequences.adjustOrPutValue(activityTrace, 1, 1);
-			processed +=1;
-			if (processed % 25 == 0) {
-				System.out.println(
-						"[eduEMSC] handled activity sequences :: " + processed + "/" + log.size()
-				);
-			}
-		}
+		System.out.println("processing activity sequences...");
+		log.stream() 
+			.parallel()
+			.map(trace -> TraceProbablility.getActivitySequence(trace, classifier))
+			.sequential()
+			.forEach(activityTrace -> activitySequences.adjustOrPutValue(activityTrace, 1, 1));
+		System.out.println("finished...");
+//		for (XTrace trace : log) {
+//			String[] activityTrace = TraceProbablility.getActivitySequence(trace, classifier);
+//			activitySequences.adjustOrPutValue(activityTrace, 1, 1);
+//			processed +=1;
+//			if (processed % 25 == 0) {
+//				System.out.println(
+//						"[eduEMSC] handled activity sequences :: " + processed + "/" + log.size()
+//				);
+//			}
+//		}
 		return activitySequences;
 	}
 	
@@ -119,16 +128,23 @@ public class eduEMSC extends duEMSC {
 			}
 		});
 		int processed = 0;
-		for (XTrace trace : log) {
-			DataState[] dataTrace = TraceProbablility.getDataSequence(trace, logAdapter, maxTraceLength);
-			dataSequences.adjustOrPutValue(dataTrace, 1, 1);
-			processed +=1;
-			if (processed % 25 == 0) {
-				System.out.println(
-						"[eduEMSC] handled data sequences :: " + processed + "/" + log.size()
-				);
-			}
-		}
+		System.out.println("processing data sequences...");
+		log.stream()
+			.parallel()
+			.map( trace -> TraceProbablility.getDataSequence(trace, logAdapter, maxTraceLength))
+			.sequential()
+			.forEach( dataTrace -> dataSequences.adjustOrPutValue(dataTrace, 1, 1));
+		System.out.println("finished...");
+//		for (XTrace trace : log) {
+//			DataState[] dataTrace = TraceProbablility.getDataSequence(trace, logAdapter, maxTraceLength);
+//			dataSequences.adjustOrPutValue(dataTrace, 1, 1);
+//			processed +=1;
+//			if (processed % 25 == 0) {
+//				System.out.println(
+//						"[eduEMSC] handled data sequences :: " + processed + "/" + log.size()
+//				);
+//			}
+//		}
 		return dataSequences;
 	}
 	
