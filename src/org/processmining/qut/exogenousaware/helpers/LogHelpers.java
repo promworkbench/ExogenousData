@@ -13,7 +13,7 @@ import org.processmining.framework.plugin.annotations.Plugin;
 public class LogHelpers {
 	
 	@Plugin(
-			name = "Sample a log with replacement with the same number of traces (consistent)",
+			name = "Sample a log with replacement with the half the number of traces (consistent)",
 			parameterLabels = {"Event Log",},
 			returnLabels = {"Sampled Log"},
 			returnTypes = {XLog.class},
@@ -28,7 +28,7 @@ public class LogHelpers {
 		
 		XLog sampleLog = new XLogImpl((XAttributeMap) givenLog.getAttributes().clone());
 		Random radomer = new Random( 500 );
-		for(int s=0; s < givenLog.size(); s++) {
+		for(int s=0; s < givenLog.size()/2.0; s++) {
 			int randomTrace = radomer.nextInt(givenLog.size());
 			sampleLog.add((XTrace) givenLog.get(randomTrace).clone());
 		}

@@ -2,6 +2,7 @@ package org.processmining.qut.exogenousaware.steps.transform.type.agg;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 import org.processmining.qut.exogenousaware.steps.slicing.data.SubSeries;
@@ -23,6 +24,48 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 	@NonNull private Transformer aggerator;
 	@Default private String name = "twsub";
 	@Default private double espilion = 0.01;
+	@Default private List<CachedVariance> cache = new ArrayList();
+	
+	private class CachedVariance {
+		
+		private int values;
+		private double mean;
+		private double std;
+
+		public CachedVariance(int values, double mean, double std) {
+			super();
+			this.values = values;
+			this.mean = mean;
+			this.std = std;
+		}
+
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + Objects.hash(mean, std, values);
+			return result;
+		}
+
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			CachedVariance other = (CachedVariance) obj;
+			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
+				return false;
+			return Double.doubleToLongBits(mean) == Double.doubleToLongBits(other.mean)
+					&& Double.doubleToLongBits(std) == Double.doubleToLongBits(other.std) && values == other.values;
+		}
+
+		private TailingWeightedSubsequencesTransform getEnclosingInstance() {
+			return TailingWeightedSubsequencesTransform.this;
+		}
+		
+				
+	}
 
 	public TransformedAttribute transform(SubSeries subtimeseries) {
 //		double agg = 1;
@@ -61,7 +104,9 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 //			agg += w;
 //		}
 		agg = Math.log(espilion+agg);
-//		System.out.println("finished tailing weight ("+agg+").");
+		if (Double.isNaN(agg) || Double.isInfinite(agg)) {
+			System.out.println("opps returning bad transform");
+		}
 		return new TransformedAttribute(subtimeseries.getAbvSlicingName()+"tailagg"+aggerator.getName(), agg);
 	}
 	

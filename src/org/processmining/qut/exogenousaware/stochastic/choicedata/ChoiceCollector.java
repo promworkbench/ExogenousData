@@ -29,7 +29,7 @@ import org.processmining.models.semantics.IllegalTransitionException;
 import org.processmining.models.semantics.petrinet.Marking;
 import org.processmining.models.semantics.petrinet.PetrinetSemantics;
 import org.processmining.models.semantics.petrinet.impl.PetrinetSemanticsFactory;
-import org.processmining.plugins.astar.petrinet.PetrinetReplayerWithoutILP;
+import org.processmining.plugins.astar.petrinet.PetrinetReplayerWithILP;
 import org.processmining.plugins.connectionfactories.logpetrinet.TransEvClassMapping;
 import org.processmining.plugins.petrinet.replayer.PNLogReplayer;
 import org.processmining.plugins.petrinet.replayer.algorithms.costbasedcomplete.CostBasedCompleteParam;
@@ -51,6 +51,7 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import nl.tue.astar.AStarException;
+import nl.tue.astar.AStarThread.QueueingModel;
 
 public class ChoiceCollector {
 	
@@ -200,11 +201,12 @@ public class ChoiceCollector {
 		
 		parameters.setGUIMode(false);
 		parameters.setUsePartialOrderedEvents(true);
+		parameters.setQueueingModel(QueueingModel.DEPTHFIRST);
 		parameters.setCreateConn(false);
 		parameters.setInitialMarking(net.getInitialMarking());
 		parameters.setFinalMarkings((Marking[]) net.getFinalMarkings().toArray(new Marking[1]));
 //		parameters.setNumThreads(this.maxConcurrentThreads); ILP problem with an array index when threaded : LPProblemProvider:24
-		parameters.setMaxNumOfStates(Integer.MAX_VALUE);
+		parameters.setMaxNumOfStates(200000);
 		
 //		collect alignments for traces in log 
 		PNRepResult alignedTraces = new PNLogReplayer().replayLog(
@@ -212,7 +214,7 @@ public class ChoiceCollector {
 				net.getNet(),
 				xlog,
 				mapping,
-				new PetrinetReplayerWithoutILP(),
+				new PetrinetReplayerWithILP(),
 				parameters
 				);
 //		traverse each alignment to compute sojourn times between synchronized transitions
@@ -371,9 +373,11 @@ public class ChoiceCollector {
 							System.out.println(trans.getClass());
 							if (trans instanceof Transition) {
 								Double sojourn = 
-									(extractTime(trace, currIdx+1).getTime() 
-									- 
-									extractTime(trace,lastsync).getTime())/ (1000.0 * 60.0);
+									Double.longBitsToDouble(
+											ExogenousUtils.getEventTimeMillis(trace.get(currIdx+1)) 
+											- 
+											ExogenousUtils.getEventTimeMillis(trace.get(lastsync))
+									);
 								addTime((Transition) trans, sojourn);
 							}
 						}
@@ -400,11 +404,6 @@ public class ChoiceCollector {
 			if (transitions.contains(trans)) {
 				this.times.get(trans).add(time);
 			}
-		}
-		
-		private Date extractTime(XTrace trace, int idx) {
-			XAttributeTimestamp time = (XAttributeTimestamp) trace.get(idx).getAttributes().get("time:timestamp");
-			return time.getValue();
 		}
 		
 		public Double[] getSojourns(Transition trans) {
@@ -481,6 +480,15 @@ public class ChoiceCollector {
 			for( int i =0; i < transformers.length; i++) {
 				if (transformers[i] instanceof SilientModelPower) {
 					thetas[i] = transformers[i].handle(thetas, datasets, xtrace, this.params, sojourns);
+				}
+			}
+//			check for nans 
+			for( ChoiceExogenousPoint[] them : thetas) {
+				for( ChoiceExogenousPoint one : them) {
+					if (Double.isNaN(one.getValue()) || Double.isInfinite(one.getValue())){
+						System.out.println("handling power messed up");
+						System.out.println(one.toString());
+					}
 				}
 			}
 //			scrape thetas from generators
@@ -560,12 +568,14 @@ public class ChoiceCollector {
 		}
 		
 		public int findEventIndex(int stepIndex) {
+			System.out.println("asked to find event as of step number : "+ stepIndex);
 			int eventIndex = -1;
 			for(StepTypes step : alignment.getStepTypes().subList(0, stepIndex)) {
 				if (step == StepTypes.L || step == StepTypes.LMGOOD) {
 					eventIndex++;
 				}
 			}
+			System.out.println("Returning :: " + eventIndex);
 			return eventIndex;
 		}
 		
@@ -584,7 +594,7 @@ public class ChoiceCollector {
 			int ret = -1;
 			for(int i = 0; i < steps.size(); i++) {
 				if (steps.get(i) == StepTypes.LMGOOD) {
-					ret = i;
+					ret = i + 1;
 					break;
 				}
 			}
@@ -827,16 +837,23 @@ public class ChoiceCollector {
 			ChoiceExogenousPoint[] powers = new ChoiceExogenousPoint[datasets.size()];
 			int cepIndex = 0;
 			for(ExogenousDataset dataset : datasets) {
-				if (dataset.checkLink(trace)) {
-					double avgTheta = 0.0;
-					for(double time : targetTimes) {
-						try {
-							avgTheta += params.computeTheta(trace, leftEventIndex, rightEventIndex, dataset, time);
-						} catch (LinkNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
+				// check for link with dataset
+				if (dataset.checkLink(trace) && targetTimes.length > 0) {					
+					// handle processing in parallel
+					System.out.println("starting between syn with sojourn size of :: " + targetTimes.length);
+					double avgTheta = Arrays.stream(targetTimes)
+							.parallel()
+							.map(
+							 time -> {
+									try {
+										return new Double(params.computeTheta(trace, leftEventIndex, rightEventIndex, dataset, time));
+									} catch (LinkNotFoundException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+									return 0.0;
+							 }
+							).reduce(0.0, Double::sum);
 					avgTheta = avgTheta / targetTimes.length;
 					powers[cepIndex] = ChoiceExogenousPoint.builder()
 							.known(true)
@@ -861,7 +878,9 @@ public class ChoiceCollector {
 		private double findDuration(XTrace trace) {
 			XEvent left = trace.get(leftEventIndex);
 			XEvent right = trace.get(rightEventIndex);
-			return ExogenousUtils.getEventTimeMillis(right) - ExogenousUtils.getEventTimeMillis(left) / 1000.0;
+			return Double.longBitsToDouble( 
+					ExogenousUtils.getEventTimeMillis(right) - ExogenousUtils.getEventTimeMillis(left)
+			);
 		}
 		
 	}
@@ -872,6 +891,7 @@ public class ChoiceCollector {
 		private Transition target;
 		
 		public PowerProceedingSynchronisation(int eventRight, Transition target) {
+			System.out.println("proceeding made targetting :: " + eventRight);
 			this.eventRight = eventRight;
 			this.target = target;
 		}
@@ -891,8 +911,7 @@ public class ChoiceCollector {
 //			for all times, compute theta
 			int cepIndex = 0;
 			for(ExogenousDataset dataset : datasets) {
-				if (dataset.checkLink(trace)) {		
-					
+				if (dataset.checkLink(trace) && times.length > 0) {		
 					double avgTheta = Arrays.stream(times)
 							.parallel()
 							.map(
@@ -960,8 +979,9 @@ public class ChoiceCollector {
 			int cepIndex = 0;
 			for(ExogenousDataset dataset : datasets) {
 //				check for linkage
-				if (dataset.checkLink(trace)) {
+				if (dataset.checkLink(trace) && times.length > 0) {
 //					compute an average of the sojourns
+					System.out.println("starting preceeding syn with sojourn size of :: " + times.length);
 					double avgTheta = Arrays.stream(times)
 							.parallel()
 							.map(

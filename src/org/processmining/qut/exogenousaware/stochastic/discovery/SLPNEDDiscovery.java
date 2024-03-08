@@ -65,8 +65,8 @@ public class SLPNEDDiscovery {
 				frequencies.put(point, newMap);
 			}
 		}
-		System.out.println("constructed immediate choice representation");
-		System.out.println(choiceData.toString());
+		choiceData = null;
+//		System.out.println("constructed immediate choice representation");
 		System.out.println("sending choice data to equalities factory...");
 		Tuple<List<Equation>,List<Function>> equalities = 
 				EqualitiesFactory.construct( 

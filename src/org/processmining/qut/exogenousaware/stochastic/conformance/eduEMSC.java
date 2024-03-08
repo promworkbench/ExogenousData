@@ -149,7 +149,7 @@ public class eduEMSC extends duEMSC {
 			//get the model probability
 			BigDecimal probabilityConditionalModel = BigDecimal.valueOf(
 					TraceProbablility.getTraceProbability(semantics.getduEMSCSemantics(), activitySequence, dataSequence, canceller));
-			System.out.println("computed a conditional model prob.");
+//			System.out.println("computed a conditional model prob.");
 			sum = sum.add(probabilityConditionalModel.multiply(dataSequenceProbabilityLog));
 
 			//			System.out.println("    trace+data done");
