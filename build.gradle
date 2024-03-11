@@ -1,0 +1,95 @@
+import java.text.SimpleDateFormat
+
+plugins {
+    // Apply the java plugin to add support for Java
+    id 'java-library'
+
+    // Apply the application plugin to add support for building a CLI application.
+    id 'application'
+    id 'distribution'
+}
+
+repositories {
+    ivy {
+        name 'ivyPromReleases'
+        patternLayout{
+            artifact '[organisation]/Releases/Packages/[module]/[revision]/[artifact]-[revision].[ext]'
+            ivy '[organisation]/Releases/Packages/[module]/[revision]/ivy.xml'
+        }
+        url = uri('https://svn.win.tue.nl/repos')
+        content {
+            includeGroup "prom"
+        }
+    }
+    ivy {
+        name 'ivyPromLibraries'
+        patternLayout{
+            artifact '[module]/[revision]/[artifact]-[revision].[ext]'
+            ivy '[module]/[revision]/ivy.xml'
+        }
+        url = uri('https://svn.win.tue.nl/repos/prom/Libraries')
+    }
+    mavenCentral()
+}
+
+dependencies {
+    implementation('prom:ProM-Plugins:latest')
+	implementation('prom:Log:latest')
+	implementation('prom:ApacheUtils:latest')
+	implementation('prom:BasicUtils:latest')
+	implementation('prom:KeyValue:latest')
+	implementation('prom:DataAwareExplorer:latest') {
+		exclude group: 'prom-libs', module: 'org.eclipse.emf.ecore'
+		exclude group: 'prom-libs', module: 'org.eclipse.uml2.uml'
+	}
+
+
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'org.qut.processmining.ab.plugins.CLI_RUNNER'
+}
+
+java{
+    withSourcesJar()
+}
+
+group = 'org.processmining'
+version = '0.1'
+description = 'PromExecutables'
+sourceCompatibility = '1.8'
+
+clean{
+    mkdir "var"
+}
+
+applicationDistribution.from('ldlib') {
+    into "ldlib"
+}
+
+
+task(testrun, dependsOn: 'classes', type: JavaExec) {
+   main 'org.qut.processmining.ab.plugins.CLI_RUNNER'
+   classpath sourceSets.main.runtimeClasspath
+}
+
+
+startScripts {
+	// make sure that the bat script can run by reducing classpath
+	// add jvm args and include lpsolve
+    doLast {
+        windowsScript.text = windowsScript.text.replaceAll('set CLASSPATH=.*', 'set CLASSPATH=.;%APP_HOME%/lib/*');
+        // windowsScript.text = windowsScript.text.replace('set DEFAULT_JVM_OPTS=', 'set JMEM=16g;\nset JOPTS=-Xmx%JMEM% -Xms%JMEM%;\nset LDP=%APP_HOME%\\ldlib\\lpsolve-5.5.4\\lib\\win64;\nset DEFAULT_JVM_OPTS=-Djava.library.path=%LDP% %JOPTS%;\n');
+    }
+}
+
+
+distributions {
+    main {
+        distributionBaseName = 'PromExecutables'
+        contents {
+            from 'buildid.txt'
+        }
+    }
+}
