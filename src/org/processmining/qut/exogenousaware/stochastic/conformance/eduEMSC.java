@@ -3,11 +3,14 @@ package org.processmining.qut.exogenousaware.stochastic.conformance;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.ProMCanceller;
+import org.processmining.qut.exogenousaware.ab.jobs.Tuple;
 import org.processmining.qut.exogenousaware.data.ExogenousDataset;
 import org.processmining.qut.exogenousaware.stochastic.model.SLPNEDSemantics;
 import org.processmining.qut.exogenousaware.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
@@ -54,31 +57,76 @@ public class eduEMSC extends duEMSC {
 
 		int jobs = activitySequences.size();
 		int curr = 1;
+		
+		List<Tuple<String[],Integer>> work = new ArrayList();
 		for (TObjectIntIterator<String[]> itAs = activitySequences.iterator(); itAs.hasNext();) {
 			itAs.advance();
-
-			String[] activitySequence = itAs.key();
-			int activitySequenceWeight = itAs.value();
-			BigDecimal activitySequenceProbabilityLog = BigDecimal.valueOf(activitySequenceWeight)
-					.divide(BigDecimal.valueOf(logSize), mc);
-
-			BigDecimal activitySequenceProbabilityModel = queryModelForTrace(semantics, canceller, mc, activitySequence,
-					dataSequences, logSize);
-
-			BigDecimal difference = activitySequenceProbabilityLog.subtract(activitySequenceProbabilityModel)
-					.max(BigDecimal.ZERO);
-			
-			if (eduEMSC.debug) {
-				System.out.println("("+curr+"/" + jobs + ") log: " 
-						+ activitySequenceProbabilityLog + " model: " + activitySequenceProbabilityModel
-						+ " difference: " + difference + " trace " + Arrays.toString(activitySequence));
-			}
-
-			curr += 1;
-			sum = sum.add(difference);
+			work.add( new Tuple(itAs.key(), itAs.value()) );
 		}
+		
+		sum = 
+				work.stream()
+				.parallel()
+				.map( t -> {
+					try {
+						return getProbDifference(t.getLeft(), t.getRight(),
+								logSize, mc, semantics, canceller,
+								dataSequences
+								);
+					} catch (LpSolveException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					return BigDecimal.ZERO;
+				}
+				).reduce(sum, BigDecimal::add);
+		
+//		for (TObjectIntIterator<String[]> itAs = activitySequences.iterator(); itAs.hasNext();) {
+//			itAs.advance();
+//
+//			String[] activitySequence = itAs.key();
+//			int activitySequenceWeight = itAs.value();
+//			BigDecimal activitySequenceProbabilityLog = BigDecimal.valueOf(activitySequenceWeight)
+//					.divide(BigDecimal.valueOf(logSize), mc);
+//
+//			BigDecimal activitySequenceProbabilityModel = queryModelForTrace(semantics, canceller, mc, activitySequence,
+//					dataSequences, logSize);
+//
+//			BigDecimal difference = activitySequenceProbabilityLog.subtract(activitySequenceProbabilityModel)
+//					.max(BigDecimal.ZERO);
+//			
+//			if (eduEMSC.debug) {
+//				System.out.println("("+curr+"/" + jobs + ") log: " 
+//						+ activitySequenceProbabilityLog + " model: " + activitySequenceProbabilityModel
+//						+ " difference: " + difference + " trace " + Arrays.toString(activitySequence));
+//			}
+//
+//			curr += 1;
+//			sum = sum.add(difference);
+//		}
 
 		return BigDecimal.ONE.subtract(sum).doubleValue();
+	}
+	
+	public static BigDecimal getProbDifference(String[] activitySequence, int activitySequenceWeight,
+			int logSize, MathContext mc, SLPNEDSemantics semantics, ProMCanceller canceller,
+			TObjectIntMap<DataState[]> dataSequences ) throws LpSolveException {
+		BigDecimal activitySequenceProbabilityLog = BigDecimal.valueOf(activitySequenceWeight)
+				.divide(BigDecimal.valueOf(logSize), mc);
+
+		BigDecimal activitySequenceProbabilityModel = queryModelForTrace(semantics, canceller, mc, activitySequence,
+				dataSequences, logSize);
+
+		BigDecimal difference = activitySequenceProbabilityLog.subtract(activitySequenceProbabilityModel)
+				.max(BigDecimal.ZERO);
+		
+		if (eduEMSC.debug) {
+			System.out.println("(concurrent) log: " 
+					+ activitySequenceProbabilityLog + " model: " + activitySequenceProbabilityModel
+					+ " difference: " + difference + " trace " + Arrays.toString(activitySequence));
+		}
+		
+		return difference;
 	}
 	
 	public static TObjectIntMap<String[]> getActivitySequences(XLog log, XEventClassifier classifier) {
