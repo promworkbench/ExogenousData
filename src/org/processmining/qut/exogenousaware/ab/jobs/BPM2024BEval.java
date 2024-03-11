@@ -42,7 +42,7 @@ import lombok.Builder;
 
 public class BPM2024BEval {
 	
-	final static String dataFolder = "C:\\Users\\Adam_\\OneDrive - Queensland University of Technology\\phd\\mypapers\\2023\\B\\data\\";
+	final static String dataFolder = "C:\\Users\\nobody\\Desktop\\adam\\data\\";
 	
 	final static String mimicFolder = dataFolder + "mimic\\";
 	final static String smartFolder = dataFolder + "smart\\";
@@ -56,12 +56,12 @@ public class BPM2024BEval {
 	final static String smartModels = smartFolder + "models\\";
 	final static String roadModels = roadFolder + "models\\";
 	
-	final static String mimicDiscLog = mimicFolder + "mimic_sampled.xes";
-	final static String mimicConfLog = mimicFolder + "mimic.xes";
+	final static String mimicDiscLog = mimicFolder + "mimic_s_sampled.xes";
+	final static String mimicConfLog = mimicFolder + "mimic_sampled.xes";
 	final static String smartDiscLog = smartFolder + "wf101_sampled.xes";
 	final static String smartConfLog = smartFolder + "wf101.xes";
-	final static String roadDiscLog = roadFolder + "roadfines_sampled.xes";
-	final static String roadConfLog = roadFolder + "roadfines_big_sampled.xes";
+	final static String roadDiscLog = roadFolder + "roadfines_s_sampled.xes";
+	final static String roadConfLog = roadFolder + "roadfines_sampled.xes";
 	
 	final static List<String> mimicDatasets = new ArrayList() {{
 		add(
