@@ -71,59 +71,27 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 //		double agg = 1;
 //		System.out.println("starting tailing weight ("+ subtimeseries.size()+").");
 		List<Double> relativeTimes = subtimeseries.getXSeries(true, Scaling.min);
-		List<Double> variances = transformToVariance(
-				subtimeseries.getYSeries(),
-				subtimeseries.getComesFrom().getMean(), 
-				subtimeseries.getComesFrom().getStd());
-		
-		double agg = IntStream.
-			rangeClosed(0,subtimeseries.size()-1)
-			.parallel()
-			.mapToDouble( (i) -> {
-				return (1/(1+Math.abs(relativeTimes.get(i)))) * variances.get(i);
-			})
-			.reduce(1.0, (ls,nx) -> ls + nx);
+		List<Double> values = subtimeseries.getYSeries();
+		double mean = subtimeseries.getComesFrom().getMean();
+		double std = subtimeseries.getComesFrom().getStd();
+		double agg = 0;
+		if (std > 0) {
+			double norm = 
+					relativeTimes.stream()
+						.mapToDouble(t -> 1.0/ (1.0 + Math.abs(t)))
+						.reduce(0.0, Double::sum);
+			agg = 
+				IntStream.range(0, values.size()-1)
+					.mapToDouble(i -> ( 1.0/ (1+Math.abs(relativeTimes.get(i))) * Math.abs((values.get(i) - mean)/ std)))
+					.reduce(0.0, Double::sum);
+			agg = agg / norm;
+		}
 			
-//		for (int k=1; k <= subtimeseries.size(); k++) {
-////			int bot = (subtimeseries.getSubEvents().size() - (k - 1));
-//			double bot = Math.abs(relativeTimes.get(k-1));
-//			bot =+ 1.0;
-////			System.out.println("calling with bot="+bot);
-//			double w = 1.0 / bot;
-//			SubSeries sample = SubSeries.builder()
-//					.subEvents(subtimeseries.getSubEvents().subList(0, k))
-//					.abvSlicingName("dummy")
-//					.slicingName("dummy")
-//					.dataset(subtimeseries.getDataset())
-//					.source(subtimeseries.getSource())
-//					.datatype(subtimeseries.getDatatype())
-//					.comesFrom(subtimeseries.getComesFrom())
-//					.endogenous(subtimeseries.getEndogenous())
-//					.build();
-//			w = w * this.aggerator.transform(sample).getValue();
-//			agg += w;
-//		}
-		agg = Math.log(espilion+agg);
 		if (Double.isNaN(agg) || Double.isInfinite(agg)) {
 			System.out.println("opps returning bad transform");
+			agg = 0;
 		}
 		return new TransformedAttribute(subtimeseries.getAbvSlicingName()+"tailagg"+aggerator.getName(), agg);
-	}
-	
-	private List<Double> transformToVariance(List<Double> values, double mean, double std){
-		
-		List<Double> ret = new ArrayList();
-		double curr = 0;
-		for(double val : values) {
-			if (std == 0) {
-				ret.add(0.0);
-				continue;
-			}
-			double now = (Math.abs(val - mean) / std);
-			ret.add(now);
-			curr += now;
-		}
-		return ret;
 	}
 		
 	public String getName() {
