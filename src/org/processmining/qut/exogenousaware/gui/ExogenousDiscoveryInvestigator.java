@@ -431,6 +431,16 @@ public class ExogenousDiscoveryInvestigator extends JPanel{
 		getExoSelectionPanel().getMeasure().setEnabled(true);
 		progresser.getState(ProgressType.Measurements).reset();
 		
+		System.out.println("hello");
+		this.context.getGlobalContext()
+			.getProvidedObjectManager()
+			.createProvidedObject("Generated DPN :: "+outcome.getLabel(),
+					outcome, PetriNetWithData.class, context);
+		this.context.getGlobalContext()
+			.getResourceManager()
+			.getResourceForInstance(outcome)
+			.setFavorite(true);
+		
 		setupDotNodeListeners();
 	}
 	
