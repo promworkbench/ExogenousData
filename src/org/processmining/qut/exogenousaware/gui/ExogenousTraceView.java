@@ -6,6 +6,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
@@ -17,6 +19,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollBar;
 import javax.swing.SwingConstants;
 
+import org.deckfour.xes.model.XAttributeLiteral;
 import org.deckfour.xes.model.XAttributeTimestamp;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XTrace;
@@ -26,8 +29,10 @@ import org.processmining.contexts.uitopia.annotations.Visualizer;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.util.ui.widgets.ProMSplitPane;
+import org.processmining.framework.util.ui.widgets.ProMTextField;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.ClickListener;
+import org.processmining.framework.util.ui.widgets.traceview.model.FilteredListModelImpl.ListModelFilter;
 import org.processmining.qut.exogenousaware.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousaware.gui.listeners.EndoTraceListener;
 import org.processmining.qut.exogenousaware.gui.panels.ExogenousTraceViewJChartFilterPanel;
@@ -257,6 +262,7 @@ public class ExogenousTraceView extends JPanel {
 	
 	public JComponent buildTraceList () {
 		JPanel bottomRight = new JPanel();
+		this.stylePanel(bottomRight);
 //		create stylish trace selector
 		ExoTraceBuilder builder = new ExoTraceBuilder();
 		ProMTraceList<XTrace> traceView = new ProMTraceList<XTrace>(
@@ -276,14 +282,21 @@ public class ExogenousTraceView extends JPanel {
 //		ordering of elements and styling
 		bottomRight.add(
 				new JLabel("Avaliable Endogenous Traces:") 
-				{{ 
-					setAlignmentY(LEFT_ALIGNMENT);
-					setAlignmentX(LEFT_ALIGNMENT);
-				}}
+		);
+		bottomRight.add(
+				new JLabel("To search for a trace, use box below and press enter.") 
+		);
+		ProMTextField searchField = new ProMTextField("","search trace:concept:name");
+		searchField.addActionListener( 
+				new endoTraceFilter(
+						this, traceView, searchField
+				)
+		);
+		bottomRight.add( 
+				searchField
 		);
 //		build and style panel
 		bottomRight.add(traceView);
-		this.stylePanel(bottomRight);
 		bottomRight.setMinimumSize(new Dimension(300,800));
 		bottomRight.validate();
 		return bottomRight;
@@ -412,6 +425,40 @@ public class ExogenousTraceView extends JPanel {
  	
  	
 // 	interfaces
+ 	public static class endoTraceFilter implements ActionListener {
+
+ 		private ExogenousTraceView source;
+		private ProMTraceList<XTrace> controller;
+		private ExoTraceBuilder builder;
+		private ProMTextField texter;
+		
+		public endoTraceFilter(ExogenousTraceView source,
+				ProMTraceList<XTrace> controller, ProMTextField texter) {
+			super();
+			this.source = source;
+			this.controller = controller;
+			this.builder = (ExoTraceBuilder) controller.getTraceBuilder();
+			this.texter = texter;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			String searchfor = texter.getText();
+			controller.filter( 
+					new ListModelFilter<XTrace>() {
+						public boolean accept(XTrace e) {
+							XAttributeLiteral attr = 
+									(XAttributeLiteral) e.getAttributes()
+										.get("concept:name");
+							return attr.getValue().contains(searchfor);
+						}
+					}
+			);
+		}
+ 		
+ 	}
+ 	
+ 	
  	public static class endoClickListener implements ClickListener<XTrace> {
 		
 		private ExogenousTraceView source;
