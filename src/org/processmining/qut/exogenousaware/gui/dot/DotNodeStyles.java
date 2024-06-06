@@ -162,24 +162,26 @@ public class DotNodeStyles {
 		double recallMeasure = 0.0;
 		double precisionMeasure = 0.0;
 		if (dp != null) {
-			if (dp.getMapToMeasures().containsKey(recallKey)) {
-				recallMeasure = dp.getMapToMeasures().get(recallKey);
-			}
-			if (dp.getMapToMeasures().containsKey(precisionKey)) {
-				precisionMeasure = dp.getMapToMeasures().get(precisionKey);
-			}
+//			TODO work on handling conformance measures based on IEEE Access
+//			paper
+//			if (dp.getMapToMeasures().containsKey(recallKey)) {
+//				recallMeasure = dp.getMapToMeasures().get(recallKey);
+//			}
+//			if (dp.getMapToMeasures().containsKey(precisionKey)) {
+//				precisionMeasure = dp.getMapToMeasures().get(precisionKey);
+//			}
 		}
 //		call the big function if recall is set
 		String label;
-		if (recallMeasure > 0.00 && precisionMeasure > 0.00) {
-			label = createTransitionLabel(istau ? buildTauStatLabel(t, stats) : buildStatLabel(t, stats), istau, g, swapper, recallMeasure, precisionMeasure);
-		} else if (recallMeasure > 0.0 && precisionMeasure < 0.01) {
-			label = createTransitionLabel(istau ? buildTauStatLabel(t, stats) : buildStatLabel(t, stats), istau, g, swapper, recallMeasure, true);
-		} else if (recallMeasure < 0.01 && precisionMeasure > 0.00) {
-			label = createTransitionLabel(istau ? buildTauStatLabel(t, stats) : buildStatLabel(t, stats), istau, g, swapper, precisionMeasure, false);
-		} else {
+//		if (recallMeasure > 0.00 && precisionMeasure > 0.00) {
+//			label = createTransitionLabel(istau ? buildTauStatLabel(t, stats) : buildStatLabel(t, stats), istau, g, swapper, recallMeasure, precisionMeasure);
+//		} else if (recallMeasure > 0.0 && precisionMeasure < 0.01) {
+//			label = createTransitionLabel(istau ? buildTauStatLabel(t, stats) : buildStatLabel(t, stats), istau, g, swapper, recallMeasure, true);
+//		} else if (recallMeasure < 0.01 && precisionMeasure > 0.00) {
+//			label = createTransitionLabel(istau ? buildTauStatLabel(t, stats) : buildStatLabel(t, stats), istau, g, swapper, precisionMeasure, false);
+//		} else {
 			label = createTransitionLabel(istau ? buildTauStatLabel(t, stats) : buildStatLabel(t, stats), istau, g, swapper);
-		}
+//		}
 		return new ExoDotTransition(label,t.getId().toString(), t.getLabel(), new GuardExpressionHandler(g, swapper));
 	}
 	
@@ -421,7 +423,7 @@ public class DotNodeStyles {
 			expression = expression + element;
 		}
 		formattedlabel = formattedlabel + expression;
-		formattedlabel = formattedlabel + endLabel + formattedConformanceLabel;
+		formattedlabel = formattedlabel + endLabel + "</TABLE>>"; // + formattedConformanceLabel;
 		return formattedlabel;
 	}
 	
