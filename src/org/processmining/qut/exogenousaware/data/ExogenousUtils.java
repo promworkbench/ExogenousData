@@ -9,7 +9,8 @@ import org.processmining.qut.exogenousaware.steps.linking.ChainAttributeLinker;
 import org.processmining.qut.exogenousaware.steps.linking.Linker;
 
 /**
- * Static class for helper functions around handling creating and using exogenous data sets.
+ * Static class for helper functions around handling creating and using 
+ * exogenous data sets.
  * @author Adam P Banham
  *
  */
