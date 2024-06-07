@@ -171,6 +171,9 @@ public class ExogenousDiscoveryInvestigator extends JPanel{
 							setAlignment(worker.get());
 						} catch (InterruptedException | ExecutionException e) {
 							// TODO Auto-generated catch block
+							System.out.println(
+									"[ExogenousDiscoveryInvestigator] "
+									+ "Alignment due to the following stack:");
 							e.printStackTrace();
 						}
 					}
@@ -183,6 +186,24 @@ public class ExogenousDiscoveryInvestigator extends JPanel{
 	}
 	
 	private void setAlignment(PNRepResult alignment) {
+		
+		if (alignment == null) {
+			progresser
+				.getState(ProgressType.Alignment)
+				.setCaption("Alignment Error!!!");
+			progresser
+				.getState(ProgressType.Alignment)
+				.setCurrent(progresser
+						.getState(ProgressType.Alignment)
+						.getTotal() - 1
+				);
+			progresser
+				.getState(ProgressType.Alignment)
+				.validate();
+			this.exoDotController.update();
+			setupDotNodeListeners();
+			return;
+		}
 //		set alignment
 		this.alignment = alignment;
 		this.exoSelectionPanel.getEnhance().setEnabled(true);
