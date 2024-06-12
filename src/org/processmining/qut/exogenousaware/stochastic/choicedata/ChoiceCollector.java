@@ -545,7 +545,7 @@ public class ChoiceCollector {
 					}
 				} else if (right_rem.contains(StepTypes.LMGOOD)) {
 					System.out.println("determined proceding power");
-					int rightIndex = left_rem.size() + 1 + nextSync(right_rem);
+					int rightIndex = left_rem.size() + nextSync(right_rem);
 					return new PowerProceedingSynchronisation(
 							findEventIndex(rightIndex),
 							(Transition) alignment.getNodeInstance().get(rightIndex)

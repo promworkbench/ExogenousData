@@ -71,8 +71,8 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 //		double agg = 1;
 //		System.out.println("starting tailing weight ("+ subtimeseries.size()+").");
 		List<Double> relativeTimes = new ArrayList<Double>() {{
-			for (long rel : subtimeseries.getXSeries(true, Scaling.min)) {
-				add(Double.longBitsToDouble(rel));
+			for (long rel : subtimeseries.getXSeries(true, Scaling.hour)) {
+				add((double)rel);
 			}
 		}};
 		List<Double> values = subtimeseries.getYSeries();
@@ -92,7 +92,7 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 		}
 			
 		if (Double.isNaN(agg) || Double.isInfinite(agg)) {
-			System.out.println("opps returning bad transform");
+			System.out.println("opps returning bad transform ::"+agg);
 			agg = 0;
 		}
 		return new TransformedAttribute(subtimeseries.getAbvSlicingName()+"tailagg"+aggerator.getName(), agg);
