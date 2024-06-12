@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.processmining.qut.exogenousdata.ds.timeseries.stats.Covariance;
 
 import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 

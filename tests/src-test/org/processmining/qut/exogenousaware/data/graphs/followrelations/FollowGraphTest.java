@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.processmining.qut.exogenousaware.ds.timeseries.data.DiscreteTimePoint;
-import org.processmining.qut.exogenousaware.ds.timeseries.data.DiscreteTimeSeries;
+import org.processmining.qut.exogenousdata.data.graphs.followrelations.FollowGraph;
+import org.processmining.qut.exogenousdata.data.graphs.followrelations.FollowPair;
+import org.processmining.qut.exogenousdata.ds.timeseries.data.DiscreteTimePoint;
+import org.processmining.qut.exogenousdata.ds.timeseries.data.DiscreteTimeSeries;
 
 public class FollowGraphTest {
 	

@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.processmining.qut.exogenousaware.ml.clustering.HierarchicalClustering;
-import org.processmining.qut.exogenousaware.ml.data.Cluster;
-import org.processmining.qut.exogenousaware.ml.data.FeatureVector;
-import org.processmining.qut.exogenousaware.ml.data.FeatureVectorImpl;
+import org.processmining.qut.exogenousdata.ml.clustering.HierarchicalClustering;
+import org.processmining.qut.exogenousdata.ml.data.Cluster;
+import org.processmining.qut.exogenousdata.ml.data.FeatureVector;
+import org.processmining.qut.exogenousdata.ml.data.FeatureVectorImpl;
 
 public class HierarchicalClusteringTest {
 
