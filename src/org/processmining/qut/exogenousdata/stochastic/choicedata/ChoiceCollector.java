@@ -457,7 +457,9 @@ public class ChoiceCollector {
 					generators.add(i);
 				}
 			}
-			ret = ret.substring(0, ret.length()-2);
+			if (ret.length() > 2) {
+				ret = ret.substring(0, ret.length()-2);
+			}
 			System.out.println("theta operations :: "+ ret);
 		}
 		
