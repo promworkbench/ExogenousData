@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.stochastic.model.dot;
+package org.processmining.qut.exogenousdata.stochastic.model.dot;
 
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 
@@ -13,8 +13,8 @@ import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.plugins.graphviz.dot.DotNode;
-import org.processmining.qut.exogenousaware.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.qut.exogenousdata.ab.jobs.Tuple;
+import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.stochasticlabelledpetrinets.plugins.StochasticLabelledPetriNetVisualisationPlugin;
 
 public class SLPNEDVisualizer extends StochasticLabelledPetriNetVisualisationPlugin<StochasticLabelledPetriNetWithExogenousData>{

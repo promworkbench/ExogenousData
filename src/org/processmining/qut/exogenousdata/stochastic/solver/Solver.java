@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.stochastic.solver;
+package org.processmining.qut.exogenousdata.stochastic.solver;
 import java.util.BitSet;
 import java.util.List;
 

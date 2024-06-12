@@ -16,7 +16,6 @@ import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.graphbased.directed.petrinet.impl.PetrinetFactory;
 import org.processmining.models.semantics.petrinet.Marking;
-import org.processmining.qut.exogenousaware.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.qut.exogenousdata.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.qut.exogenousdata.data.ExogenousDatasetAttributes;
@@ -26,6 +25,8 @@ import org.processmining.qut.exogenousdata.steps.determination.Determination;
 import org.processmining.qut.exogenousdata.steps.linking.AttributeLinker;
 import org.processmining.qut.exogenousdata.steps.slicing.PastOutcomeSlicer;
 import org.processmining.qut.exogenousdata.steps.transform.type.StochasticTransformer;
+import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscovery;
+import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 
 public class SLPNEDDiscoveryTest {
 	

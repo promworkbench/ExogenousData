@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.stochastic.conformance;
+package org.processmining.qut.exogenousdata.stochastic.conformance;
 
 import java.util.HashMap;
 import java.util.Map;

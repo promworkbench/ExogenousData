@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.helpers;
+package org.processmining.qut.exogenousdata.helpers;
 
 import java.util.Random;
 

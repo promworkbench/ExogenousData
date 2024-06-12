@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.stochastic.conformance;
+package org.processmining.qut.exogenousdata.stochastic.conformance;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -11,10 +11,10 @@ import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.model.XLog;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.plugins.InductiveMiner.Pair;
-import org.processmining.qut.exogenousaware.stochastic.model.SLPNEDSemantics;
-import org.processmining.qut.exogenousaware.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.qut.exogenousdata.ab.jobs.Tuple;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
+import org.processmining.qut.exogenousdata.stochastic.model.SLPNEDSemantics;
+import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.stochasticlabelleddatapetrinet.datastate.DataState;
 import org.processmining.stochasticlabelleddatapetrinet.duemsc.duEMSC;
 import org.processmining.stochasticlabelleddatapetrinet.logadapter.DataStateLogAdapter;

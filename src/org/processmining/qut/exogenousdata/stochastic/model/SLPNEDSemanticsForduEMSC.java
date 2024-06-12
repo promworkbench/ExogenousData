@@ -1,9 +1,9 @@
-package org.processmining.qut.exogenousaware.stochastic.model;
+package org.processmining.qut.exogenousdata.stochastic.model;
 
 import java.util.BitSet;
 
-import org.processmining.qut.exogenousaware.stochastic.conformance.ExogenousDataState;
 import org.processmining.stochasticlabelleddatapetrinet.StochasticLabelledDataPetriNet.VariableType;
+import org.processmining.qut.exogenousdata.stochastic.conformance.ExogenousDataState;
 import org.processmining.stochasticlabelleddatapetrinet.StochasticLabelledDataPetriNetSemantics;
 import org.processmining.stochasticlabelleddatapetrinet.datastate.DataState;
 

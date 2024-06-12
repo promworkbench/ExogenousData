@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.stochastic.discovery;
+package org.processmining.qut.exogenousdata.stochastic.discovery;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,16 +15,16 @@ import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.basicstochasticminer.solver.Equation;
 import org.processmining.basicstochasticminer.solver.Function;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
-import org.processmining.qut.exogenousaware.stochastic.choicedata.ChoiceCollector;
-import org.processmining.qut.exogenousaware.stochastic.choicedata.ChoiceDataPoint;
-import org.processmining.qut.exogenousaware.stochastic.choicedata.ChoiceExogenousPoint;
-import org.processmining.qut.exogenousaware.stochastic.equalities.EqualitiesFactory;
-import org.processmining.qut.exogenousaware.stochastic.model.SLPNEDSemantics;
-import org.processmining.qut.exogenousaware.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
-import org.processmining.qut.exogenousaware.stochastic.solver.Solver;
 import org.processmining.qut.exogenousdata.ab.jobs.Tuple;
 import org.processmining.qut.exogenousdata.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
+import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceCollector;
+import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceDataPoint;
+import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceExogenousPoint;
+import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory;
+import org.processmining.qut.exogenousdata.stochastic.model.SLPNEDSemantics;
+import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
+import org.processmining.qut.exogenousdata.stochastic.solver.Solver;
 
 import cern.colt.Arrays;
 

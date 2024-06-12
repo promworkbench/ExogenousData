@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.stochastic.model;
+package org.processmining.qut.exogenousdata.stochastic.model;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,11 +19,11 @@ import org.processmining.models.graphbased.directed.petrinet.PetrinetEdge;
 import org.processmining.models.graphbased.directed.petrinet.PetrinetNode;
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
-import org.processmining.qut.exogenousaware.stochastic.equalities.EqualitiesFactory.SLPNEDVarType;
-import org.processmining.qut.exogenousaware.stochastic.equalities.EqualitiesFactory.SLPNEDVariable;
-import org.processmining.qut.exogenousaware.stochastic.equalities.EqualitiesFactory.SLPNEDVariablePower;
 import org.processmining.qut.exogenousdata.ab.jobs.Tuple;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
+import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVarType;
+import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVariable;
+import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVariablePower;
 import org.processmining.stochasticlabelledpetrinets.StochasticLabelledPetriNet;
 
 import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;

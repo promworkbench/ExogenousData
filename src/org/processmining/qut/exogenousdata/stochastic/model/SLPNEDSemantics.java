@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.stochastic.model;
+package org.processmining.qut.exogenousdata.stochastic.model;
 
 import java.util.Arrays;
 import java.util.BitSet;

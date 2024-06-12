@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.stochastic.choicedata;
+package org.processmining.qut.exogenousdata.stochastic.choicedata;
 
 import java.util.ArrayList;
 import java.util.Arrays;

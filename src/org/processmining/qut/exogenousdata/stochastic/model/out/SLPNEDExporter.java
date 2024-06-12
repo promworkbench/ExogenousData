@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.stochastic.model.out;
+package org.processmining.qut.exogenousdata.stochastic.model.out;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import org.processmining.contexts.uitopia.annotations.UIExportPlugin;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.plugin.annotations.PluginVariant;
-import org.processmining.qut.exogenousaware.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
+import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 
 @Plugin(name = "StochasticLabelledPetriNetWithExogenousData exporter", 
 	returnLabels = {}, returnTypes = {}, 

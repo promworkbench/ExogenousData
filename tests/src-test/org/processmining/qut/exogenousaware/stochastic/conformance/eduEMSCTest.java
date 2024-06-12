@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.qut.exogenousaware.stochastic.discovery.SLPNEDDiscoveryTest;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
+import org.processmining.qut.exogenousdata.stochastic.conformance.eduEMSC;
 
 import lpsolve.LpSolveException;
 

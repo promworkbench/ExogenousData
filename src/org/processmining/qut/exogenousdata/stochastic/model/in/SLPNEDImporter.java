@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.stochastic.model.in;
+package org.processmining.qut.exogenousdata.stochastic.model.in;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import org.processmining.framework.abstractplugins.AbstractImportPlugin;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginLevel;
-import org.processmining.qut.exogenousaware.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
+import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 
 @Plugin(
 		name = "StochasticLabelledPetriNetWithExogenousData",

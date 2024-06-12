@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.stochastic.equalities;
+package org.processmining.qut.exogenousdata.stochastic.equalities;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,10 +14,10 @@ import org.processmining.basicstochasticminer.solver.Sum;
 import org.processmining.basicstochasticminer.solver.Variable;
 import org.processmining.basicstochasticminer.solver.VariablePower;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
-import org.processmining.qut.exogenousaware.stochastic.choicedata.ChoiceDataPoint;
-import org.processmining.qut.exogenousaware.stochastic.choicedata.ChoiceExogenousPoint;
 import org.processmining.qut.exogenousdata.ab.jobs.Tuple;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
+import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceDataPoint;
+import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceExogenousPoint;
 
 public class EqualitiesFactory {
 	
