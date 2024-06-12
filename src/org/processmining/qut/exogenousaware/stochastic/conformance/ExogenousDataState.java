@@ -3,7 +3,7 @@ package org.processmining.qut.exogenousaware.stochastic.conformance;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.processmining.qut.exogenousaware.data.ExogenousDataset;
+import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.stochasticlabelleddatapetrinet.datastate.DataState;
 
 public class ExogenousDataState implements DataState{

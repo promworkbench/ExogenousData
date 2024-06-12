@@ -16,16 +16,16 @@ import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.graphbased.directed.petrinet.impl.PetrinetFactory;
 import org.processmining.models.semantics.petrinet.Marking;
-import org.processmining.qut.exogenousaware.data.ExogenousAnnotatedLog;
-import org.processmining.qut.exogenousaware.data.ExogenousDataset;
-import org.processmining.qut.exogenousaware.data.ExogenousDatasetAttributes;
-import org.processmining.qut.exogenousaware.data.ExogenousDatasetLinkType;
-import org.processmining.qut.exogenousaware.data.ExogenousDatasetType;
-import org.processmining.qut.exogenousaware.steps.determination.Determination;
-import org.processmining.qut.exogenousaware.steps.linking.AttributeLinker;
-import org.processmining.qut.exogenousaware.steps.slicing.PastOutcomeSlicer;
-import org.processmining.qut.exogenousaware.steps.transform.type.StochasticTransformer;
 import org.processmining.qut.exogenousaware.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
+import org.processmining.qut.exogenousdata.data.ExogenousAnnotatedLog;
+import org.processmining.qut.exogenousdata.data.ExogenousDataset;
+import org.processmining.qut.exogenousdata.data.ExogenousDatasetAttributes;
+import org.processmining.qut.exogenousdata.data.ExogenousDatasetLinkType;
+import org.processmining.qut.exogenousdata.data.ExogenousDatasetType;
+import org.processmining.qut.exogenousdata.steps.determination.Determination;
+import org.processmining.qut.exogenousdata.steps.linking.AttributeLinker;
+import org.processmining.qut.exogenousdata.steps.slicing.PastOutcomeSlicer;
+import org.processmining.qut.exogenousdata.steps.transform.type.StochasticTransformer;
 
 public class SLPNEDDiscoveryTest {
 	

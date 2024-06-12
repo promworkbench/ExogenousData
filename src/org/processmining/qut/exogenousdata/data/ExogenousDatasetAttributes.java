@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.data;
+package org.processmining.qut.exogenousdata.data;
 
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XAttributeBoolean;

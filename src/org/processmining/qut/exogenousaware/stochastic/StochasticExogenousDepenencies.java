@@ -12,12 +12,12 @@ import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginCategory;
 import org.processmining.framework.util.HTMLToString;
-import org.processmining.qut.exogenousaware.ExogenousDataPlugins;
-import org.processmining.qut.exogenousaware.data.ExogenousAnnotatedLog;
-import org.processmining.qut.exogenousaware.data.ExogenousDataset;
 import org.processmining.qut.exogenousaware.stochastic.conformance.eduEMSC;
 import org.processmining.qut.exogenousaware.stochastic.discovery.SLPNEDDiscovery;
 import org.processmining.qut.exogenousaware.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
+import org.processmining.qut.exogenousdata.ExogenousDataPlugins;
+import org.processmining.qut.exogenousdata.data.ExogenousAnnotatedLog;
+import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 
 public class StochasticExogenousDepenencies {
 	

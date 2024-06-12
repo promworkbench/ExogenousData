@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.ab.jobs;
+package org.processmining.qut.exogenousdata.ab.jobs;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,10 +33,10 @@ import org.processmining.framework.plugin.events.ProgressEventListener.ListenerL
 import org.processmining.framework.plugin.impl.FieldSetException;
 import org.processmining.framework.providedobjects.ProvidedObjectManager;
 import org.processmining.framework.util.Pair;
-import org.processmining.qut.exogenousaware.data.ExogenousDataset;
 import org.processmining.qut.exogenousaware.stochastic.conformance.eduEMSC;
 import org.processmining.qut.exogenousaware.stochastic.discovery.SLPNEDDiscovery;
 import org.processmining.qut.exogenousaware.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
+import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 
 import lombok.Builder;
 

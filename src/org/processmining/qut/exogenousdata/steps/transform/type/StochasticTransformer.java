@@ -1,8 +1,8 @@
-package org.processmining.qut.exogenousaware.steps.transform.type;
+package org.processmining.qut.exogenousdata.steps.transform.type;
 
-import org.processmining.qut.exogenousaware.steps.slicing.data.SubSeries;
-import org.processmining.qut.exogenousaware.steps.transform.data.StochasticDummyAttribute;
-import org.processmining.qut.exogenousaware.steps.transform.data.TransformedAttribute;
+import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries;
+import org.processmining.qut.exogenousdata.steps.transform.data.StochasticDummyAttribute;
+import org.processmining.qut.exogenousdata.steps.transform.data.TransformedAttribute;
 
 /*
  * A simple transform that does nothing but makes an attribute to trace back the subseries.

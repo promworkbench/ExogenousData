@@ -5,8 +5,8 @@ import static org.junit.Assert.fail;
 import org.deckfour.xes.classification.XEventNameClassifier;
 import org.junit.Test;
 import org.processmining.framework.plugin.ProMCanceller;
-import org.processmining.qut.exogenousaware.data.ExogenousDataset;
 import org.processmining.qut.exogenousaware.stochastic.discovery.SLPNEDDiscoveryTest;
+import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 
 import lpsolve.LpSolveException;
 

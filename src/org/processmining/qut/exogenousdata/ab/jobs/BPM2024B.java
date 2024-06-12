@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.ab.jobs;
+package org.processmining.qut.exogenousdata.ab.jobs;
 
 import java.util.ArrayList;
 import java.util.HashMap;

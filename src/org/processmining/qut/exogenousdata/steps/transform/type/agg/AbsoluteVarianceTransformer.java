@@ -1,8 +1,8 @@
-package org.processmining.qut.exogenousaware.steps.transform.type.agg;
+package org.processmining.qut.exogenousdata.steps.transform.type.agg;
 
-import org.processmining.qut.exogenousaware.steps.slicing.data.SubSeries;
-import org.processmining.qut.exogenousaware.steps.transform.data.TransformedAttribute;
-import org.processmining.qut.exogenousaware.steps.transform.type.Transformer;
+import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries;
+import org.processmining.qut.exogenousdata.steps.transform.data.TransformedAttribute;
+import org.processmining.qut.exogenousdata.steps.transform.type.Transformer;
 
 import lombok.Builder;
 import lombok.Builder.Default;

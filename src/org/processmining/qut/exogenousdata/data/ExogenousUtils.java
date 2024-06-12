@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.data;
+package org.processmining.qut.exogenousdata.data;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -6,11 +6,11 @@ import java.util.NoSuchElementException;
 import org.deckfour.xes.model.XAttributeTimestamp;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
-import org.processmining.qut.exogenousaware.exceptions.ExogenousAttributeNotFoundException;
-import org.processmining.qut.exogenousaware.steps.linking.AttributeLinker;
-import org.processmining.qut.exogenousaware.steps.linking.ChainAttributeLinker;
-import org.processmining.qut.exogenousaware.steps.linking.GrabFristLinker;
-import org.processmining.qut.exogenousaware.steps.linking.Linker;
+import org.processmining.qut.exogenousdata.exceptions.ExogenousAttributeNotFoundException;
+import org.processmining.qut.exogenousdata.steps.linking.AttributeLinker;
+import org.processmining.qut.exogenousdata.steps.linking.ChainAttributeLinker;
+import org.processmining.qut.exogenousdata.steps.linking.GrabFristLinker;
+import org.processmining.qut.exogenousdata.steps.linking.Linker;
 
 /**
  * Static class for helper functions around handling creating and using exogenous data sets.

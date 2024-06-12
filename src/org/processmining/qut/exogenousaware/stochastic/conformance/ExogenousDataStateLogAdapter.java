@@ -3,10 +3,10 @@ package org.processmining.qut.exogenousaware.stochastic.conformance;
 import org.deckfour.xes.model.XAttributeMap;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XTrace;
-import org.processmining.qut.exogenousaware.data.ExogenousDataset;
-import org.processmining.qut.exogenousaware.exceptions.LinkNotFoundException;
 import org.processmining.qut.exogenousaware.stochastic.choicedata.ChoiceCollector.ChoiceCollectorParameters;
 import org.processmining.qut.exogenousaware.stochastic.model.SLPNEDSemantics;
+import org.processmining.qut.exogenousdata.data.ExogenousDataset;
+import org.processmining.qut.exogenousdata.exceptions.LinkNotFoundException;
 import org.processmining.stochasticlabelleddatapetrinet.datastate.DataState;
 import org.processmining.stochasticlabelleddatapetrinet.logadapter.DataStateLogAdapter;
 

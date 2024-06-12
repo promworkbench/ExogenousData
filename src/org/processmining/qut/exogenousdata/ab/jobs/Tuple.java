@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.ab.jobs;
+package org.processmining.qut.exogenousdata.ab.jobs;
 
 public class Tuple<S1, S2> {
 	

@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousaware.steps.linking;
+package org.processmining.qut.exogenousdata.steps.linking;
 
 import java.util.ArrayList;
 import java.util.List;

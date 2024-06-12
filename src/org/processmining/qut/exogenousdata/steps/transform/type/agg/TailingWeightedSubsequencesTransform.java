@@ -1,14 +1,14 @@
-package org.processmining.qut.exogenousaware.steps.transform.type.agg;
+package org.processmining.qut.exogenousdata.steps.transform.type.agg;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-import org.processmining.qut.exogenousaware.steps.slicing.data.SubSeries;
-import org.processmining.qut.exogenousaware.steps.slicing.data.SubSeries.Scaling;
-import org.processmining.qut.exogenousaware.steps.transform.data.TransformedAttribute;
-import org.processmining.qut.exogenousaware.steps.transform.type.Transformer;
+import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries;
+import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries.Scaling;
+import org.processmining.qut.exogenousdata.steps.transform.data.TransformedAttribute;
+import org.processmining.qut.exogenousdata.steps.transform.type.Transformer;
 
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -70,7 +70,11 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 	public TransformedAttribute transform(SubSeries subtimeseries) {
 //		double agg = 1;
 //		System.out.println("starting tailing weight ("+ subtimeseries.size()+").");
-		List<Double> relativeTimes = subtimeseries.getXSeries(true, Scaling.min);
+		List<Double> relativeTimes = new ArrayList<Double>() {{
+			for (long rel : subtimeseries.getXSeries(true, Scaling.min)) {
+				add(Double.longBitsToDouble(rel));
+			}
+		}};
 		List<Double> values = subtimeseries.getYSeries();
 		double mean = subtimeseries.getComesFrom().getMean();
 		double std = subtimeseries.getComesFrom().getStd();

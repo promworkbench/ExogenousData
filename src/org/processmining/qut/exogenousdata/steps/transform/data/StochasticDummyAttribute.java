@@ -1,7 +1,7 @@
-package org.processmining.qut.exogenousaware.steps.transform.data;
+package org.processmining.qut.exogenousdata.steps.transform.data;
 
 import org.deckfour.xes.extension.XExtension;
-import org.processmining.qut.exogenousaware.steps.slicing.data.SubSeries;
+import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries;
 
 /*
  * A dummy attribute to trace back to the subseries for slpned discovery.
