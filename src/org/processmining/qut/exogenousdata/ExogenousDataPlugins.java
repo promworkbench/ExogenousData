@@ -13,6 +13,7 @@ import org.processmining.contexts.uitopia.annotations.Visualizer;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginCategory;
 import org.processmining.framework.plugin.annotations.PluginLevel;
+import org.processmining.framework.util.HTMLToString;
 import org.processmining.models.connections.petrinets.behavioral.FinalMarkingConnection;
 import org.processmining.models.connections.petrinets.behavioral.InitialMarkingConnection;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
@@ -423,5 +424,55 @@ public class ExogenousDataPlugins {
 	public void exogenousEnhancement(final UIPluginContext context, 
 			final XLog exogenous, final PetriNetWithData model) throws Throwable {
 		throw new NotImplementedException("Still under construction...");
+	}
+	
+	@Plugin(
+			name = "Make Log into Exogenous Dataset",
+			parameterLabels = {"Dataset Log",},
+			categories={PluginCategory.Analytics},
+			help="This plugin allows users to build an exogneous dataset from a log."
+					+ version,
+			returnLabels = {"Exogenous Dataset"}, returnTypes = {ExogenousDataset.class}, 
+			userAccessible = true
+	)
+	@UITopiaVariant(
+			affiliation = "QUT",
+			author = "A. Banham",
+			email = "adam.banham@hdr.qut.edu.au",
+			pack = "ExogenousData"
+	)
+	public ExogenousDataset createDataset(final UIPluginContext context, 
+			final XLog datasetLog) throws Throwable {
+		return ExogenousDataset.builder()
+				.source(datasetLog)
+				.build()
+				.setup();
+	}
+	
+	@Plugin(
+			name = "Describe Exogenous Dataset",
+			parameterLabels = {"Exogenous Dataset",},
+			categories={PluginCategory.Analytics},
+			help="This plugin allows users describe exogneous dataset."
+					+ version,
+			returnLabels = {"Description of Dataset"}, returnTypes = {HTMLToString.class}, 
+			userAccessible = true
+	)
+	@UITopiaVariant(
+			affiliation = "QUT",
+			author = "A. Banham",
+			email = "adam.banham@hdr.qut.edu.au",
+			pack = "ExogenousData"
+	)
+	public HTMLToString describeDataset(final UIPluginContext context, 
+			final ExogenousDataset dataset) throws Throwable {
+		return new HTMLToString() {
+
+			public String toHTMLString(boolean includeHTMLTags) {
+				return "Dataset Type: " + dataset.getDataType().toString() + "\n"
+					   +"Data Mean : " + dataset.getMean() + "\n"
+					   +"Dataset Std : " + dataset.getStd();
+			}
+		};
 	}
 }

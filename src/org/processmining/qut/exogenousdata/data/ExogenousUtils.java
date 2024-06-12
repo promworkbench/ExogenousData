@@ -1,22 +1,39 @@
 package org.processmining.qut.exogenousdata.data;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
+import org.deckfour.xes.model.XAttributeTimestamp;
+import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.processmining.qut.exogenousdata.exceptions.ExogenousAttributeNotFoundException;
 import org.processmining.qut.exogenousdata.steps.linking.AttributeLinker;
 import org.processmining.qut.exogenousdata.steps.linking.ChainAttributeLinker;
+import org.processmining.qut.exogenousdata.steps.linking.GrabFristLinker;
 import org.processmining.qut.exogenousdata.steps.linking.Linker;
 
 /**
- * Static class for helper functions around handling creating and using 
- * exogenous data sets.
+ * Static class for helper functions around handling creating and using exogenous data sets.
  * @author Adam P Banham
  *
  */
 public class ExogenousUtils {
 
 	private ExogenousUtils() {};
+	
+	/**
+	 * Extracts the timestamp of the given event in miliseconds from epoch.
+	 * @param ev
+	 * @return time in miliseconds.
+	 * @throws NoSuchElementException
+	 */
+	public static long getEventTimeMillis(XEvent ev) throws NoSuchElementException {
+		if (ev.getAttributes().containsKey("time:timestamp")) {
+			return ( (XAttributeTimestamp) ev.getAttributes().get("time:timestamp")).getValueMillis();
+		} else {
+			throw new NoSuchElementException("Unable to find suitable attribute for event to describe time.");
+		}
+	};
 	
 	/**
 	 * Finds an exogenous data type for a given exogenous log.
@@ -44,6 +61,8 @@ public class ExogenousUtils {
 			return ExogenousDatasetLinkType.TRACE_ATTRIBUTE_MATCH;
 		} else if (ExogenousLogAttributes.EXOGENOUS_LINK_TYPE_EVENTATTRS.check(elog)) {
 			return ExogenousDatasetLinkType.EVENT_ATTRIBUTE_MATCH;
+		} else if (ExogenousLogAttributes.EXOGENOUS_LINK_TYPE_ANY.check(elog)) {
+			return ExogenousDatasetLinkType.ANY_MATCH;
 		} else {
 			throw new ExogenousAttributeNotFoundException(ExogenousDatasetLinkType.class);
 		}
@@ -69,6 +88,8 @@ public class ExogenousUtils {
 		} else if (edata.linkType.equals(ExogenousDatasetLinkType.EVENT_ATTRIBUTE_MATCH)) {
 //			TODO need to make a event based linker
 			return AttributeLinker.builder().attributeName("foo").build();
+		} else if (edata.linkType.equals(ExogenousDatasetLinkType.ANY_MATCH)) {
+			return GrabFristLinker.builder().build();
 		} else {
 	//		return a dummy attribute linker in the otherwise case
 			return AttributeLinker.builder().attributeName("foo").build();

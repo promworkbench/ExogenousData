@@ -32,12 +32,13 @@ public class ExogenousLogAttributes {
 
 	private ExogenousLogAttributes() {};
 	
+	public static String EXOGENOUS_DATASET_NAME = "exogenous:name";
 	public static ExogenousLogAttribute EXOGENOUS_DATASET = ExogenousLogAttribute.EXOGENOUS_DATASET;
 	public static ExogenousLogAttribute EXOGENOUS_DATA_TYPE_DISCRETE = ExogenousLogAttribute.EXOGENOUS_DATA_TYPE_DISCRETE;
 	public static ExogenousLogAttribute EXOGENOUS_DATA_TYPE_NUMERICAL = ExogenousLogAttribute.EXOGENOUS_DATA_TYPE_NUMERICAL;
 	public static ExogenousLogAttribute EXOGENOUS_LINK_TYPE_TRACEATTRS = ExogenousLogAttribute.EXOGENOUS_LINK_TYPE_TRACEATTRS;
 	public static ExogenousLogAttribute EXOGENOUS_LINK_TYPE_EVENTATTRS = ExogenousLogAttribute.EXOGENOUS_LINK_TYPE_EVENTATTRS;
-	
+	public static ExogenousLogAttribute EXOGENOUS_LINK_TYPE_ANY = ExogenousLogAttribute.EXOGENOUS_LINK_TYPE_ANY;
 	
 	public static List<String> extractLinkAttributes(XLog elog){
 		List<String> attributes = new ArrayList<String>();
@@ -69,6 +70,10 @@ public class ExogenousLogAttributes {
 		EXOGENOUS_LINK_TYPE_EVENTATTRS(
 				new ArrayList<String>(){{add("exogenous:dataset");add("exogenous:link:method");}},
 				new ArrayList<String>(){{add("TRUE");add("ematch");}}
+		),
+		EXOGENOUS_LINK_TYPE_ANY(
+				new ArrayList<String>() {{add("exogenous:dataset");add("exogenous:link:method");}},
+				new ArrayList<String>(){{add("TRUE");add("any");}}
 		),
 		EXOGENOUS_LINK_ATTRIBUTES(
 				new ArrayList<String>(){{add("exogenous:dataset");add("exogenous:link:matching");}},

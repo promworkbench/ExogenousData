@@ -3,6 +3,7 @@ package org.processmining.qut.exogenousdata.data;
 import java.awt.Color;
 import java.util.List;
 
+import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.qut.exogenousdata.exceptions.CannotConvertException;
@@ -11,6 +12,7 @@ import org.processmining.qut.exogenousdata.exceptions.LinkNotFoundException;
 import org.processmining.qut.exogenousdata.gui.colours.ColourScheme;
 import org.processmining.qut.exogenousdata.steps.linking.Linker;
 
+import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -27,6 +29,12 @@ public class ExogenousDataset {
 	@Default @Getter @Setter Color colourBase = ColourScheme.green;
 	@Default @Getter Linker linker = null;
 	@Default private Boolean setupCompleted = false;
+	
+//	stats
+	private double mean;
+	@Default private boolean computedMean = false;
+	private double std;
+	@Default private boolean computedStd = false;
 
 
 
@@ -78,9 +86,9 @@ public class ExogenousDataset {
 	 */
 	public List<XTrace> findLinkage(XTrace trace) throws LinkNotFoundException {
 		//		check for link
-		//		if (!checkLink(trace)) {
-		//			throw new LinkNotFoundException();
-		//		}
+				if (!checkLink(trace)) {
+					throw new LinkNotFoundException();
+				}
 		//		otherwise, find links
 		return linker.link(trace, source);
 	}
@@ -101,6 +109,66 @@ public class ExogenousDataset {
 			}
 		}
 		return name;
+	}
+		
+	public double getMean() {
+		if (!computedMean) {
+			if (dataType == ExogenousDatasetType.NUMERICAL) {
+				double mean = 0;
+				int total = 0;
+				for( XTrace xseries : source) {
+					for(XEvent ev : xseries) {
+						Object val = ExogenousDatasetAttributes.extractExogenousValue(ev);
+						if (val instanceof Integer) {
+							mean+= (int) val;
+						} else if (val instanceof Double) {
+							mean+= (double) val;
+						}
+						total += 1;
+					}
+					
+				}
+				this.mean = mean / total;
+				this.computedMean = true;
+				System.out.println("Dataset ("+getName()+") mean computed :: "+mean);
+				return this.mean;
+			} else {
+				throw new ValueException("Unable to compute mean on non-numerical datasets.");
+			}
+		} else {
+			return this.mean;
+		}
+		
+	}
+	
+	public double getStd() {
+		if (!computedStd) {
+			if (dataType == ExogenousDatasetType.NUMERICAL) {
+				double mean = getMean();
+				double std = 0;
+				int total = 0;
+				for( XTrace xseries : source) {
+					for(XEvent ev : xseries) {
+						Object val = ExogenousDatasetAttributes.extractExogenousValue(ev);
+						if (val instanceof Integer) {
+							std += Math.pow(((int) ExogenousDatasetAttributes.extractExogenousValue(ev)) - mean, 2.0);
+						} else if (val instanceof Double) {
+							std += Math.pow(((double) ExogenousDatasetAttributes.extractExogenousValue(ev)) - mean, 2.0);
+						}
+						total += 1;
+					}
+					
+				}
+				this.std = Math.sqrt(std / total);
+				System.out.println("Dataset ("+getName()+") std computed :: "+this.std);
+				this.computedStd = true;
+				return this.std;
+			} else {
+				throw new ValueException("Unable to compute mean on non-numerical datasets.");
+			}
+		} else {
+			return this.std;
+		}		
 	}
 
 	@Override

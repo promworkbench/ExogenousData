@@ -11,11 +11,14 @@ import lombok.Builder.Default;
 public class ExoPanelPicker {
 
 	@Default private List<Color> colours = new ArrayList<Color>(){{
+		add(ColourScheme.red);
+		add(ColourScheme.purple);
+		add(ColourScheme.pink);
 		add(ColourScheme.blue);
+		add(ColourScheme.coral);
 		add(ColourScheme.green);
 		add(ColourScheme.yellow);
 		add(ColourScheme.orange);
-		add(ColourScheme.coral);
 	}};
 	@Default private int counter = 0;
 	
