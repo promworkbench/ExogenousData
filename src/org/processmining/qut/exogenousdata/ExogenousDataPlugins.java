@@ -55,7 +55,7 @@ import org.processmining.qut.exogenousdata.steps.determination.configs.AIIM2022;
 */
 public class ExogenousDataPlugins {
 	
-	public static final String version = "<br> Package Version: 0.0.5.beta";
+	public static final String version = "<br> Package Version: 0.0.6.beta";
 	
 	
 	@Plugin(
