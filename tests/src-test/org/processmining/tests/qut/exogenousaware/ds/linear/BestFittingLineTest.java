@@ -3,7 +3,7 @@ package org.processmining.tests.qut.exogenousaware.ds.linear;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.processmining.qut.exogenousaware.ds.linear.BestFittingLine;
+import org.processmining.qut.exogenousdata.ds.linear.BestFittingLine;
 
 public class BestFittingLineTest {
 	

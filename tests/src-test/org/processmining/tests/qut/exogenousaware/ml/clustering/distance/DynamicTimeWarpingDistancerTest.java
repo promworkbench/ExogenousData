@@ -1,9 +1,9 @@
 package org.processmining.tests.qut.exogenousaware.ml.clustering.distance;
 
 import org.junit.Test;
-import org.processmining.qut.exogenousaware.ml.clustering.distance.DynamicTimeWarpingDistancer;
-import org.processmining.qut.exogenousaware.ml.data.FeatureVector;
-import org.processmining.qut.exogenousaware.ml.data.FeatureVectorImpl;
+import org.processmining.qut.exogenousdata.ml.clustering.distance.DynamicTimeWarpingDistancer;
+import org.processmining.qut.exogenousdata.ml.data.FeatureVector;
+import org.processmining.qut.exogenousdata.ml.data.FeatureVectorImpl;
 
 public class DynamicTimeWarpingDistancerTest {
 

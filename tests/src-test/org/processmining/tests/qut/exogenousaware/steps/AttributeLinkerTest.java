@@ -12,7 +12,7 @@ import org.deckfour.xes.model.impl.XAttributeLiteralImpl;
 import org.deckfour.xes.model.impl.XAttributeMapImpl;
 import org.deckfour.xes.model.impl.XTraceImpl;
 import org.junit.Test;
-import org.processmining.qut.exogenousaware.steps.linking.AttributeLinker;
+import org.processmining.qut.exogenousdata.steps.linking.AttributeLinker;
 
 public class AttributeLinkerTest {
 
