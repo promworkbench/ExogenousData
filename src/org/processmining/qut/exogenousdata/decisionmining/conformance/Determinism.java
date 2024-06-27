@@ -76,6 +76,28 @@ public class Determinism {
 			) {
 		double ret = 1.0;
 		
+		if (net.getOutEdges(place).size() > 1) {
+			Collection<PetrinetEdge<
+			? extends PetrinetNode,
+			? extends PetrinetNode>
+			> out = net.getOutEdges(place);
+			double totalTrans = out.size();
+			double nonTrival = 0.0;
+			for(PetrinetEdge<
+					? extends PetrinetNode,
+					? extends PetrinetNode
+				> edge: out) {
+				PetrinetNode node = edge.getTarget();
+				if (node instanceof PNWDTransition) {
+					PNWDTransition trans = (PNWDTransition) node;
+					if (!isGuardTrivial(trans)) {
+						nonTrival += 1;
+					}
+				}
+			}
+			ret = nonTrival / totalTrans;
+		}
+		
 		return ret;
 	}
 	
