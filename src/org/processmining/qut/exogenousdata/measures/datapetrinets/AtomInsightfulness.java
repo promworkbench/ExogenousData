@@ -11,4 +11,9 @@ public class AtomInsightfulness implements PetriNetMeasure {
 		return 0;
 	}
 
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

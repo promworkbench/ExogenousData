@@ -41,13 +41,12 @@ import org.processmining.plugins.graphviz.visualisation.DotPanelUserSettings;
 import org.processmining.plugins.graphviz.visualisation.listeners.DotElementSelectionListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.GraphChangedListener.GraphChangedReason;
-import org.processmining.qut.exogenousdata.gui.colours.ColourScheme;
-import org.processmining.qut.exogenousdata.measures.datapetrinets.DecisionPrecision;
-import org.processmining.qut.exogenousdata.measures.datapetrinets.DecisionRecall;
-import org.processmining.qut.exogenousdata.stats.models.ProcessModelStatistics;
-import org.processmining.qut.exogenousdata.stats.models.ProcessModelStatistics.DecisionPoint;
 import org.processmining.plugins.graphviz.visualisation.listeners.MouseInElementsChangedListener;
 import org.processmining.plugins.graphviz.visualisation.listeners.SelectionChangedListener;
+import org.processmining.qut.exogenousdata.gui.colours.ColourScheme;
+import org.processmining.qut.exogenousdata.measures.datapetrinets.DeterminismMeasure;
+import org.processmining.qut.exogenousdata.stats.models.ProcessModelStatistics;
+import org.processmining.qut.exogenousdata.stats.models.ProcessModelStatistics.DecisionPoint;
 
 import com.kitfox.svg.Group;
 import com.kitfox.svg.RenderableElement;
@@ -216,12 +215,12 @@ public class DotPanelG2 extends NavigableSVGPanelG2 {
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			
 //			create gauge for reasoning-recall
-			String label = DecisionRecall.NAME;
+			String label = DeterminismMeasure.NAME;
 			g2d.setColor(Color.LIGHT_GRAY);
 			
 			
-			if (this.statistics.getSeenGraphMeasures().contains(DecisionRecall.NAME)) {
-				gmeasure = this.statistics.getGraphMeasures().get(DecisionRecall.NAME);
+			if (this.statistics.getSeenGraphMeasures().contains(DeterminismMeasure.NAME)) {
+				gmeasure = this.statistics.getGraphMeasures().get(DeterminismMeasure.NAME);
 				label = label + String.format(" (%.2f)", gmeasure);
 			}
 			
@@ -234,8 +233,8 @@ public class DotPanelG2 extends NavigableSVGPanelG2 {
 			localIndex = 0;
 			for( Place moment : this.statistics.getDecisionMoments()) {
 				DecisionPoint dp = this.statistics.getInformation(moment);
-				if (dp.getMapToMeasures().containsKey(DecisionRecall.NAME)) {
-					double dpmeasure = dp.getMapToMeasures().get(DecisionRecall.NAME);
+				if (dp.getMapToMeasures().containsKey(DeterminismMeasure.NAME)) {
+					double dpmeasure = dp.getMapToMeasures().get(DeterminismMeasure.NAME);
 					localmeasures[localIndex] = dpmeasure;
 				}
 				localIndex++;
@@ -248,34 +247,6 @@ public class DotPanelG2 extends NavigableSVGPanelG2 {
 			
 //			create gauge for reasoning-precision
 			startX += gaugeWidth + gaugeSpacing;
-			label = DecisionPrecision.NAME;
-			g2d.setColor(Color.LIGHT_GRAY);
-			
-			
-			if (this.statistics.getSeenGraphMeasures().contains(DecisionPrecision.NAME)) {
-				gmeasure = this.statistics.getGraphMeasures().get(DecisionPrecision.NAME);
-				label = label + String.format(" (%.2f)", gmeasure);
-			}
-			
-			textX = startX + (gaugeWidth/2) - (label.length()/2) * 5.7;
-			g2d.drawString(label, (int) (textX) , 14 );
-			
-			createMeasureGauge(g2d, (int)startX, topRunnerHeight, gaugeWidth , gaugeHeight, gmeasure);
-			
-//			check for internal states for reasoning-precision
-			localIndex = 0;
-			for( Place moment : this.statistics.getDecisionMoments()) {
-				DecisionPoint dp = this.statistics.getInformation(moment);
-				if (dp.getMapToMeasures().containsKey(DecisionPrecision.NAME)) {
-					double dpmeasure = dp.getMapToMeasures().get(DecisionPrecision.NAME);
-					localmeasures[localIndex] = dpmeasure;
-				}
-				localIndex++;
-			}
-			createInternalGauge(g2d, (int) (startX + internalGaugeSpacing), topRunnerHeight, gaugeWidth, gaugeHeight, localmeasures);
-			
-			gmeasure = 0.0;
-			localmeasures = new double[decisionMoments];
 		}
 	}
 	
