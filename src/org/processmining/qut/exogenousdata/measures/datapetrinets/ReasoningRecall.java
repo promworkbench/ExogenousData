@@ -34,6 +34,7 @@ import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NonNull;
 
+@Deprecated
 @Builder
 public class ReasoningRecall implements PetriNetMeasure {
 	
@@ -269,6 +270,12 @@ public class ReasoningRecall implements PetriNetMeasure {
 			mapper.put(key,realValue);
 		}
 		
+	}
+
+
+	public String getName() {
+		// TODO Auto-generated method stub
+		return this.NAME;
 	}
 	
 	
