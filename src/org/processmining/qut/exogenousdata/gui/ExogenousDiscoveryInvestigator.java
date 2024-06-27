@@ -46,12 +46,12 @@ import org.processmining.qut.exogenousdata.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousdata.data.storage.ExogenousDiscoveryInvestigation;
 import org.processmining.qut.exogenousdata.gui.dot.ExoDotTransition;
 import org.processmining.qut.exogenousdata.gui.panels.ExogenousDiscoveryProgresser;
+import org.processmining.qut.exogenousdata.gui.panels.ExogenousDiscoveryProgresser.ProgressType;
 import org.processmining.qut.exogenousdata.gui.panels.ExogenousEnhancementGraphInvestigator;
 import org.processmining.qut.exogenousdata.gui.panels.ExogenousInvestigatorDotPanel;
-import org.processmining.qut.exogenousdata.gui.panels.ExogenousInvestigatorSelectionPanel;
-import org.processmining.qut.exogenousdata.gui.panels.ExogenousDiscoveryProgresser.ProgressType;
 import org.processmining.qut.exogenousdata.gui.panels.ExogenousInvestigatorDotPanel.DotOverlay;
 import org.processmining.qut.exogenousdata.gui.panels.ExogenousInvestigatorDotPanel.DotOverlayInformationDump;
+import org.processmining.qut.exogenousdata.gui.panels.ExogenousInvestigatorSelectionPanel;
 import org.processmining.qut.exogenousdata.gui.workers.ExogenousDiscoveryAlignmentWorker;
 import org.processmining.qut.exogenousdata.gui.workers.ExogenousDiscoveryMeasurementWorker;
 import org.processmining.qut.exogenousdata.gui.workers.ExogenousDiscoveryStatisticWorker;
@@ -567,7 +567,8 @@ public class ExogenousDiscoveryInvestigator extends JPanel{
 	}
 	
 	public void setMeasurements(Map<String,Double> measures) {
-		System.out.println("[ExogenousDiscoveryInvestigator] new measures :: "+ measures.toString());
+		System.out.println("[ExogenousDiscoveryInvestigator] new measures :: "+
+				measures.toString());
 		
 		for ( Entry<String, Double> measure : measures.entrySet()) {
 			this.statistics.addGraphMeasure(measure.getKey(), measure.getValue());
