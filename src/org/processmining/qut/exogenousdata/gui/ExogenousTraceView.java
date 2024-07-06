@@ -6,6 +6,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
@@ -17,6 +19,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollBar;
 import javax.swing.SwingConstants;
 
+import org.deckfour.xes.model.XAttributeLiteral;
 import org.deckfour.xes.model.XAttributeTimestamp;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XTrace;
@@ -26,14 +29,16 @@ import org.processmining.contexts.uitopia.annotations.Visualizer;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginLevel;
 import org.processmining.framework.util.ui.widgets.ProMSplitPane;
+import org.processmining.framework.util.ui.widgets.ProMTextField;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList;
 import org.processmining.framework.util.ui.widgets.traceview.ProMTraceList.ClickListener;
+import org.processmining.framework.util.ui.widgets.traceview.model.FilteredListModelImpl.ListModelFilter;
 import org.processmining.qut.exogenousdata.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousdata.gui.listeners.EndoTraceListener;
 import org.processmining.qut.exogenousdata.gui.panels.ExogenousTraceViewJChartFilterPanel;
 import org.processmining.qut.exogenousdata.gui.panels.ExogenousTraceViewJChartFilterPanel.EventFilter;
-import org.processmining.qut.exogenousdata.gui.promlist.WedgeBuilderFactory;
 import org.processmining.qut.exogenousdata.gui.promlist.ProMListComponents.ExoTraceBuilder;
+import org.processmining.qut.exogenousdata.gui.promlist.WedgeBuilderFactory;
 import org.processmining.qut.exogenousdata.gui.workers.TraceVisEventChart;
 import org.processmining.qut.exogenousdata.gui.workers.TraceVisOverviewChart;
 import org.processmining.qut.exogenousdata.gui.workers.TraceVisTraceBreakdownCharts;
@@ -283,6 +288,30 @@ public class ExogenousTraceView extends JPanel {
 		);
 //		build and style panel
 		bottomRight.add(traceView);
+//		add filter box
+		ProMTextField filter = new ProMTextField(
+				"", 
+				"filters the visible traces based on give partial case."
+		);
+		filter.setToolTipText(
+			"filters the visible traces based on give partial case.");
+		filter.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				traceView.filter(new ListModelFilter<XTrace>() {
+					
+					public boolean accept(XTrace e) {
+						// TODO Auto-generated method stub
+						String partial = filter.getText();
+						XAttributeLiteral concept = 
+								(XAttributeLiteral) e.getAttributes()
+								.get("concept:name");
+						return concept.getValue().contains(partial);
+					}
+				});
+			}
+		});
+		bottomRight.add(filter);
 		this.stylePanel(bottomRight);
 		bottomRight.setMinimumSize(new Dimension(300,800));
 		bottomRight.validate();
