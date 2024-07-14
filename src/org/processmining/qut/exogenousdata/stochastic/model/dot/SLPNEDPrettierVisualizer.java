@@ -127,7 +127,7 @@ public class SLPNEDPrettierVisualizer extends StochasticLabelledPetriNetVisualis
 					+ " BORDER=\"0\" "
 					+ "><TR>"
 					+ "<TD COLSPAN=\"3\">" 
-					+ net.getTransitionLabel(transition)
+					+  label
 					+"</TD>"
 					+ "</TR>"
 					+ "<TR>"
@@ -203,12 +203,6 @@ public class SLPNEDPrettierVisualizer extends StochasticLabelledPetriNetVisualis
 			} else {
 				prow.append("<TD> </TD>");
 			}
-//			dotLabel += "{";
-//			dotLabel += "<f"+adjustHook+"l>  &#966;"+adjuster+"="
-//					+ String.format(WeightFormat, adjustments.getLeft())
-//					+ "| <f"+adjustHook+"r> &#966;&not;"+adjuster+"="
-//					+ String.format(WeightFormat, adjustments.getRight());
-//			dotLabel += "} |\n";
 			prow.append("</TR>");
 			if (keep) {
 				parameters.append(prow.toString());
