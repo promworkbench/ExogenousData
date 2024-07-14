@@ -2,8 +2,6 @@ package org.processmining.qut.exogenousdata.gui.dot;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -24,9 +22,9 @@ import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.Pet
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.VariableAccess;
 import org.processmining.plugins.graphviz.dot.Dot;
 import org.processmining.plugins.graphviz.dot.Dot.GraphDirection;
-import org.processmining.qut.exogenousdata.stats.models.ProcessModelStatistics;
 import org.processmining.plugins.graphviz.dot.DotEdge;
 import org.processmining.plugins.graphviz.dot.DotNode;
+import org.processmining.qut.exogenousdata.stats.models.ProcessModelStatistics;
 
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -163,14 +161,6 @@ public class DotGraphVisualisation {
 			dp++;
 		}
 		clusterDot.addNode(nodes.get(end.get(0).getId().toString()));
-		File f = new File("C:\\\\Users\\\\n7176546\\\\OneDrive - Queensland University of Technology\\\\Desktop\\\\test\\\\dummy.dot");
-		try {
-			clusterDot.exportToFile(f);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-//			e.printStackTrace();
-		}
-	
 	}
 	
 	private void styleDot() {
