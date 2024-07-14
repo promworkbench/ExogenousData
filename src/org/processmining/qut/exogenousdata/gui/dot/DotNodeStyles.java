@@ -124,7 +124,7 @@ public class DotNodeStyles {
 	}
 	
 	public static DotNode buildNoRuleTransition(Transition t) {
-		boolean istau = t.getLabel().startsWith("tau ");
+		boolean istau = t.isInvisible();
 		String label = createTransitionLabel(istau ? "" : t.getLabel(), istau);
 		return new ExoDotTransition(label, t.getId().toString(), t.getLabel(), new GuardExpressionHandler(null, null));
 	}
@@ -136,25 +136,25 @@ public class DotNodeStyles {
 	}
 	
 	public static DotNode buildNoRuleTransition(Transition t, Map<String,String> swapper) {
-		boolean istau = t.getLabel().startsWith("tau ");
+		boolean istau = t.isInvisible();
 		String label = createTransitionLabel(istau ? "" : t.getLabel(), istau );
 		return new ExoDotTransition(label, t.getId().toString(), t.getLabel(), new GuardExpressionHandler(null, swapper));
 	}
 	
 	public static DotNode buildNoRuleTransition(Transition t, ProcessModelStatistics stats, Map<String,String> swapper) {
-		boolean istau = t.getLabel().startsWith("tau ");
+		boolean istau = t.isInvisible();
 		String label = createTransitionLabel(istau ? buildTauStatLabel(t, stats) : buildStatLabel(t, stats), istau);
 		return new ExoDotTransition(label, t.getId().toString(), t.getLabel(), new GuardExpressionHandler(null, swapper));
 	}
 	
 	public static DotNode buildRuleTransition(Transition t, GuardExpression g, Map<String,String> swapper) {
-		boolean istau = t.getLabel().startsWith("tau ");
+		boolean istau = t.isInvisible();
 		String label = createTransitionLabel(istau ? "" : t.getLabel(), istau, g, swapper);
 		return new ExoDotTransition(label,t.getId().toString(), t.getLabel(), new GuardExpressionHandler(g, swapper));
 	}
 	
 	public static DotNode buildRuleTransition(Transition t, ProcessModelStatistics stats, GuardExpression g, Map<String,String> swapper) {
-		boolean istau = t.getLabel().startsWith("tau ");
+		boolean istau = t.isInvisible();
 //		work out if we have a guard wise recall measurement
 		String recallKey = t.getId().toString()+"-recall";
 		String precisionKey = t.getId().toString()+"-precision";

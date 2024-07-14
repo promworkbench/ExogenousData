@@ -109,6 +109,20 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 		for(Place place : net.getNet().getPlaces()) {
 			this.places.put(place, indexer);
 			this.initial_marking[indexer] = net.getInitialMarking().contains(place) ? 1: 0;
+			Collection<PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode>> inedges = net.getNet().getInEdges(place);
+			Collection<PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode>> outedges = net.getNet().getOutEdges(place);
+//			find out and in transitions for places
+			int[] inplaces = new int[net.getNet().getTransitions().size()];
+			int[] outplaces = new int[net.getNet().getTransitions().size()];
+			for( PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : inedges) {
+				inplaces[this.transitions.get(edge.getSource())] = 1;
+			}
+			indexer = 0;
+			for( PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : outedges) {
+				outplaces[this.transitions.get(edge.getTarget())] = 1;
+			}
+			this.input_places.put(indexer, inplaces);
+			this.output_places.put(indexer, outplaces);
 			indexer++;
 		}
 //		find input/output for transitions
@@ -287,13 +301,17 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 	}
 
 	public int[] getInputTransitions(int place) {
-		// TODO Auto-generated method stub
-		return null;
+		int [] iplaces = this.input_places.get(place);
+		return 	IntStream.rangeClosed(0, iplaces.length-1)
+				.filter(i -> iplaces[i] > 0)
+				.toArray();
 	}
 
 	public int[] getOutputTransitions(int place) {
-		// TODO Auto-generated method stub
-		return null;
+		int[] oplaces = this.output_places.get(place);
+		return 	IntStream.rangeClosed(0, oplaces.length-1)
+				.filter(i -> oplaces[i] > 0)
+				.toArray();
 	}
 
 	public SLPNEDSemantics getDefaultSemantics() {
@@ -366,7 +384,7 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 
 //	import functions
 	public void addPlace() {
-		int newPlaceId = 1;
+		int newPlaceId = 0;
 		if (places.values().size() > 0) {
 			newPlaceId = places.values().stream().reduce(Integer::max).get()+1;
 		}
@@ -374,10 +392,14 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 		places.put(place, newPlaceId);
 //		extend initial and final marking
 		int[] old_initial = initial_marking;
-		initial_marking = new int[newPlaceId];
+		initial_marking = new int[newPlaceId+1];
 		for(int i = 0; i < old_initial.length; i++) {
 			initial_marking[i] = old_initial[i];
 		}
+		int[] array = new int[]{0};
+		input_places.put(newPlaceId, array);
+		array = new int[]{0};
+		output_places.put(newPlaceId, array);
 	}
 	
 	public void addPlaceToInitial(int place) {
@@ -408,16 +430,33 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 		this.not_adjustments.put(newTransId, notadjusters);
 		this.input_transitions.put(newTransId, new int[initial_marking.length]);
 		this.output_transitions.put(newTransId, new int[initial_marking.length]);
+//		update place inputs and outputs
+		for(int place=0; place < this.getNumberOfPlaces(); place++) {
+			input_places.put(place, 
+					Arrays.copyOf(input_places.get(place), 
+								  this.getNumberOfTransitions()
+					)
+			);
+			output_places.put(place, 
+					Arrays.copyOf(output_places.get(place), 
+								  this.getNumberOfTransitions()
+					)
+			);
+		}
 	}
 	
 	public void addPlaceTransitionArc(int place ,int transition) {
 		int[] iplaces = this.input_transitions.get(transition);
 		iplaces[place] += 1;
+		int[] oplaces = this.output_places.get(place);
+		oplaces[transition] += 1;
 	}
 	
 	public void addTransitionPlaceArc(int transition, int place) {
 		int[] oplaces = this.output_transitions.get(transition);
 		oplaces[place] += 1;
+		int[] iplaces = this.input_places.get(place);
+		iplaces[transition] += 1;
 	}
 	
 	public void setBaseWeight(Transition transition, double weight) {
