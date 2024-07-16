@@ -568,7 +568,7 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 //            for dataset one and two in plot record the information
             try {
 				PrintWriter writer = new PrintWriter(file);
-				writer.println("series_name, time, value");
+				writer.println("series_name,time,value,desc");
 				
 //				get endo moments
 				XYSeriesCollection data = (XYSeriesCollection) 
@@ -579,9 +579,10 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 					if (series instanceof XYSeries) {
 						XYSeries datadum = (XYSeries) series;
 						writer.println(
-								"event, "
+								"event,"
 								+ datadum.getX(0).toString()
-								+ ", "
+								+ ","
+								+ ","
 								+ XUtils.getConceptName(self.endo.get(evid))
 						);
 						evid += 1;
@@ -599,9 +600,9 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 							writer.println(
 									""
 									+ datadum.getKey()
-									+ ", "
+									+ ","
 									+ datadum.getX(idx).toString()
-									+ ", "
+									+ ","
 									+ datadum.getY(idx).toString()
 							);
 						}
@@ -620,12 +621,14 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 	}
 
 	public double getEventTimestampMillis(XEvent ev) {
-		double time = (double) ((XAttributeTimestamp) ev.getAttributes().get("time:timestamp")).getValueMillis();
+		double time = ((XAttributeTimestamp) 
+				ev.getAttributes().get("time:timestamp")).getValueMillis();
 		return time / (1000 * 60 * 60);
 	}
 	
 	public double getExoEventValue(XEvent ev) {
-		return Double.parseDouble(ev.getAttributes().get("exogenous:value").toString());
+		return Double.parseDouble(ev.getAttributes()
+				.get("exogenous:value").toString());
 	}
 	
 	public static String getExogenousName(XTrace trace) {
