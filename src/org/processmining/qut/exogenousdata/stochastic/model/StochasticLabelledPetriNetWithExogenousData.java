@@ -108,17 +108,23 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 		indexer = 0;
 		for(Place place : net.getNet().getPlaces()) {
 			this.places.put(place, indexer);
-			this.initial_marking[indexer] = net.getInitialMarking().contains(place) ? 1: 0;
-			Collection<PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode>> inedges = net.getNet().getInEdges(place);
-			Collection<PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode>> outedges = net.getNet().getOutEdges(place);
+			this.initial_marking[indexer] = net.getInitialMarking()
+					.contains(place) ? 1: 0;
+			Collection<PetrinetEdge<? extends PetrinetNode,
+					? extends PetrinetNode>> inedges = net.getNet()
+					.getInEdges(place);
+			Collection<PetrinetEdge<? extends PetrinetNode,
+					? extends PetrinetNode>> outedges = net.getNet()
+					.getOutEdges(place);
 //			find out and in transitions for places
 			int[] inplaces = new int[net.getNet().getTransitions().size()];
 			int[] outplaces = new int[net.getNet().getTransitions().size()];
-			for( PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : inedges) {
+			for( PetrinetEdge<? extends PetrinetNode,
+					? extends PetrinetNode> edge : inedges) {
 				inplaces[this.transitions.get(edge.getSource())] = 1;
 			}
-			indexer = 0;
-			for( PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : outedges) {
+			for( PetrinetEdge<? extends PetrinetNode,
+					? extends PetrinetNode> edge : outedges) {
 				outplaces[this.transitions.get(edge.getTarget())] = 1;
 			}
 			this.input_places.put(indexer, inplaces);
@@ -135,7 +141,6 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 			for( PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : inedges) {
 				inplaces[this.places.get(edge.getSource())] = 1;
 			}
-			indexer = 0;
 			for( PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : outedges) {
 				outplaces[this.places.get(edge.getTarget())] = 1;
 			}
