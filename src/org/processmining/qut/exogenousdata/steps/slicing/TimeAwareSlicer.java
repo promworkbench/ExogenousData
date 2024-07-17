@@ -41,7 +41,7 @@ public class TimeAwareSlicer implements Slicer{
 	@Override
 	public Map<XEvent, SubSeries> slice(XTrace endogenous, XTrace exogenous, ExogenousDataset edataset) {
 		Map<XEvent,SubSeries> points = new HashMap<XEvent,SubSeries>();
-		String dataset = exogenous.getAttributes().get("exogenous:name").toString();
+		String dataset = edataset.getName();
 //		#1 : find endogenous before exogenous signal starts
 		ArrayList<XEvent> starts = new ArrayList<XEvent>();
 //		find the earliest timestamp in exogenous signal

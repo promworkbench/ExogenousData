@@ -81,7 +81,7 @@ public class FutureOutcomeSlicer implements Slicer {
 
 	public Map<XEvent, SubSeries> slice(XTrace endogenous, XTrace exogenous, ExogenousDataset dataset) {
 		Map<XEvent,SubSeries> points = new HashMap<XEvent,SubSeries>();
-		String datasetName = exogenous.getAttributes().get("exogenous:name").toString();
+		String datasetName = dataset.getName();
 		// for each endogenous event find all datapoints to the left
 		for(XEvent ev: endogenous) {
 			long time = getEventTimeMillis(ev) + this.timePeriod;
