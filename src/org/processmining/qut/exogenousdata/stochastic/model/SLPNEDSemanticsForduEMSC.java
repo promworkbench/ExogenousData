@@ -2,8 +2,8 @@ package org.processmining.qut.exogenousdata.stochastic.model;
 
 import java.util.BitSet;
 
-import org.processmining.stochasticlabelleddatapetrinet.StochasticLabelledDataPetriNet.VariableType;
 import org.processmining.qut.exogenousdata.stochastic.conformance.ExogenousDataState;
+import org.processmining.stochasticlabelleddatapetrinet.StochasticLabelledDataPetriNet.VariableType;
 import org.processmining.stochasticlabelleddatapetrinet.StochasticLabelledDataPetriNetSemantics;
 import org.processmining.stochasticlabelleddatapetrinet.datastate.DataState;
 
@@ -47,7 +47,7 @@ public class SLPNEDSemanticsForduEMSC implements StochasticLabelledDataPetriNetS
 	}
 
 	public void setDataState(DataState dataState) {
-		state = dataState;
+		state = dataState.deepCopy();
 		
 	}
 
