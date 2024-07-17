@@ -16,6 +16,7 @@ import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.util.Pair;
 import org.processmining.basicstochasticminer.solver.Equation;
 import org.processmining.basicstochasticminer.solver.Function;
+import org.processmining.framework.plugin.Progress;
 
 public class Solver {
 
@@ -24,6 +25,26 @@ public class Solver {
 	//https://scipopt.org/index.php#license
 
 	public static final double lowest = 0.0001;
+	
+//	Controls for the paramter values
+//	having a wider range is better than a small range for solver
+	public static double MIN = 0.0001;
+	public static double MAX = 100000.0;
+	public static double GAP = (MAX - MIN) * 0.1;
+	
+//	how long do you want to optimise for
+//	higher values could mean longer runtime
+	public static int MAX_EVAL = 1000;
+	public static int MAX_ITERS = 1000;
+	public static int MAX_ATTEMPTS = MAX_EVAL * MAX_ITERS;
+	
+//	how carefully should the solver move
+//	too big and the solution will default all factors to 1
+//	too small and it will move impractically slow
+	public static double LEARNING_RATE = 1e-10;
+	
+//	for feedback back to prom UI if set
+	public static Progress PROG = null;
 
 	/**
 	 * 
@@ -39,6 +60,7 @@ public class Solver {
 	 */
 	public static double[] solve(List<Equation> equations, int numberOfParameters, int[] fixParameters,
 			int[] nonZeroParameters, double[] initialParameterValues) {
+		
 		MultivariateJacobianFunction jfunction = new MultivariateJacobianFunction() {
 
 			public Pair<RealVector, RealMatrix> value(RealVector point) {
@@ -75,17 +97,24 @@ public class Solver {
 		for (int parameter : nonZeroParameters) {
 			nonZeroParametersb.set(parameter);
 		}
-
+		setProgressorMax(MAX_ATTEMPTS);
 		ParameterValidator validator = new ParameterValidator() {
+			private int runs = 0;
+			
 			public RealVector validate(RealVector params) {
-//								System.out.println("validate " + params);
+				runs += 1;
+				System.out.println("["+runs+"] "
+						+ "validating :: " + params);
+				incrementProgressor();
 				for (int i = 0; i < params.getDimension(); i++) {
 					if (nonZeroParametersb.get(i) && params.getEntry(i) <= 0) {
-						params.setEntry(i, lowest);
+						params.setEntry(i, MIN * 5);
 					} else if (fixedParametersb.get(i)) {
 						params.setEntry(i, 1);
-					} else if (params.getEntry(i) < lowest) {
-						params.setEntry(i, lowest * 2);
+					} else if (params.getEntry(i) < MIN) {
+						params.setEntry(i, MIN * 5);
+					} else if (params.getEntry(i) > MAX) {
+						params.setEntry(i, MAX*0.98);
 					}
 				}
 				return params;
@@ -104,9 +133,14 @@ public class Solver {
 		//		initialGuess.set(2);
 
 		//set the weights
-		RealMatrix weight = new Array2DRowRealMatrix(equations.size(), equations.size());
+		RealMatrix weight = new Array2DRowRealMatrix(
+				equations.size(),
+				equations.size()
+		);
 		for (int equation = 0; equation < equations.size(); equation++) {
-			weight.setEntry(equation, equation, equations.get(equation).getOccurrences());
+			weight.setEntry(equation, equation, 
+					equations.get(equation).getOccurrences()
+			);
 		}
 
 		LeastSquaresProblem problem = new LeastSquaresBuilder()//
@@ -116,11 +150,12 @@ public class Solver {
 				.weight(weight)//
 				.parameterValidator(validator)//
 				.lazyEvaluation(false)//
-				.maxEvaluations(10000000)//
-				.maxIterations(10000000)//
+				.maxEvaluations(MAX_EVAL)//
+				.maxIterations(MAX_ITERS)//
 				.build();
-		LeastSquaresOptimizer optimiser = new LevenbergMarquardtOptimizer().withCostRelativeTolerance(1.0e-10)
-				.withParameterRelativeTolerance(1.0e-10);
+		LeastSquaresOptimizer optimiser = new LevenbergMarquardtOptimizer()
+				.withCostRelativeTolerance(LEARNING_RATE)
+				.withParameterRelativeTolerance(LEARNING_RATE);
 //		LeastSquaresOptimizer optimiser = new GaussNewtonOptimizer(GaussNewtonOptimizer.Decomposition.CHOLESKY);
 		Optimum optimum = optimiser.optimize(problem);
 
@@ -129,5 +164,32 @@ public class Solver {
 		//		System.out.println("iterations: " + optimum.getIterations());
 
 		return optimum.getPoint().toArray();
+	}
+	
+//	UI Functions to keep progressor updated during solving
+	public static void setProgressor(Progress progressor) {
+		PROG = progressor;
+	}
+	
+	public static void setProgressorMax(int max) {
+		if (PROG != null) {
+			PROG.setMaximum( 
+					PROG.getMaximum()
+					+ max
+			);
+		}
+	}
+	
+	public static void incrementProgressor() {
+		incrementProgressor(1);
+	}
+	
+	public static void incrementProgressor(int amount) {
+		if (PROG != null) {
+			while(amount > 0) {
+				PROG.inc();
+				amount -= 1;
+			}
+		}
 	}
 }
