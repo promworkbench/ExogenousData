@@ -20,12 +20,15 @@ import org.processmining.qut.exogenousdata.stochastic.model.in.SLPNEDImporter;
 
 public class ThesisRunner {
 	
-	public static final String LOGFILE = "";
+	public static final String DATADIR = "C:\\Users\\n7176546\\OneDrive - Queensland University of Technology\\phd\\thesis\\extensions\\stochastic\\models\\test_data\\";
+	public static final String LOGFILE = DATADIR+"roadfines_snippet.xes";
 	public static final String[] DATASETFILES = new String[] {
-			
+			DATADIR+"exogenous_dataset_unresolved_fines.xes",
+			DATADIR+"exogenous_dataset_unpaid_fines.xes"
 	};
-	public static final String MODELFILE = "";
-	public static final String InterestedCase = "";
+	public static final String MODELFILE = DATADIR+"slpned_over_sample.slpned";
+	public static final String InterestedCase = "A21188";
+	public static final String InterestedLabel = "Send for Credit Collection";
 	public static final int[] firing = new int[] {
 			
 	};
@@ -98,7 +101,15 @@ public class ThesisRunner {
 				.parsed(false)
 				.build();
 		
-		new SLPNEDReplayer().replay(net, xlog);
+		try {
+			new SLPNEDReplayer()
+				.setInterestedTransitionLabel(InterestedLabel)
+				.setInterestCase(InterestedCase)
+				.replay(net, xlog);
+		} catch (Exception e) {
+			System.out.println("Runner failed :: "+e.getCause());
+			e.printStackTrace();
+		}
 
 	}
 
