@@ -49,7 +49,8 @@ public class SubSeries {
 		ms(1.0),
 		sec(1000.0),
 		min(1000.0 * 60.0),
-		hour(1000.0 * 60.0 * 60.0);
+		hour(1000.0 * 60.0 * 60.0),
+		day(1000.0 * 60.0 * 60.0 * 24);
 		
 		private Double scale;
 		
