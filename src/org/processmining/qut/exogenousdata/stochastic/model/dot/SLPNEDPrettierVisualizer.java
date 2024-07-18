@@ -182,9 +182,7 @@ public class SLPNEDPrettierVisualizer extends StochasticLabelledPetriNetVisualis
 						+ ">"
 						+ " * "
 						+ df.format(adjusterValue)
-						+ " ^ |"
-						+ adjuster
-						+ "| "
+						+ "^(TTES) "
 						+ "</TD>");
 				keep = true;
 			} else {
