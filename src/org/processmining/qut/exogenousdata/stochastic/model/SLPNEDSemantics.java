@@ -145,6 +145,12 @@ public class SLPNEDSemantics implements StochasticLabelledPetriNetSemantics {
 		}
 		return weight;
 	}
+	
+	public double getProbabilityOfTransition(int transition, 
+			double[] powers, int[] known) {
+		return (getTransitionWeight(transition, powers, known)) / 
+			   (getTotalWeightOfEnabledTransitions(powers, known));
+	}
 
 	public SLPNEDSemantics clone() {
 		SLPNEDSemantics semantics = new SLPNEDSemantics(this.net);
