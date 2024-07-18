@@ -131,7 +131,8 @@ public class ChoiceCollector {
 			simplierTrace.add(event);
 			XTrace linkage = dataset.findLinkage(simplierTrace).get(0);
 			double theta = thetaAggerator.transform(
-						eventSlicer.slice(simplierTrace, linkage, dataset).get(event)
+						eventSlicer.slice(simplierTrace, linkage, dataset)
+						.get(event)
 				).getRealValue();
 //			System.out.println("Computed event Theta :: "+ theta);
 			return theta;

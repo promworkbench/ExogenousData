@@ -286,5 +286,17 @@ public class ExogenousDataState implements DataState{
 		ret += ")";
 		return ret;
 	}
+	
+	public String toFancyString() {
+		String ret = "{";
+		for( int key=0; key < size(); key++) {
+			ret +=  ""
+					+ state.get(key).name
+					+" -> "
+					+ state.get(key).toString() +",";
+		}
+		ret = ret.substring(0, ret.length()-1);
+		return ret + "}";
+	}
 
 }
