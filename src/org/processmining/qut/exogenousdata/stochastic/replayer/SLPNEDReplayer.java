@@ -1,7 +1,9 @@
 package org.processmining.qut.exogenousdata.stochastic.replayer;
 
+import java.text.DecimalFormat;
 import java.util.BitSet;
 import java.util.Date;
+import java.util.Map.Entry;
 
 import org.deckfour.xes.model.XAttributeTimestamp;
 import org.deckfour.xes.model.XEvent;
@@ -20,8 +22,10 @@ import net.sf.saxon.exslt.Math;
 
 public class SLPNEDReplayer {
 	
+//	state
 	private String INTERESTED_TLABEL = null;
 	private String INTERESTED_CASE = null;
+	private int[] FIRING_SEQ = null;
 	
 	public SLPNEDReplayer() {};
 	
@@ -35,8 +39,16 @@ public class SLPNEDReplayer {
 		return this;
 	}
 	
+	public SLPNEDReplayer setFiringSeq(int[] firing) {
+		FIRING_SEQ = firing;
+		return this;
+	}
+	
+//	internals
+	private DecimalFormat DF = new DecimalFormat("0.000");
+	
 	public void replay(StochasticLabelledPetriNetWithExogenousData net,
-			ExogenousAnnotatedLog xlog) {
+			ExogenousAnnotatedLog xlog) throws Exception {
 		SLPNEDSemantics semantics = net.getDefaultSemantics();
 		ExogenousDataStateLogAdapter adapter = new ExogenousDataStateLogAdapter(
 				semantics, 
@@ -44,11 +56,16 @@ public class SLPNEDReplayer {
 		);
 		
 		
-		if (INTER_CODE != null) {
+		if (INTERESTED_CASE != null) {
 			for(XTrace trace: xlog) {
 				String concept = XUtils.getConceptName(trace);
 				if (concept.contains(INTERESTED_CASE)){
-					replayTrace(adapter, semantics.clone(), trace);
+					if (FIRING_SEQ != null) {
+						replayTrace(adapter, semantics.clone(), trace, FIRING_SEQ);
+					} else {
+						replayTrace(adapter, semantics.clone(), trace);
+					}
+					
 				}
 				
 			}
@@ -124,7 +141,7 @@ public class SLPNEDReplayer {
 				break;
 			}
 //			find a transition to fire
-			int transition = 0;
+			int transition = firing[fireId];
 			BitSet enabled = semantics.getEnabledTransitions();
 			if (!enabled.get(transition)) {
 				throw new Exception("[REPLAY] Could not fire transition :: "
@@ -180,6 +197,10 @@ public class SLPNEDReplayer {
 		debugMsg(
 				" Current state :: "
 				+ xstate.toFancyString()
+		);
+//		show choice data extracted, if an event is attached.
+		choiceMsg(
+				formatChoiceData(xstate, transition, semantics)
 		);
 		double[] powers = xstate.getPowers(semantics.getFactorTranslation());
 		int[] knowns = xstate.getKnowns(semantics.getFactorTranslation());
@@ -254,10 +275,37 @@ public class SLPNEDReplayer {
 		}
 	}
 	
+	public String formatChoiceData(ExogenousDataState xstate, 
+			int transition, SLPNEDSemantics semantics) {
+		String ret = "";
+//		format enabled
+		BitSet enabled = semantics.getEnabledTransitions();
+		ret += "$\\{ ";
+		for(int pos=enabled.nextSetBit(0); pos >= 0; 
+				pos=enabled.nextSetBit(pos+1)) {
+			ret += semantics.getTransitionLabel(pos) +", ";
+		}
+		ret += "\\}$ & ";
+//		format TTES
+		ret += "$\\{ ";
+		double[] powers = xstate.getPowers(semantics.getFactorTranslation());
+		for(Entry<String, Integer> entry : 
+			semantics.getFactorTranslation().entrySet()) {
+			ret += entry.getKey() + " \\mapsto "
+				   + DF.format(powers[entry.getValue()])
+				   + ", ";
+		}
+		ret += "\\}$ & ";
+//		format fired
+		ret += "$[ "+semantics.getTransitionLabel(transition)+" ]$";
+		return ret;
+	}
+	
 //	logging functions
 	protected static String DEBUG_CODE = "[DEBUG]";
 	protected static String REPLAY_CODE = "[REPLAY]";
 	protected static String INTER_CODE = "[!INTERESTED!]";
+	protected static String CHOICE_CODE = "[~CHOICEDATA~]";
 	public void replayMsg(String msg) {
 		shoutMsg(REPLAY_CODE, msg);
 	}
@@ -266,6 +314,9 @@ public class SLPNEDReplayer {
 	}
 	public void interMsg(String msg) {
 		shoutMsg(INTER_CODE, msg);
+	}
+	public void choiceMsg(String msg) {
+		shoutMsg(CHOICE_CODE, msg);
 	}
 	public void shoutMsg(String code, String msg) {
 		System.out.println(
