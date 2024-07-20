@@ -37,6 +37,11 @@ public class ThesisRunner {
 	 * Mad with power : cmd text sub and replace for table data
 	 * grep CHOICEDATA$1 thingo.txt | cut -f2-100000 -d" " | sort | sed s/"Create Fine"/"\\\shtmathCF"/g | sed s/"Insert Fine Notification"/"\\\shtmathIFN"/g | sed s/"Payment"/"\\\shtmathPY?"/g | sed s/"Send Fine"/"\\\shtmathSF"/g | sed s/"Notify Result Appeal to Offender"/"\\\shtmathNRA"/g | sed s/"Receive Result Appeal from Prefecture"/"\\\shtmathRAP"/g | sed s/"Send Appeal to Prefecture"/"\\\shtmathSAP"/g | sed s/"Send for Credit Collection"/"\\\shtmathCC"/g | sed s/"\$fines"/"\\\mathpanelone"/g | sed s/"\#fines"/"\\\mathpaneltwo"/g | sed s/"Insert Date Appeal to Prefecture"/"\\\shtmathIAP"/g | sed s/"Add penalty"/"\\\shtmathAP"/g | sed s/"Appeal to Judge"/"\\\shtmathAtJ"/g | awk '$0="\t"$0"\\\\"'
 	 */
+	
+	/*
+	 * Mad with power : cmd text sub and replace for table data
+	 * grep VISDATA$1 stdout_from_runner.txt | cut -f2-100000 -d" " | sort | sed s/"Create Fine"/"\\\shtmathCF"/g | sed s/"Insert Fine Notification"/"\\\shtmathIFN"/g | sed s/"Payment"/"\\\shtmathPY?"/g | sed s/"Send Fine"/"\\\shtmathSF"/g | sed s/"Notify Result Appeal to Offender"/"\\\shtmathNRA"/g | sed s/"Receive Result Appeal from Prefecture"/"\\\shtmathRAP"/g | sed s/"Send Appeal to Prefecture"/"\\\shtmathSAP"/g | sed s/"Send for Credit Collection"/"\\\shtmathCC"/g | sed s/"\$fines"/"\\\mathpanelone"/g | sed s/"\#fines"/"\\\mathpaneltwo"/g | sed s/"Insert Date Appeal to Prefecture"/"\\\shtmathIAP"/g | sed s/"Add penalty"/"\\\shtmathAP"/g | sed s/"Appeal to Judge"/"\\\shtmathAtJ"/g | awk '$0="\t"$0"\\\\"'
+	 */
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
