@@ -160,7 +160,15 @@ public class DotGraphVisualisation {
 			
 			dp++;
 		}
+		
+		try {
 		clusterDot.addNode(nodes.get(end.get(0).getId().toString()));
+		}
+		catch (Exception e)
+		{
+			System.out.println("[DotGraphVisulisation][ERROR]"
+					+ " unable to get ending place.");
+		}
 	}
 	
 	private void styleDot() {
