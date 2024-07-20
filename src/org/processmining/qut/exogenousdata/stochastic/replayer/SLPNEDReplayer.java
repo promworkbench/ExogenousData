@@ -1,6 +1,8 @@
 package org.processmining.qut.exogenousdata.stochastic.replayer;
 
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Date;
 import java.util.Map.Entry;
@@ -17,8 +19,6 @@ import org.processmining.qut.exogenousdata.stochastic.model.SLPNEDSemantics;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.stochasticlabelleddatapetrinet.datastate.DataState;
 import org.xeslite.common.XUtils;
-
-import net.sf.saxon.exslt.Math;
 
 public class SLPNEDReplayer {
 	
@@ -55,7 +55,7 @@ public class SLPNEDReplayer {
 				xlog.getExogenousDatasets().toArray(new ExogenousDataset[0])
 		);
 		
-		
+		DF.setRoundingMode(RoundingMode.FLOOR);
 		if (INTERESTED_CASE != null) {
 			for(XTrace trace: xlog) {
 				String concept = XUtils.getConceptName(trace);
@@ -271,8 +271,146 @@ public class SLPNEDReplayer {
 							semantics.getTotalWeightOfEnabledTransitions(powers, knowns)
 					);
 			}
-			
 		}
+//		show vis data breakdown
+		visMsg( 
+				formatVisData(xstate, transition, semantics)
+		);
+//		work out perturbations
+		debugMsg( xstate.toFancyString());
+		int[] altknown = Arrays.copyOf(knowns, knowns.length);
+		int len = knowns.length;
+		double pow = Math.pow(2, len);
+		for (int i = 0; i < pow; i++) {
+            String bin = Integer.toBinaryString(i);
+            while (bin.length() < len)
+                bin = "0" + bin;
+            char[] chars = bin.toCharArray();
+            boolean[] boolArray = new boolean[len];
+            boolean breaker = false;
+            for (int j = 0; j < chars.length; j++) {
+                boolArray[j] = chars[j] == '0' ? true : false;
+                if (knowns[j] != 1 && boolArray[j]) {
+                	breaker = true;
+                	break;
+                }
+            }
+            if (breaker) {
+            	continue;
+            }
+            for (int j=0; j < chars.length; j++) {
+            	altknown[j] = boolArray[j] ? 1 : 0;
+            }
+//            skip the same state as original
+            if (Arrays.equals(altknown, knowns)) {
+            	continue;
+            }
+            debugMsg("test perturb :: " + Arrays.toString(boolArray));
+            visMsg(
+            		formatPertData(powers, altknown,
+            				transition, semantics)
+            );
+        }
+		
+	}
+	
+	public String formatPertData(
+			double[] powers, int[] knowns,
+			int transition, SLPNEDSemantics semantics) {
+		String ret = "";
+//		work out the prob for transition using base weights
+		double tweight = semantics.getBaseWeight(transition);
+		double allweight = 0.0;
+		BitSet enabled = semantics.getEnabledTransitions();
+		ret += "$\\{ ";
+		for( int pos= enabled.nextSetBit(0); pos >= 0;
+				pos = enabled.nextSetBit(pos+1)) {
+			allweight += semantics.getBaseWeight(pos);
+			ret += semantics.getTransitionLabel(pos) +", ";
+		}
+		ret += "\\}$ & ";
+		double bprob = tweight/allweight;
+//		work out the prob for transition using given state
+		double altprob = semantics.getProbabilityOfTransition(transition,
+				powers,
+				knowns);
+//		work change in prob between cases
+		double change = altprob - bprob;
+//		add TTES
+		ret += "$\\{ ";
+		for(Entry<String, Integer> entry : 
+			semantics.getFactorTranslation().entrySet()) {
+			if (knowns[entry.getValue()] > 0) {
+				ret += entry.getKey() + " \\mapsto "
+						   + DF.format(powers[entry.getValue()])
+						   + ", ";
+			} else {
+				ret += entry.getKey() + " \\mapsto "
+						   + "\\bot"
+						   + ", ";
+			}
+		}
+		ret += "\\}$ & ";
+//		format fired
+		ret += "$[ "+semantics.getTransitionLabel(transition)+" ]$";
+//		format output
+		ret += " & "
+				+ DF.format(bprob)
+				+ " & "
+				+ DF.format(change)
+				+ " & "
+				+ DF.format(altprob);
+		return ret;
+	}
+	
+	public String formatVisData(ExogenousDataState xstate, 
+			int transition, SLPNEDSemantics semantics) {
+		String ret = "";
+//		work out the prob for transition using base weights
+		double tweight = semantics.getBaseWeight(transition);
+		double allweight = 0.0;
+		BitSet enabled = semantics.getEnabledTransitions();
+		ret += "$\\{ ";
+		for( int pos= enabled.nextSetBit(0); pos >= 0;
+				pos = enabled.nextSetBit(pos+1)) {
+			allweight += semantics.getBaseWeight(pos);
+			ret += semantics.getTransitionLabel(pos) +", ";
+		}
+		ret += "\\}$ & ";
+		double bprob = tweight/allweight;
+//		work out the prob for transition using given state
+		double altprob = semantics.getProbabilityOfTransition(transition,
+				xstate.getPowers(semantics.getFactorTranslation()),
+				xstate.getKnowns(semantics.getFactorTranslation()));
+//		work change in prob between cases
+		double change = altprob - bprob;
+//		add TTES
+		ret += "$\\{ ";
+		double[] powers = xstate.getPowers(semantics.getFactorTranslation());
+		int[] knowns = xstate.getKnowns(semantics.getFactorTranslation());
+		for(Entry<String, Integer> entry : 
+			semantics.getFactorTranslation().entrySet()) {
+			if (knowns[entry.getValue()] > 0) {
+				ret += entry.getKey() + " \\mapsto "
+						   + DF.format(powers[entry.getValue()])
+						   + ", ";
+			} else {
+				ret += entry.getKey() + " \\mapsto "
+						   + "\\bot"
+						   + ", ";
+			}
+		}
+		ret += "\\}$ & ";
+//		format fired
+		ret += "$[ "+semantics.getTransitionLabel(transition)+" ]$";
+//		format output
+		ret += " & "
+				+ DF.format(bprob)
+				+ " & "
+				+ DF.format(change)
+				+ " & "
+				+ DF.format(altprob);
+		return ret;
 	}
 	
 	public String formatChoiceData(ExogenousDataState xstate, 
@@ -306,6 +444,7 @@ public class SLPNEDReplayer {
 	protected static String REPLAY_CODE = "[REPLAY]";
 	protected static String INTER_CODE = "[!INTERESTED!]";
 	protected static String CHOICE_CODE = "[~CHOICEDATA~]";
+	protected static String VIS_CODE = "[-VISDATA-]";
 	public void replayMsg(String msg) {
 		shoutMsg(REPLAY_CODE, msg);
 	}
@@ -317,6 +456,9 @@ public class SLPNEDReplayer {
 	}
 	public void choiceMsg(String msg) {
 		shoutMsg(CHOICE_CODE, msg);
+	}
+	public void visMsg(String msg) {
+		shoutMsg(VIS_CODE, msg);
 	}
 	public void shoutMsg(String code, String msg) {
 		System.out.println(

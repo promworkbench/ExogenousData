@@ -151,6 +151,10 @@ public class SLPNEDSemantics implements StochasticLabelledPetriNetSemantics {
 		return (getTransitionWeight(transition, powers, known)) / 
 			   (getTotalWeightOfEnabledTransitions(powers, known));
 	}
+	
+	public double getBaseWeight(int transition) {
+		return net.getBaseWeight(transition);
+	}
 
 	public SLPNEDSemantics clone() {
 		SLPNEDSemantics semantics = new SLPNEDSemantics(this.net);
