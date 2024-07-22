@@ -24,6 +24,7 @@ public class PNWDTransitionTree implements
 		flows = new HashSet<>();
 		nodes = new HashSet<>();
 		root = PNWDTransitionTreeFactory.constructRootNode();
+		nodes.add(root);
 		constructTree(playouts);
 	}
 
