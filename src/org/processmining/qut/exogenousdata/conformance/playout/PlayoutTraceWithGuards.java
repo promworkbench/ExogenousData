@@ -10,14 +10,19 @@ public class PlayoutTraceWithGuards
 	implements PlayoutTrace<PlayoutStepWithGuard> {
 	
 	private List<PlayoutStepWithGuard> steps;
+	private boolean finished;
 	
 	public PlayoutTraceWithGuards(List<PNWDTransition> history) {
+		this(history, false);
+	}
+	
+	public PlayoutTraceWithGuards(List<PNWDTransition> history, boolean finished) {
 		super();
 		this.steps = new ArrayList<>();
+		this.finished = finished;
 		processHistory(history);
 	}
 
-	
 	public void processHistory(List<PNWDTransition> history) {
 		List<PNWDTransition> silents = new ArrayList();
 		for(PNWDTransition trans: history) {
@@ -43,6 +48,12 @@ public class PlayoutTraceWithGuards
 					silents.clear();
 				}
 			}
+		}
+//		if the playout was finsihed add halt
+		if (finished) {
+			steps.add( 
+					new PlayoutStepWithGuard(true, "HALT", null)
+			);
 		}
 	}
 

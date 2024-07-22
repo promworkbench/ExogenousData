@@ -1,5 +1,8 @@
 package org.processmining.qut.exogenousdata.conformance.guards;
 
+import java.util.Map;
+
+import org.processmining.datapetrinets.exception.EvaluatorException;
 import org.processmining.datapetrinets.expression.GuardExpression;
 
 public class PNWDGuard implements Guard {
@@ -28,6 +31,60 @@ public class PNWDGuard implements Guard {
 			return "PNWDGuard [guard=" + "TRUE" + ", ID=" + ID + "]";
 		}
 	}
+
+	public String cannonRepresentation() {
+		// TODO Auto-generated method stub
+		return guard.toCanonicalString();
+	}
+
+	public GuardOutcomes evaluate(Map<String, Object> datastate) {
+		if (guard == null) {
+			return GuardOutcomes.TRUE;
+		}
+		try {
+			boolean eval = (boolean) guard.evaluate(datastate);
+	//		System.out.println("Testing on datastate :: "
+	//				+ datastate.toString() 
+	//				+" result was "
+	//				+ eval
+	//				+ " for guard :: "
+	//				+ guard.toCanonicalString());
+			if (eval == true) {
+				return GuardOutcomes.TRUE;
+			} else if (eval == false){
+				return GuardOutcomes.FALSE;
+			}
+		} catch (EvaluatorException e) {
+//			Expected failure when evaluation does not have attributes in datastate
+//			System.out.println("Failed to evaluate guard ::"
+//					+ guard.toCanonicalString()
+//					+ " using datastate :: "
+//					+ datastate.toString());
+		}
+		return GuardOutcomes.UNDEF;
+	}
+
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ID;
+		return result;
+	}
+
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PNWDGuard other = (PNWDGuard) obj;
+		if (ID != other.ID)
+			return false;
+		return true;
+	}
+	
+	
 	
 	
 }

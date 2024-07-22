@@ -1,14 +1,16 @@
 package org.processmining.qut.exogenousdata.conformance.transitiontree;
 
+import java.util.Set;
+
 import org.deckfour.xes.model.XTrace;
 
 public interface TransitionTree<
 	T extends TransitionTreeNode, V extends TransitionTreeFlow> {
 	
 	
-	abstract public V getFlows();
+	abstract public Set<V> getFlows();
 	
-	abstract public T getNodes();
+	abstract public Set<T> getNodes();
 	
 	abstract public T getRoot();
 	

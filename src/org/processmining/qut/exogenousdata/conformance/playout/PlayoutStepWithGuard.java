@@ -16,8 +16,11 @@ public class PlayoutStepWithGuard implements PlayoutStep {
 	}
 
 	public String toString() {
-		return "PlayoutStepWithGuard [halt=" + halt 
-				+ ", label=" + label + ", guard=" + guard.toString() + "]";
+		if (isHalt()) {
+			return "PlayoutStepWithGuard [HALTING]";
+		} else {
+			return "PlayoutStepWithGuard [label=" + label + ", guard=" + guard.toString() + "]";
+		}
 	}
 
 	public boolean isHalt() {
@@ -32,6 +35,4 @@ public class PlayoutStepWithGuard implements PlayoutStep {
 		return guard;
 	}
 	
-	
-
 }

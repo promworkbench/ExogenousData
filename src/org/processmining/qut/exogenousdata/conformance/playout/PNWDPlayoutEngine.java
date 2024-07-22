@@ -144,7 +144,7 @@ public class PNWDPlayoutEngine
 		}
 		
 		public PlayoutTraceWithGuards convertToPlayout() {
-			return new PlayoutTraceWithGuards(history);
+			return new PlayoutTraceWithGuards(history, reachedFinal());
 		}
 		
 		public int visibleLength() {

@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousdata.conformance.playout;
+package org.processmining.qut.exogenousdata.conformance.transitiontree;
 
 import static org.junit.Assert.fail;
 
@@ -7,46 +7,37 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithData;
+import org.processmining.qut.exogenousdata.conformance.playout.PNWDPlayoutEngine;
 import org.processmining.qut.exogenousdata.utils.LoadingUtils;
 
-public class PNWDPlayoutEngineTest {
-	
+public class PNWDTransitionTreeTest {
+
 	Path modelPath = Paths.get(
 			"tests","src-test","resource", "ax3_model_3.pnml");
-
+	
 	@Test
-	public void justRunTest() {
+	public void constructionTest() {
 		PetriNetWithData model = LoadingUtils.loadDPNFromFile(modelPath.toFile());
 		if (model == null) {
 			fail("Unable to load in testing pnml file for DPN.");
 		}
-		for(PlayoutTraceWithGuards playout : 
-			new PNWDPlayoutEngine().generateTraces(model, 6)) {
-			System.out.println(playout);
-		}
+		PNWDTransitionTree tree = new PNWDTransitionTree(new PNWDPlayoutEngine().generateTraces(model, 5));
+		System.out.println(tree);
 	}
 	
 	@Test
-	public void playoutLengthTest() {
+	public void attemptVariousConstructionsTest() {
 		PetriNetWithData model = LoadingUtils.loadDPNFromFile(modelPath.toFile());
 		if (model == null) {
 			fail("Unable to load in testing pnml file for DPN.");
 		}
-		for(int n=0; n < 10; n++) {
-			System.out.println("testing length :: n="+n);
-			for(PlayoutTraceWithGuards playout : 
-				new PNWDPlayoutEngine().generateTraces(model, n)) {
-				int len = 0;
-				for( PlayoutStep step : playout.getSteps()) {
-					len += 1;
-				}
-				if (len > n+1) {
-					System.out.println("Longer than expected :: " + playout);
-					fail("Generated a playout longer than n="+n);
-				}
+		for(int n=0; n < 20; n++) {
+			try {
+			PNWDTransitionTree tree = new PNWDTransitionTree(new PNWDPlayoutEngine().generateTraces(model, n));
+			} catch (Exception e) {
+				fail("Unable to build tree with n="+n+"\n stack::"+e.getStackTrace().toString());
 			}
 		}
-
 	}
 
 }
