@@ -57,8 +57,11 @@ import org.processmining.qut.exogenousdata.steps.determination.configs.AIIM2022;
 */
 public class ExogenousDataPlugins {
 	
-	public static final String version = "<br> Package Version: "
-			+ExogenousDataStatics.version;
+	private static final String packageName = ExogenousDataStatics.packageName;
+	private static final String version = ExogenousDataStatics.version;
+	private static final String authora = ExogenousDataStatics.authora;
+	private static final String authorEmail = ExogenousDataStatics.authoraEmail;
+	private static final String authorAff = ExogenousDataStatics.authoraAff;
 	
 	
 	@Plugin(
@@ -83,10 +86,10 @@ public class ExogenousDataPlugins {
 			userAccessible = true
 	)
 	@UITopiaVariant(
-			affiliation = "QUT",
-			author = "A. Banham",
-			email = "adam.banham@hdr.qut.edu.au",
-			pack = "ExogenousData"
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public ExogenousAnnotatedLog preperation(final UIPluginContext context, 
 			final XLog endogenous, final XLog[] exogenous) throws Throwable{
@@ -139,10 +142,10 @@ public class ExogenousDataPlugins {
 			userAccessible = true
 	)
 	@UITopiaVariant(
-			affiliation = "QUT",
-			author = "A. Banham",
-			email = "adam.banham@hdr.qut.edu.au",
-			pack = "ExogenousData"
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public ExogenousAnnotatedLog AIIM2022preperation(final UIPluginContext context, 
 			final XLog endogenous, final XLog[] exogenous) throws Throwable {
@@ -200,10 +203,10 @@ public class ExogenousDataPlugins {
 			userAccessible = true
 	)
 	@UITopiaVariant(
-			affiliation = "QUT",
-			author = "A. Banham",
-			email = "adam.banham@hdr.qut.edu.au",
-			pack = "ExogenousData"
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	@Visualizer
 	public JComponent exogenousAnnotationViewing(final UIPluginContext context, 
@@ -238,10 +241,11 @@ public class ExogenousDataPlugins {
 					+ version,
 			userAccessible = true
 	)
-	@UITopiaVariant(affiliation = "QUT",
-		author = "A. Banham", 
-		email = "adam.banham@hdr.qut.edu.au",
-		pack = "ExogenousData"
+	@UITopiaVariant(
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public ExogenousDiscoveryInvestigator NonExogenousDiscovery_DPN(
 			final UIPluginContext context, final XLog eventlog,
@@ -283,10 +287,11 @@ public class ExogenousDataPlugins {
 					+ version,
 			userAccessible = true
 	)
-	@UITopiaVariant(affiliation = "QUT",
-		author = "A. Banham", 
-		email = "adam.banham@hdr.qut.edu.au",
-		pack = "ExogenousData"
+	@UITopiaVariant(
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public ExogenousDiscoveryInvestigator ExogenousDiscovery_DPN(
 			final UIPluginContext context, final ExogenousAnnotatedLog exogenous,
@@ -321,10 +326,11 @@ public class ExogenousDataPlugins {
 					+ version,
 			userAccessible = true
 	)
-	@UITopiaVariant(affiliation = "QUT",
-		author = "A. Banham", 
-		email = "adam.banham@hdr.qut.edu.au",
-		pack = "ExogenousData"
+	@UITopiaVariant(
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public ExogenousDiscoveryInvestigator ExogenousDiscovery_PN(
 			final UIPluginContext context, final ExogenousAnnotatedLog exogenous,
@@ -363,10 +369,11 @@ public class ExogenousDataPlugins {
 					+ version,
 			userAccessible = true
 	)
-	@UITopiaVariant(affiliation = "QUT",
-		author = "A. Banham", 
-		email = "adam.banham@hdr.qut.edu.au",
-		pack = "ExogenousData"
+	@UITopiaVariant(
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public ExogenousDiscoveryInvestigator ExogenousDiscovery_PT(
 			final UIPluginContext context, final ExogenousAnnotatedLog exogenous,
@@ -412,10 +419,11 @@ public class ExogenousDataPlugins {
 					+ version,
 			userAccessible = true
 	)
-	@UITopiaVariant(affiliation = "QUT",
-		author = "A. Banham", 
-		email = "adam.banham@hdr.qut.edu.au",
-		pack = "ExogenousData"
+	@UITopiaVariant(
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public ExogenousDiscoveryInvestigator ExogenousDiscovery_APN(
 			final UIPluginContext context, final ExogenousAnnotatedLog exogenous,
@@ -471,10 +479,10 @@ public class ExogenousDataPlugins {
 			returnLabels = {}, returnTypes = {}, userAccessible = true
 	)
 	@UITopiaVariant(
-			affiliation = "QUT",
-			author = "A. Banham",
-			email = "adam.banham@hdr.qut.edu.au",
-			pack = "ExogenousData"
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public void exogenousEnhancement(final UIPluginContext context, 
 			final XLog exogenous, final PetriNetWithData model) throws Throwable {
@@ -491,10 +499,10 @@ public class ExogenousDataPlugins {
 			userAccessible = true
 	)
 	@UITopiaVariant(
-			affiliation = "QUT",
-			author = "A. Banham",
-			email = "adam.banham@hdr.qut.edu.au",
-			pack = "ExogenousData"
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public ExogenousDataset createDataset(final UIPluginContext context, 
 			final XLog datasetLog) throws Throwable {
@@ -514,10 +522,10 @@ public class ExogenousDataPlugins {
 			userAccessible = true
 	)
 	@UITopiaVariant(
-			affiliation = "QUT",
-			author = "A. Banham",
-			email = "adam.banham@hdr.qut.edu.au",
-			pack = "ExogenousData"
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public HTMLToString describeDataset(final UIPluginContext context, 
 			final ExogenousDataset dataset) throws Throwable {

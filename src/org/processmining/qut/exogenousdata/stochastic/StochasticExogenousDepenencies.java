@@ -12,7 +12,7 @@ import org.processmining.framework.plugin.ProMCanceller;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginCategory;
 import org.processmining.framework.util.HTMLToString;
-import org.processmining.qut.exogenousdata.ExogenousDataPlugins;
+import org.processmining.qut.exogenousdata.ExogenousDataStatics;
 import org.processmining.qut.exogenousdata.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.qut.exogenousdata.stochastic.conformance.eduEMSC;
@@ -21,7 +21,11 @@ import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPe
 
 public class StochasticExogenousDepenencies {
 	
-	private static final String version = ExogenousDataPlugins.version;
+	private static final String packageName = ExogenousDataStatics.packageName;
+	private static final String version = ExogenousDataStatics.version;
+	private static final String authora = ExogenousDataStatics.authora;
+	private static final String authorEmail = ExogenousDataStatics.authoraEmail;
+	private static final String authorAff = ExogenousDataStatics.authoraAff;
 	
 	@Plugin(
 			name = "Discover Stochastic Exogenous Depenencies in a Petri Net (xLog).",
@@ -34,10 +38,10 @@ public class StochasticExogenousDepenencies {
 			userAccessible = true
 	)
 	@UITopiaVariant(
-			affiliation = "QUT",
-			author = "A. Banham",
-			email = "adam.banham@hdr.qut.edu.au",
-			pack = "ExogenousData"
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public StochasticLabelledPetriNetWithExogenousData discoverySLPNEDFromLog(final UIPluginContext context,
 			final ExogenousAnnotatedLog xlog, final AcceptingPetriNet net) 
@@ -56,10 +60,10 @@ public class StochasticExogenousDepenencies {
 			userAccessible = true
 	)
 	@UITopiaVariant(
-			affiliation = "QUT",
-			author = "A. Banham",
-			email = "adam.banham@hdr.qut.edu.au",
-			pack = "ExogenousData"
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public StochasticLabelledPetriNetWithExogenousData discoverySLPNEDFromSets(final UIPluginContext context,
 			final XLog xlog, final AcceptingPetriNet net, final ExogenousDataset[] datasets) 
@@ -82,10 +86,10 @@ public class StochasticExogenousDepenencies {
 			userAccessible = true
 	)
 	@UITopiaVariant(
-			affiliation = "QUT",
-			author = "A. Banham",
-			email = "adam.banham@hdr.qut.edu.au",
-			pack = "ExogenousData"
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public HTMLToString computExogenouseduEMSC(
 			final UIPluginContext context,
