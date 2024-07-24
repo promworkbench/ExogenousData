@@ -3,6 +3,7 @@ package org.processmining.qut.exogenousdata.conformance.guards;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PNWDTransition;
 
@@ -36,7 +37,10 @@ public class PNWDGuardFactory {
 	
 	public static Strengthening<Guard> getStrengthening(
 			List<PNWDTransition> trans){
-		return new NaiveStrengthening();
+		return new NaiveStrengthening(
+				trans.stream().map(t -> getGuard(t))
+				.collect(Collectors.toList())
+		);
 	}
 
 }
