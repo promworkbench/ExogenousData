@@ -48,7 +48,7 @@ public class DataAwareConformancePlugins {
 	public PNWDTransitionTree preperation(final UIPluginContext context, 
 			PetriNetWithData dpn) {
 		return new PNWDTransitionTree(
-				new PNWDPlayoutEngine().generateTraces(dpn, 5)
+				new PNWDPlayoutEngine().generateTraces(dpn, 4)
 		);
 	}
 

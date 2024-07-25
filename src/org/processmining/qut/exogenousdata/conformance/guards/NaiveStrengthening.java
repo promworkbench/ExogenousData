@@ -14,20 +14,38 @@ public class NaiveStrengthening implements Strengthening<Guard> {
 	}
 	
 	public NaiveStrengthening(List<Guard> options) {
+		assert options.size() > 0;
 		this.contains = new HashSet();
 		for( Guard guard: options) {
-			contains.add(guard);
+			if (contains.size() > 0 && !guard.isTrue()) {
+				contains.add(guard);
+			} else {
+				contains.add(guard);
+			}
 		}
+		assert contains.size() > 0;
 	}
 
 	public int getID() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 1;
 	}
 
 	public String cannonRepresentation() {
-		// TODO Auto-generated method stub
-		return null;
+		String ret = "";
+		if (contains.size() < 2) {
+			for(Guard g : contains) {
+				ret += g.cannonRepresentation();
+			}
+			return ret;
+		} else {
+			for(Guard g : contains) {
+				ret += g.cannonRepresentation() + OPERATOR;
+			}
+		}
+		if (ret.length() > OPERATOR.length()) {
+			ret = ret.substring(0, ret.length() - OPERATOR.length());
+		}
+		return ret;
 	}
 
 	public GuardOutcomes evaluate(Map<String, Object> datastate) {
@@ -73,6 +91,22 @@ public class NaiveStrengthening implements Strengthening<Guard> {
 		} else if (!contains.equals(other.contains))
 			return false;
 		return true;
+	}
+
+	public boolean isTrue() {
+		boolean ret = true;
+		for(Guard g: contains) {
+			ret = ret && g.isTrue();
+		}
+		return ret;
+	}
+
+	public boolean isFalse() {
+		boolean ret = true;
+		for(Guard g: contains) {
+			ret = ret && g.isFalse();
+		}
+		return ret;
 	}
 	
 }

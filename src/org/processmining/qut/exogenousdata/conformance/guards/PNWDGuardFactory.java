@@ -32,7 +32,10 @@ public class PNWDGuardFactory {
 	
 	public static Weakening<Guard> getWeakening(
 			List<PNWDTransition> trans) {
-		return new NaiveWeakening();
+		return new NaiveWeakening( 
+				trans.stream().map(t -> getGuard(t))
+				.collect(Collectors.toList())
+		);
 	}
 	
 	public static Strengthening<Guard> getStrengthening(

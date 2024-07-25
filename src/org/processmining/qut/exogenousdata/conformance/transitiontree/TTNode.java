@@ -76,12 +76,16 @@ public class TTNode implements TransitionTreeNode {
 	
 	public void addFlowToOutedges(TTFlowWithGuard outedge) {
 		outedges.add(outedge);
+		System.out.println(outedges);
+	}
+	
+	public void clearOutEdges() {
+		outedges.clear();
 	}
 
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((path == null) ? 0 : path.uniqueness());
 		result = prime * result + ((getVariant() == null) ? 0 : getVariant().hashCode());
 		return result;
 	}

@@ -94,12 +94,13 @@ public class TransitionTreeVisualiser {
 						+ flow.guard().cannonRepresentation()
 							.replace("<", "&lt;")
 							.replace(">", "&gt;")
+							.replace("gT", "g<sub>T</sub>")
 						+ "]>");
 			} else {
 				dotEdge.setOption("taillabel", "<"
 						+ "["
 						+ flow.label()
-						+ ","
+						+ ",g<sub>T</sub> "
 						+ "]>");
 			}
 			dotEdge.setOption("headlabel", "<"

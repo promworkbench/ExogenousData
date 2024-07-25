@@ -20,7 +20,7 @@ import org.processmining.qut.exogenousdata.stochastic.model.in.SLPNEDImporter;
 
 public class ThesisRunner {
 	
-	public static final String DATADIR = "C:\\Users\\n7176546\\OneDrive - Queensland University of Technology\\phd\\thesis\\extensions\\stochastic\\models\\test_data\\";
+	public static final String DATADIR = "F:\\data\\thesis\\";
 	public static final String LOGFILE = DATADIR+"roadfines_snippet.xes";
 	public static final String[] DATASETFILES = new String[] {
 			DATADIR+"exogenous_dataset_unresolved_fines.xes",

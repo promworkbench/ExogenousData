@@ -22,8 +22,13 @@ public class TTFlowWithGuard implements TransitionTreeFlow {
 	}
 	
 	public boolean hasGuard() {
-		PNWDGuard g = (PNWDGuard) guard;
-		return g.getGuard() != null;
+		if (guard instanceof PNWDGuard) {
+			PNWDGuard g = (PNWDGuard) guard;
+			return g.getGuard() != null;
+		} else {
+			return guard != null;
+		}
+		
 	}
 
 	public TTNode src() {

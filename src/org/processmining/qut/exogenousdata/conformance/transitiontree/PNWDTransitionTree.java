@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,15 +54,46 @@ public class PNWDTransitionTree implements
 					flow = PNWDTransitionTreeFactory.constructFlow(last, next, step);
 				} else {
 					flow = PNWDTransitionTreeFactory.constructFlow(last, next, step);
-					path.add(flow);
 					next.addToPath(flow);
+					prevNodes.put(variant.toString(), next);
+					nodes.add(next);
 				}
-				nodes.add(next);
+				path.add(flow);
 				flows.add(flow);
 				last = next;
 			}
 		}
-		
+		applyFlowReduction();
+	}
+	
+	public void applyFlowReduction() {
+		Set<TTFlowWithGuard> rflows = new HashSet();
+		for(TTNode src : nodes) {
+			Map<TTNode, List<TTFlowWithGuard>> maps = new HashMap();
+			for(TTFlowWithGuard flow : src.getOutgoingFlows()) {
+				if (maps.containsKey(flow.tgt())) {
+					maps.get(flow.tgt()).add(flow);
+				} else {
+					maps.put(flow.tgt(), new ArrayList());
+					maps.get(flow.tgt()).add(flow);
+				}
+			}
+			src.clearOutEdges();
+			for( Entry<TTNode, List<TTFlowWithGuard>> entry : maps.entrySet()) {
+				TTFlowWithGuard flow = null;
+				if (entry.getValue().size() == 1) {
+					flow = entry.getValue().get(0);
+				} else {
+					flow = PNWDTransitionTreeFactory.combineFlows(entry.getValue());
+				}
+				src.addFlowToOutedges(flow);
+				flow.tgt().setSuccFlow(flow);
+				rflows.add(flow);
+			}
+			
+		}
+		System.out.println(rflows);
+		flows = rflows;
 	}
 
 

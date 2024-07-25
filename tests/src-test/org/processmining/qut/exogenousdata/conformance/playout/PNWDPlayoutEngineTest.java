@@ -13,6 +13,8 @@ public class PNWDPlayoutEngineTest {
 	
 	Path modelPath = Paths.get(
 			"tests","src-test","resource", "ax3_model_3.pnml");
+	Path testingModelPath = Paths.get( 
+			"tests", "src-test", "resource", "testing_dpn_with_rework.pnml");
 
 	@Test
 	public void justRunTest() {
@@ -48,5 +50,31 @@ public class PNWDPlayoutEngineTest {
 		}
 
 	}
+	
+	@Test
+	public void playoutReworkTest() {
+		PetriNetWithData model = LoadingUtils.loadDPNFromFile(testingModelPath.toFile());
+		if (model == null) {
+			fail("Unable to load in testing pnml file for DPN.");
+		}
+		for(int n=0; n < 6; n++) {
+			System.out.println("testing length :: n="+n);
+			for(PlayoutTraceWithGuards playout : 
+				new PNWDPlayoutEngine().generateTraces(model, n)) {
+				int len = 0;
+				for( PlayoutStep step : playout.getSteps()) {
+					len += 1;
+				}
+				if (len > n+1) {
+					System.out.println("Longer than expected :: " + playout);
+					fail("Generated a playout longer than n="+n);
+				}
+				System.out.println(playout);
+			}
+		}
+
+	}
+	
+	
 
 }

@@ -15,5 +15,9 @@ public interface Guard {
 	abstract public String cannonRepresentation();
 	
 	abstract public GuardOutcomes evaluate(Map<String,Object> datastate); 
+	
+	abstract public boolean isTrue();
+	
+	abstract public boolean isFalse();
 
 }

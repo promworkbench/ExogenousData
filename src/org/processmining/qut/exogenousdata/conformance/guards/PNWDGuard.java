@@ -34,7 +34,10 @@ public class PNWDGuard implements Guard {
 
 	public String cannonRepresentation() {
 		// TODO Auto-generated method stub
-		return guard.toCanonicalString();
+		if (guard != null) {
+			return guard.toCanonicalString();
+		}
+		return "gT";
 	}
 
 	public GuardOutcomes evaluate(Map<String, Object> datastate) {
@@ -82,6 +85,20 @@ public class PNWDGuard implements Guard {
 		if (ID != other.ID)
 			return false;
 		return true;
+	}
+
+	public boolean isTrue() {
+		if (guard != null) {
+			return guard.isTrue();
+		}
+		return true;
+	}
+
+	public boolean isFalse() {
+		if (guard != null) {
+			return guard.isFalse();
+		}
+		return false;
 	}
 	
 	
