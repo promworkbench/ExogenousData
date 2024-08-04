@@ -15,11 +15,11 @@ import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.Pet
 import org.processmining.qut.exogenousdata.conformance.guards.Guard.GuardOutcomes;
 import org.processmining.qut.exogenousdata.utils.LoadingUtils;
 
-public class NaiveStrengtheningTest {
-	
+public class NaiveWeakeningTest {
+
 	Path modelPath = Paths.get(
 			"tests","src-test","resource", "ax3_model_3.pnml");
-
+	
 	@Test
 	public void keepGaurdsTest() {
 		PetriNetWithData model = LoadingUtils.loadDPNFromFile(modelPath.toFile());
@@ -33,38 +33,39 @@ public class NaiveStrengtheningTest {
 //		try with one guard
 		Guard g = PNWDGuardFactory.getGuard(trans[0]);
 		
-		Strengthening<Guard> strength = PNWDGuardFactory.getStrengthening( 
+		Weakening<Guard> weak = PNWDGuardFactory.getWeakening( 
 				new ArrayList(){{ 
 					add(trans[0]);
 				}}
 		);
-//		System.out.println(strength.toString());
-		assertEquals(1, strength.numOfGuards());
-		strength = PNWDGuardFactory.getStrengthening( 
+//		System.out.println(weak.toString());
+		assertEquals(1, weak.numOfGuards());
+		weak = PNWDGuardFactory.getWeakening( 
 				new ArrayList(){{ 
 					add(trans[0]);
 					add(trans[0]);
 				}}
 		);
-//		System.out.println(strength.toString());
-		assertEquals(1, strength.numOfGuards());
-		strength = PNWDGuardFactory.getStrengthening( 
+//		System.out.println(weak.toString());
+		assertEquals(1, weak.numOfGuards());
+		weak = PNWDGuardFactory.getWeakening( 
 				new ArrayList(){{ 
 					add(trans[0]);
 					add(trans[1]);
 				}}
 		);
-//		System.out.println(strength.toString());
-		assertEquals(2, strength.numOfGuards());
-		strength = PNWDGuardFactory.getStrengthening( 
+//		System.out.println(weak.toString());
+		assertEquals(2, weak.numOfGuards());
+		weak = PNWDGuardFactory.getWeakening( 
 				new ArrayList(){{ 
 					add(trans[0]);
 					add(trans[1]);
 					add(trans[2]);
+					add(trans[2]);
 				}}
 		);
-//		System.out.println(strength.toString());
-		assertEquals(3, strength.numOfGuards());
+//		System.out.println(weak.toString());
+		assertEquals(3, weak.numOfGuards());
 	}
 	
 	@Test
@@ -78,7 +79,7 @@ public class NaiveStrengtheningTest {
 			put("d1", 3);
 		}};
 		Map<String,Object> datastateF = new HashMap() {{ 
-			put("d1", 9);
+			put("d1", 15);
 		}};
 		Map<String,Object> datastateU = new HashMap() {{
 			put("x", "xsa");
@@ -90,43 +91,46 @@ public class NaiveStrengtheningTest {
 //		try with one guard
 		Guard g = PNWDGuardFactory.getGuard(trans[0]);
 		
-		Strengthening<Guard> strength = PNWDGuardFactory.getStrengthening( 
+		Weakening<Guard> weak = PNWDGuardFactory.getWeakening( 
 				new ArrayList(){{ 
 					add(trans[0]);
 				}}
 		);
-		assertEquals(GuardOutcomes.TRUE, strength.evaluate(datastateU));
-		assertEquals(GuardOutcomes.TRUE, strength.evaluate(datastateF));
-		assertEquals(GuardOutcomes.TRUE, strength.evaluate(datastateT));
-		strength = PNWDGuardFactory.getStrengthening( 
+		assertEquals(GuardOutcomes.TRUE, weak.evaluate(datastateU));
+		assertEquals(GuardOutcomes.TRUE, weak.evaluate(datastateF));
+		assertEquals(GuardOutcomes.TRUE, weak.evaluate(datastateT));
+		weak = PNWDGuardFactory.getWeakening( 
 				new ArrayList(){{ 
 					add(trans[0]);
 					add(trans[0]);
 				}}
 		);
-		assertEquals(GuardOutcomes.TRUE, strength.evaluate(datastateU));
-		assertEquals(GuardOutcomes.TRUE, strength.evaluate(datastateF));
-		assertEquals(GuardOutcomes.TRUE, strength.evaluate(datastateT));
-		strength = PNWDGuardFactory.getStrengthening( 
+		assertEquals(GuardOutcomes.TRUE, weak.evaluate(datastateU));
+		assertEquals(GuardOutcomes.TRUE, weak.evaluate(datastateF));
+		assertEquals(GuardOutcomes.TRUE, weak.evaluate(datastateT));
+		weak = PNWDGuardFactory.getWeakening( 
 				new ArrayList(){{ 
 					add(trans[0]);
 					add(trans[1]);
 				}}
 		);
-		assertEquals(GuardOutcomes.UNDEF, strength.evaluate(datastateU));
-		assertEquals(GuardOutcomes.FALSE, strength.evaluate(datastateF));
-		assertEquals(GuardOutcomes.TRUE, strength.evaluate(datastateT));
-		strength = PNWDGuardFactory.getStrengthening( 
+//		System.out.println(weak.cannonRepresentation());
+		assertEquals(GuardOutcomes.TRUE, weak.evaluate(datastateU));
+		assertEquals(GuardOutcomes.TRUE, weak.evaluate(datastateF));
+		assertEquals(GuardOutcomes.TRUE, weak.evaluate(datastateT));
+		weak = PNWDGuardFactory.getWeakening( 
 				new ArrayList(){{ 
-					add(trans[0]);
 					add(trans[1]);
 					add(trans[2]);
+					add(trans[3]);
 				}}
 		);
-		assertEquals(3, strength.numOfGuards());
-		assertEquals(GuardOutcomes.UNDEF, strength.evaluate(datastateU));
-		assertEquals(GuardOutcomes.FALSE, strength.evaluate(datastateF));
-		assertEquals(GuardOutcomes.TRUE, strength.evaluate(datastateT));
+//		System.out.println(weak.cannonRepresentation());
+		assertEquals(3, weak.numOfGuards());
+		assertEquals(GuardOutcomes.UNDEF, weak.evaluate(datastateU));
+		assertEquals(GuardOutcomes.FALSE, weak.evaluate(datastateF));
+		assertEquals(GuardOutcomes.TRUE, weak.evaluate(datastateT));
 	}
+	
 
 }

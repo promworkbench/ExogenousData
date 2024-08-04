@@ -41,16 +41,40 @@ public class NaiveWeakening implements Weakening<Guard> {
 
 	public GuardOutcomes evaluate(Map<String, Object> datastate) {
 		// TODO Auto-generated method stub
-		return GuardOutcomes.FALSE;
+		GuardOutcomes ret = GuardOutcomes.FALSE;
+		boolean allundef = true;
+		for(Guard g: contains) {
+			GuardOutcomes out = g.evaluate(datastate);
+			if (out == GuardOutcomes.TRUE) {
+				return GuardOutcomes.TRUE;
+			} else if (out == GuardOutcomes.UNDEF) {
+				allundef = allundef && true;
+			} else {
+				allundef = false;
+			}
+		}
+		if (allundef) {
+			return GuardOutcomes.UNDEF;
+		}
+		return ret;
 	}
 
+	/**
+	 * A weakening is always true if it contains a guard that is always true.
+	 */
 	public boolean isTrue() {
-		// TODO Auto-generated method stub
+		for(Guard g : contains) {
+			if (g.isTrue()) {
+				return true;
+			}
+		}
 		return false;
 	}
 
+	/**
+	 * Difficult to ascertain if a weakening is always false.
+	 */
 	public boolean isFalse() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -75,6 +99,14 @@ public class NaiveWeakening implements Weakening<Guard> {
 		} else if (!contains.equals(other.contains))
 			return false;
 		return true;
+	}
+
+	public int numOfGuards() {
+		return contains.size();
+	}
+
+	public String toString() {
+		return "NaiveWeakening [contains=" + contains + "]";
 	}
 	
 	

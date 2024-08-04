@@ -76,7 +76,6 @@ public class TTNode implements TransitionTreeNode {
 	
 	public void addFlowToOutedges(TTFlowWithGuard outedge) {
 		outedges.add(outedge);
-		System.out.println(outedges);
 	}
 	
 	public void clearOutEdges() {

@@ -92,7 +92,6 @@ public class PNWDTransitionTree implements
 			}
 			
 		}
-		System.out.println(rflows);
 		flows = rflows;
 	}
 

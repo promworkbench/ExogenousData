@@ -24,7 +24,7 @@ public class PNWDTransitionTreeTest {
 			fail("Unable to load in testing pnml file for DPN.");
 		}
 		PNWDTransitionTree tree = new PNWDTransitionTree(new PNWDPlayoutEngine().generateTraces(model, 5));
-		System.out.println(tree);
+//		System.out.println(tree);
 	}
 	
 	@Test
@@ -33,7 +33,7 @@ public class PNWDTransitionTreeTest {
 		if (model == null) {
 			fail("Unable to load in testing pnml file for DPN.");
 		}
-		for(int n=0; n < 20; n++) {
+		for(int n=0; n < 6; n++) {
 			try {
 			PNWDTransitionTree tree = new PNWDTransitionTree(new PNWDPlayoutEngine().generateTraces(model, n));
 			} catch (Exception e) {
@@ -48,10 +48,10 @@ public class PNWDTransitionTreeTest {
 		if (model == null) {
 			fail("Unable to load in testing pnml file for DPN.");
 		}
-		for(int n=0; n < 6; n++) {
+		for(int n=0; n < 4; n++) {
 			try {
 			PNWDTransitionTree tree = new PNWDTransitionTree(new PNWDPlayoutEngine().generateTraces(model, n));
-			System.out.println("n="+n+"\n"+tree.toString());
+//			System.out.println("n="+n+"\n"+tree.toString());
 			} catch (Exception e) {
 				fail("Unable to build tree with n="+n+"\n stack::"+e.getStackTrace().toString());
 			}

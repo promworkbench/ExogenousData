@@ -45,7 +45,7 @@ public class DataAwareConformancePlugins {
 			email = authorEmail,
 			pack = packageName
 	)
-	public PNWDTransitionTree preperation(final UIPluginContext context, 
+	public PNWDTransitionTree generatePlayoutTree(final UIPluginContext context, 
 			PetriNetWithData dpn) {
 		return new PNWDTransitionTree(
 				new PNWDPlayoutEngine().generateTraces(dpn, 4)

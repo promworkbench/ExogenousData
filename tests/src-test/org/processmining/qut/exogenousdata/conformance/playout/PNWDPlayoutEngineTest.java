@@ -24,7 +24,10 @@ public class PNWDPlayoutEngineTest {
 		}
 		for(PlayoutTraceWithGuards playout : 
 			new PNWDPlayoutEngine().generateTraces(model, 6)) {
-			System.out.println(playout);
+//			System.out.println(playout);
+			if (playout == null) {
+				fail("All playouts should be initialised.");
+			}
 		}
 	}
 	
@@ -69,7 +72,7 @@ public class PNWDPlayoutEngineTest {
 					System.out.println("Longer than expected :: " + playout);
 					fail("Generated a playout longer than n="+n);
 				}
-				System.out.println(playout);
+//				System.out.println(playout);
 			}
 		}
 

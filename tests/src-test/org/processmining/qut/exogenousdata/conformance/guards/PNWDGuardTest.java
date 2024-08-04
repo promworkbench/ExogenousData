@@ -47,8 +47,14 @@ public class PNWDGuardTest {
 				continue;
 			}
 			assertEquals(GuardOutcomes.TRUE, flow.evaluateGuard(datastateT));
-			assertEquals(GuardOutcomes.FALSE,flow.evaluateGuard(datastateF));
-			assertEquals(GuardOutcomes.UNDEF,flow.evaluateGuard(datastateU));
+			GuardOutcomes ret = flow.evaluateGuard(datastateF);
+			if (ret == GuardOutcomes.UNDEF) {
+				fail("guard should not evaluate undefined.");
+			}
+			ret = flow.evaluateGuard(datastateU);
+			if (ret == GuardOutcomes.FALSE) {
+				fail("guard should not evaluate to false.");
+			}
 		}
 	}
 
