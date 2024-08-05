@@ -76,9 +76,19 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 			}
 		}};
 		List<Double> values = subtimeseries.getYSeries();
-		double mean = subtimeseries.getComesFrom().getMean();
-		double std = subtimeseries.getComesFrom().getStd();
+		
+		double mean; 
+		double std;
 		double agg = 0;
+		try {
+			mean = subtimeseries.getComesFrom().getMean();
+			std = subtimeseries.getComesFrom().getStd();
+		} catch (Throwable e) {
+//			mean didnt work out
+			return new TransformedAttribute(
+					subtimeseries.getAbvSlicingName()
+					+"tailagg"+aggerator.getName(), agg);
+		}
 		if (std > 0) {
 			double norm = 
 					relativeTimes.stream()
@@ -86,7 +96,10 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 						.reduce(0.0, Double::sum);
 			agg = 
 				IntStream.range(0, values.size()-1)
-					.mapToDouble(i -> ( 1.0/ (1+Math.abs(relativeTimes.get(i))) * Math.abs((values.get(i) - mean)/ std)))
+					.mapToDouble(i -> 
+					( 1.0 / ( 1+Math.abs(relativeTimes.get(i))) 
+							  * Math.abs((values.get(i) - mean)/ std))
+					)
 					.reduce(0.0, Double::sum);
 			agg = agg / norm;
 		}
@@ -95,7 +108,9 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 			System.out.println("opps returning bad transform ::"+agg);
 			agg = 0;
 		}
-		return new TransformedAttribute(subtimeseries.getAbvSlicingName()+"tailagg"+aggerator.getName(), agg);
+		return new TransformedAttribute(
+				subtimeseries.getAbvSlicingName()
+				+"tailagg"+aggerator.getName(), agg);
 	}
 		
 	public String getName() {

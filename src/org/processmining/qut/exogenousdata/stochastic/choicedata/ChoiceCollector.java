@@ -39,7 +39,6 @@ import org.processmining.plugins.replayer.replayresult.SyncReplayResult;
 import org.processmining.pnetreplayer.utils.TransEvClassMappingUtils;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.qut.exogenousdata.data.ExogenousUtils;
-import org.processmining.qut.exogenousdata.exceptions.LinkNotFoundException;
 import org.processmining.qut.exogenousdata.steps.slicing.PastOutcomeSlicer;
 import org.processmining.qut.exogenousdata.steps.slicing.Slicer;
 import org.processmining.qut.exogenousdata.steps.transform.type.Transformer;
@@ -100,7 +99,7 @@ public class ChoiceCollector {
 				.build();
 		@Default boolean useDefaultAggerator = true;
 		
-		public void adjustAggeratorForPanel(ExogenousDataset dataset) {
+		public void adjustAggeratorForPanel(ExogenousDataset dataset) throws Throwable {
 			if (useDefaultAggerator) {
 				double mean = dataset.getMean();
 				double std = dataset.getStd();
@@ -113,7 +112,7 @@ public class ChoiceCollector {
 			}
 		}
 		
-		public double computeTheta(XTrace trace, int eventIndex, ExogenousDataset dataset) throws LinkNotFoundException {
+		public double computeTheta(XTrace trace, int eventIndex, ExogenousDataset dataset) throws Throwable {
 			adjustAggeratorForPanel(dataset);
 			XTrace simplierTrace = new XTraceImpl(trace.getAttributes());
 			simplierTrace.add(trace.get(eventIndex));
@@ -125,7 +124,7 @@ public class ChoiceCollector {
 			return theta;
 		}
 		
-		public double computeEventTheta(XEvent event, XAttributeMap traceAttrs, ExogenousDataset dataset) throws LinkNotFoundException {
+		public double computeEventTheta(XEvent event, XAttributeMap traceAttrs, ExogenousDataset dataset) throws Throwable {
 			adjustAggeratorForPanel(dataset);
 			XTrace simplierTrace = new XTraceImpl(traceAttrs);
 			simplierTrace.add(event);
@@ -138,7 +137,7 @@ public class ChoiceCollector {
 			return theta;
 		}
 		
-		public double computeProceedingTheta(XTrace trace, XEvent posEvent, ExogenousDataset dataset) throws LinkNotFoundException {
+		public double computeProceedingTheta(XTrace trace, XEvent posEvent, ExogenousDataset dataset) throws Throwable {
 			adjustAggeratorForPanel(dataset);
 			XTrace simplierTrace = new XTraceImpl(trace.getAttributes());
 			simplierTrace.add(posEvent);
@@ -150,7 +149,7 @@ public class ChoiceCollector {
 			return theta;
 		}
 		
-		public double computeTheta(XTrace trace, int leftIndex, int rightIndex, ExogenousDataset dataset, Double sojourn) throws LinkNotFoundException {
+		public double computeTheta(XTrace trace, int leftIndex, int rightIndex, ExogenousDataset dataset, Double sojourn) throws Throwable {
 			adjustAggeratorForPanel(dataset);
 			XTrace simplierTrace = new XTraceImpl(trace.getAttributes());
 			Date newDate = new Date(
@@ -794,7 +793,7 @@ public class ChoiceCollector {
 									.value(theta)
 									.name(dataset.getName())
 									.build();
-						} catch (LinkNotFoundException e) {
+						} catch (Throwable e) {
 //							already checked, shouldn't happen
 						}
 						
@@ -850,7 +849,7 @@ public class ChoiceCollector {
 							 time -> {
 									try {
 										return new Double(params.computeTheta(trace, leftEventIndex, rightEventIndex, dataset, time));
-									} catch (LinkNotFoundException e) {
+									} catch (Throwable e) {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
@@ -927,7 +926,7 @@ public class ChoiceCollector {
 									((XAttributeTimestamp) newEvent.getAttributes().get("time:timestamp")).setValue(newDate);
 									try {
 										return new Double(params.computeProceedingTheta(trace, newEvent, dataset));
-									} catch (LinkNotFoundException e) {
+									} catch (Throwable e) {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
@@ -997,7 +996,7 @@ public class ChoiceCollector {
 									((XAttributeTimestamp) newEvent.getAttributes().get("time:timestamp")).setValue(newDate);
 									try {
 										return new Double(params.computeProceedingTheta(trace, newEvent, dataset));
-									} catch (LinkNotFoundException e) {
+									} catch (Throwable e) {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
