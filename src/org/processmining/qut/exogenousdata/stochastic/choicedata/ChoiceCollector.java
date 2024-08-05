@@ -45,7 +45,6 @@ import org.processmining.qut.exogenousdata.steps.transform.type.Transformer;
 import org.processmining.qut.exogenousdata.steps.transform.type.agg.AbsoluteVarianceTransformer;
 import org.processmining.qut.exogenousdata.steps.transform.type.agg.TailingWeightedSubsequencesTransform;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -496,15 +495,21 @@ public class ChoiceCollector {
 //			scrape thetas from generators
 			int genIndex = 0;
 			for(int gen : generators) {
-				ChoiceDataPoint point = ChoiceDataPoint.builder()
-						.enabled(findEnabled(gen))
-						.fired(findFired(gen))
-						.powers(thetas[gen])
-						.firingSeq(findFiringSeq(gen))
-						.build();
-//				System.out.println(point.toString());
-				ret[genIndex] = point;
-				genIndex++;
+				ChoiceDataPoint point;
+				try {
+					point = ChoiceDataPoint.builder()
+							.enabled(findEnabled(gen))
+							.fired(findFired(gen))
+							.powers(thetas[gen])
+							.firingSeq(findFiringSeq(gen))
+							.build();
+					System.out.println(point.toString());
+					ret[genIndex] = point;
+					genIndex++;
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			return ret;
 		}
@@ -657,13 +662,13 @@ public class ChoiceCollector {
 			return new HashSet() {{ addAll(curr.getExecutableTransitions()); }};
 		}
 		
-		public Transition findFired(int stepIndex) {
+		public Transition findFired(int stepIndex) throws Exception {
 			int transIndex = findTransitionIndex(stepIndex);
 			Object node = this.alignment.getNodeInstance().get(stepIndex);
 			if (node instanceof Transition) {
 				return (Transition) node;
 			}
-			throw new ValueException("Expected a transition here.");
+			throw new Exception("Expected a transition here.");
 		}
 	}
 	

@@ -3,20 +3,19 @@ package org.processmining.qut.exogenousdata.ds.timeseries.stats;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Singular;
 
 @Builder
-public class Covariance implements Measure{
+public class Covariance implements Measure {
 	
 	@NonNull @Singular private List<Double> dependents;
 	@NonNull @Singular private List<Double> independents;
 	
-	public double calculate() {
+	public double calculate() throws Exception {
 		if (dependents.size() != independents.size()) {
-			throw new ValueException("The two given vectors for dependents and indepents are not the same length");
+			throw new Exception("The two given vectors for dependents and indepents are not the same length");
 		}
 		double imean = independents.stream().reduce(0.0, Double::sum) / independents.size();
 		double dmean = dependents.stream().reduce(0.0, Double::sum) / dependents.size();

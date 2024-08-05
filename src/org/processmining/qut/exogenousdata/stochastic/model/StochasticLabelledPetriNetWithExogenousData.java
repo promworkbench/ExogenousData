@@ -26,8 +26,6 @@ import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFacto
 import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVariablePower;
 import org.processmining.stochasticlabelledpetrinets.StochasticLabelledPetriNet;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
-
 public class StochasticLabelledPetriNetWithExogenousData implements StochasticLabelledPetriNet {
 	
 	private AcceptingPetriNet net;
@@ -272,7 +270,7 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 				return entry.getKey().getLabel();
 			}
 		}
-		throw new ValueException("transition id ("+transition+") not known.");
+		return null;
 	}
 
 	public boolean isTransitionSilent(int transition) {
@@ -281,14 +279,14 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 				return entry.getKey().isInvisible();
 			}
 		}
-		throw new ValueException("transition id ("+transition+") not known.");
+		return false;
 	}
 
 	public int isInInitialMarking(int place) {
 		if (place < initial_marking.length) {
 			return initial_marking[place];
 		}
-		throw new ValueException("place id ("+place+") not known.");
+		return 0;
 	}
 
 	public int[] getInputPlaces(int transition) {

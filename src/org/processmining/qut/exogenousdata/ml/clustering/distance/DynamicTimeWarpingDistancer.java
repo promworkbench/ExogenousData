@@ -7,7 +7,6 @@ import org.processmining.qut.exogenousdata.ml.clustering.distance.data.WarpingPa
 import org.processmining.qut.exogenousdata.ml.data.FeatureVector;
 import org.processmining.qut.exogenousdata.ml.data.FeatureVectorImpl;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import lombok.Builder;
 import lombok.Builder.Default;
 
@@ -17,7 +16,7 @@ public class DynamicTimeWarpingDistancer implements Distancer {
 	
 	@Default Distancer cellDistancer = EuclideanDistancer.builder().build();
 	
-	public double distance(FeatureVector A, FeatureVector B) {
+	public double distance(FeatureVector A, FeatureVector B) throws Exception {
 		// step one construct distance matrix of double[|A|][|B|]
 		// [row][column]
 		double[][] distanceMatrix = new double[A.getSize()][B.getSize()];
@@ -30,10 +29,15 @@ public class DynamicTimeWarpingDistancer implements Distancer {
 		// compute cell distance between ith and jth values
 		for(int i=A.getSize()-1; i >= 0; i--) {
 			for (int j=0; j < B.getSize(); j++) {
-				distanceMatrix[i][j] = cellDistancer.distance(
-						FeatureVectorImpl.builder().value(A.getValues().get(A.getSize() - (i+1))).build(), 
-						FeatureVectorImpl.builder().value(B.getValues().get(j)).build()
-				);
+				try {
+					distanceMatrix[i][j] = cellDistancer.distance(
+							FeatureVectorImpl.builder().value(A.getValues().get(A.getSize() - (i+1))).build(), 
+							FeatureVectorImpl.builder().value(B.getValues().get(j)).build()
+					);
+				} catch (Throwable e) {
+					// TODO Auto-generated catch block
+					distanceMatrix[i][j] = Double.MAX_VALUE;
+				}
 				
 			}
 		}
@@ -71,7 +75,7 @@ public class DynamicTimeWarpingDistancer implements Distancer {
 				}
 			}
 			if (update == null) {
-				throw new ValueException("Unable to find the next warp element along warping path");
+				throw new Exception("Unable to find the next warp element along warping path");
 			} else {
 				currentLeft = update.getLID();
 				currentRight = update.getRID();

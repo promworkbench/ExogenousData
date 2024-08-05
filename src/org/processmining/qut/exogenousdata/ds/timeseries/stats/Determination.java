@@ -2,7 +2,6 @@ package org.processmining.qut.exogenousdata.ds.timeseries.stats;
 
 import java.util.List;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Singular;
@@ -21,10 +20,10 @@ public class Determination {
 	@NonNull @Singular private List<Double> dependents;
 	@NonNull @Singular private List<Double> independents;
 	
-	public void calculate() {
+	public void calculate() throws Exception {
 //		check that dependents and independents are the same length
 		if (dependents.size() != independents.size()) {
-			throw new ValueException("The two given vectors for dependents and indepents are not the same length");
+			throw new Exception("The two given vectors for dependents and indepents are not the same length");
 		}
 		double cov = Covariance.builder().independents(independents).dependents(dependents).build().calculate();
 	}
