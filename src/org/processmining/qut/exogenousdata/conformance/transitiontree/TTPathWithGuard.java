@@ -1,5 +1,6 @@
 package org.processmining.qut.exogenousdata.conformance.transitiontree;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +22,14 @@ public class TTPathWithGuard implements TransitionTreePath<TTFlowWithGuard> {
 		return path.stream()
 			.map(p -> p.label())
 			.collect(Collectors.toList());
+	}
+	
+	public int length() {
+		return path.size();
+	}
+	
+	public Iterable<TTFlowWithGuard> getSteps() {
+		return Collections.unmodifiableList(path);
 	}
 	
 	public int uniqueness() {
@@ -59,5 +68,7 @@ public class TTPathWithGuard implements TransitionTreePath<TTFlowWithGuard> {
 			return false;
 		return true;
 	}
+
+
 
 }

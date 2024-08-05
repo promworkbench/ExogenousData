@@ -4,6 +4,8 @@ import java.util.Optional;
 
 public interface MatchingStep<T,V>{
 	
+	public static String SKIPPER = ">>";
+	
 	public static enum StepType {
 		sync,
 		logmove,

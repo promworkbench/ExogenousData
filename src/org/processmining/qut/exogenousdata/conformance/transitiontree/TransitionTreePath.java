@@ -5,5 +5,9 @@ public interface TransitionTreePath<T extends TransitionTreeFlow> {
 	abstract void append(T flow);
 	
 	abstract Iterable<String> variant();
+	
+	abstract int length();
+	
+	abstract Iterable<T> getSteps();
 
 }
