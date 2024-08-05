@@ -4,7 +4,7 @@ public class ExogenousDataStatics {
 	
 	private ExogenousDataStatics () {};
 	
-	public final static String version = "0.0.6.beta";
+	public final static String version = "<br><b>Version</b>: 0.0.6.beta";
 	public final static String packageName = "ExogenousData";
 	
 //	Author A
