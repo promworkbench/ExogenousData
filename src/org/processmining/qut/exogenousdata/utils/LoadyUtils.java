@@ -8,9 +8,9 @@ import org.processmining.datapetrinets.io.DPNIOException;
 import org.processmining.datapetrinets.io.DataPetriNetImporter;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithData;
 
-public class LoadingUtils {
+public class LoadyUtils {
 	
-	private LoadingUtils() {};
+	private LoadyUtils() {};
 	
 	/**
 	 * Takes a pnml file to create a PetriNetWithData.
