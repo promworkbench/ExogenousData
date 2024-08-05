@@ -10,13 +10,18 @@ import org.processmining.qut.exogenousdata.conformance.transitiontree.Transition
 public class ExploratoryBookkeepingEngine 
 	implements BookkeepingEngine<TTNode, TTFlowWithGuard> {
 
-	public double computeBookkeeping(TransitionTree<TTNode, TTFlowWithGuard> tree,
-			Matching<XEvent, TTFlowWithGuard> matcher, XLog log) {
+	public double computeBookkeeping(
+			TransitionTree<TTNode, TTFlowWithGuard> tree,
+			Matching<XEvent, TTFlowWithGuard> matcher, 
+			XLog log) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	public double computeBookkeeping(TTFlowWithGuard flow, Matching<XEvent, TTFlowWithGuard> matcher, XLog log) {
+	public double computeBookkeeping(
+			TTFlowWithGuard flow, 
+			Matching<XEvent, TTFlowWithGuard> matcher, 
+			XLog log) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

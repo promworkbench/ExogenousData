@@ -4,6 +4,8 @@ import org.deckfour.xes.model.XTrace;
 
 public interface Matching<T,V> {
 	
+	public static String SKIPPER = ">>";
+	
 	abstract public Iterable<MatchingStep<T,V>> 
 		getPath(XTrace trace);
 	
