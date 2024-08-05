@@ -12,7 +12,6 @@ import org.processmining.qut.exogenousdata.exceptions.LinkNotFoundException;
 import org.processmining.qut.exogenousdata.gui.colours.ColourScheme;
 import org.processmining.qut.exogenousdata.steps.linking.Linker;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -111,7 +110,7 @@ public class ExogenousDataset {
 		return name;
 	}
 		
-	public double getMean() {
+	public double getMean() throws Throwable {
 		if (!computedMean) {
 			if (dataType == ExogenousDatasetType.NUMERICAL) {
 				double mean = 0;
@@ -133,7 +132,7 @@ public class ExogenousDataset {
 				System.out.println("Dataset ("+getName()+") mean computed :: "+mean);
 				return this.mean;
 			} else {
-				throw new ValueException("Unable to compute mean on non-numerical datasets.");
+				throw new Exception("Unable to compute mean on non-numerical datasets.");
 			}
 		} else {
 			return this.mean;
@@ -141,7 +140,7 @@ public class ExogenousDataset {
 		
 	}
 	
-	public double getStd() {
+	public double getStd() throws Throwable {
 		if (!computedStd) {
 			if (dataType == ExogenousDatasetType.NUMERICAL) {
 				double mean = getMean();
@@ -164,7 +163,7 @@ public class ExogenousDataset {
 				this.computedStd = true;
 				return this.std;
 			} else {
-				throw new ValueException("Unable to compute mean on non-numerical datasets.");
+				throw new Exception("Unable to compute mean on non-numerical datasets.");
 			}
 		} else {
 			return this.std;

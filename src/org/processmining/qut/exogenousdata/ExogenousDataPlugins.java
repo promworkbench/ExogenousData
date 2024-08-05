@@ -531,11 +531,15 @@ public class ExogenousDataPlugins {
 	public HTMLToString describeDataset(final UIPluginContext context, 
 			final ExogenousDataset dataset) throws Throwable {
 		return new HTMLToString() {
+			
+			double mean = dataset.getMean();
+			double std = dataset.getStd();
 
 			public String toHTMLString(boolean includeHTMLTags) {
+				
 				return "Dataset Type: " + dataset.getDataType().toString() + "\n"
-					   +"Data Mean : " + dataset.getMean() + "\n"
-					   +"Dataset Std : " + dataset.getStd();
+					   +"Data Mean : " + mean + "\n"
+					   +"Dataset Std : " + std;
 			}
 		};
 	}
