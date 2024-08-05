@@ -493,7 +493,8 @@ public class ExogenousDataPlugins {
 			name = "Make Log into Exogenous Dataset",
 			parameterLabels = {"Dataset Log",},
 			categories={PluginCategory.Analytics},
-			help="This plugin allows users to build an exogneous dataset from a log."
+			help="This plugin allows users to cast an event log into an "
+					+ "exogneous dataset. "
 					+ version,
 			returnLabels = {"Exogenous Dataset"}, returnTypes = {ExogenousDataset.class}, 
 			userAccessible = true
