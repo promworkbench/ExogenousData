@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PNWDTransition;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithData;
 import org.processmining.qut.exogenousdata.conformance.guards.Guard.GuardOutcomes;
-import org.processmining.qut.exogenousdata.utils.LoadingUtils;
+import org.processmining.qut.exogenousdata.utils.LoadyUtils;
 
 public class NaiveStrengtheningTest {
 	
@@ -22,7 +22,7 @@ public class NaiveStrengtheningTest {
 
 	@Test
 	public void keepGaurdsTest() {
-		PetriNetWithData model = LoadingUtils.loadDPNFromFile(modelPath.toFile());
+		PetriNetWithData model = LoadyUtils.loadDPNFromFile(modelPath.toFile());
 		if (model == null) {
 			fail("Unable to load in testing pnml file for DPN.");
 		}
@@ -69,7 +69,7 @@ public class NaiveStrengtheningTest {
 	
 	@Test
 	public void gaurdOutcomesTest() {
-		PetriNetWithData model = LoadingUtils.loadDPNFromFile(modelPath.toFile());
+		PetriNetWithData model = LoadyUtils.loadDPNFromFile(modelPath.toFile());
 		if (model == null) {
 			fail("Unable to load in testing pnml file for DPN.");
 		}

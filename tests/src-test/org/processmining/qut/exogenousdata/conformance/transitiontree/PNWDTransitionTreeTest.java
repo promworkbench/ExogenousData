@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 import org.junit.Test;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithData;
 import org.processmining.qut.exogenousdata.conformance.playout.PNWDPlayoutEngine;
-import org.processmining.qut.exogenousdata.utils.LoadingUtils;
+import org.processmining.qut.exogenousdata.utils.LoadyUtils;
 
 public class PNWDTransitionTreeTest {
 
@@ -19,7 +19,7 @@ public class PNWDTransitionTreeTest {
 	
 	@Test
 	public void constructionTest() {
-		PetriNetWithData model = LoadingUtils.loadDPNFromFile(modelPath.toFile());
+		PetriNetWithData model = LoadyUtils.loadDPNFromFile(modelPath.toFile());
 		if (model == null) {
 			fail("Unable to load in testing pnml file for DPN.");
 		}
@@ -29,7 +29,7 @@ public class PNWDTransitionTreeTest {
 	
 	@Test
 	public void attemptVariousConstructionsTest() {
-		PetriNetWithData model = LoadingUtils.loadDPNFromFile(modelPath.toFile());
+		PetriNetWithData model = LoadyUtils.loadDPNFromFile(modelPath.toFile());
 		if (model == null) {
 			fail("Unable to load in testing pnml file for DPN.");
 		}
@@ -44,7 +44,7 @@ public class PNWDTransitionTreeTest {
 	
 	@Test
 	public void attemptVariousConstructionsWithReworkTest() {
-		PetriNetWithData model = LoadingUtils.loadDPNFromFile(modelReworkPath.toFile());
+		PetriNetWithData model = LoadyUtils.loadDPNFromFile(modelReworkPath.toFile());
 		if (model == null) {
 			fail("Unable to load in testing pnml file for DPN.");
 		}
@@ -61,7 +61,7 @@ public class PNWDTransitionTreeTest {
 	
 	@Test
 	public void ensureCorrectNodeTests() {
-		PetriNetWithData model = LoadingUtils.loadDPNFromFile(modelReworkPath.toFile());
+		PetriNetWithData model = LoadyUtils.loadDPNFromFile(modelReworkPath.toFile());
 		if (model == null) {
 			fail("Unable to load in testing pnml file for DPN.");
 		}

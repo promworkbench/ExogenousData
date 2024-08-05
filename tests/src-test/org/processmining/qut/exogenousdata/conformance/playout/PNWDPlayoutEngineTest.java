@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 
 import org.junit.Test;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithData;
-import org.processmining.qut.exogenousdata.utils.LoadingUtils;
+import org.processmining.qut.exogenousdata.utils.LoadyUtils;
 
 public class PNWDPlayoutEngineTest {
 	
@@ -18,7 +18,7 @@ public class PNWDPlayoutEngineTest {
 
 	@Test
 	public void justRunTest() {
-		PetriNetWithData model = LoadingUtils.loadDPNFromFile(modelPath.toFile());
+		PetriNetWithData model = LoadyUtils.loadDPNFromFile(modelPath.toFile());
 		if (model == null) {
 			fail("Unable to load in testing pnml file for DPN.");
 		}
@@ -33,7 +33,7 @@ public class PNWDPlayoutEngineTest {
 	
 	@Test
 	public void playoutLengthTest() {
-		PetriNetWithData model = LoadingUtils.loadDPNFromFile(modelPath.toFile());
+		PetriNetWithData model = LoadyUtils.loadDPNFromFile(modelPath.toFile());
 		if (model == null) {
 			fail("Unable to load in testing pnml file for DPN.");
 		}
@@ -56,7 +56,7 @@ public class PNWDPlayoutEngineTest {
 	
 	@Test
 	public void playoutReworkTest() {
-		PetriNetWithData model = LoadingUtils.loadDPNFromFile(testingModelPath.toFile());
+		PetriNetWithData model = LoadyUtils.loadDPNFromFile(testingModelPath.toFile());
 		if (model == null) {
 			fail("Unable to load in testing pnml file for DPN.");
 		}

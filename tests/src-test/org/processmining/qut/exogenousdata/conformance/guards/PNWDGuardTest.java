@@ -14,7 +14,7 @@ import org.processmining.qut.exogenousdata.conformance.guards.Guard.GuardOutcome
 import org.processmining.qut.exogenousdata.conformance.playout.PNWDPlayoutEngine;
 import org.processmining.qut.exogenousdata.conformance.transitiontree.PNWDTransitionTree;
 import org.processmining.qut.exogenousdata.conformance.transitiontree.TTFlowWithGuard;
-import org.processmining.qut.exogenousdata.utils.LoadingUtils;
+import org.processmining.qut.exogenousdata.utils.LoadyUtils;
 
 public class PNWDGuardTest {
 	
@@ -23,7 +23,7 @@ public class PNWDGuardTest {
 
 	@Test
 	public void test() {
-		PetriNetWithData model = LoadingUtils.loadDPNFromFile(modelPath.toFile());
+		PetriNetWithData model = LoadyUtils.loadDPNFromFile(modelPath.toFile());
 		if (model == null) {
 			fail("Unable to load in testing pnml file for DPN.");
 		}
