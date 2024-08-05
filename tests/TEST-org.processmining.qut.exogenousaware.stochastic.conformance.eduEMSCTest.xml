@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="0" hostname="Adam-PC" name="org.processmining.qut.exogenousaware.stochastic.conformance.eduEMSCTest" skipped="0" tests="1" time="0.828" timestamp="2024-08-05T13:03:04">
+  <properties>
+    <property name="sun.desktop" value="windows" />
+    <property name="ant.library.dir" value="F:\tools\apache-ant-1.10.14-bin\apache-ant-1.10.14\lib" />
+    <property name="awt.toolkit" value="sun.awt.windows.WToolkit" />
+    <property name="ant.file.type" value="file" />
+    <property name="java.specification.version" value="11" />
+    <property name="ant.project.name" value="ExogenousData.test" />
+    <property name="sun.cpu.isalist" value="amd64" />
+    <property name="bin" value="F:\Projects\prom-exogenous-data\ExogenousData\bindist" />
+    <property name="sun.jnu.encoding" value="Cp1252" />
+    <property name="java.class.path" value="F:\Projects\prom-exogenous-data\ExogenousData\tests\bin-test-instrument;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\cobertura-2.1.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\asm-5.0.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\asm-analysis-5.0.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\asm-commons-5.0.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\asm-tree-5.0.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\asm-util-5.0.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\commons-lang3-3.3.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\hamcrest-core-1.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\jaxen-1.1.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\jetty-6.1.14.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\jetty-util-6.1.14.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\junit-4.11.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\logback-classic-1.0.13.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\logback-core-1.0.13.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\oro-2.0.8.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\servlet-api-2.5-6.1.14.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\lib-cobertura-2.1.1\slf4j-api-1.7.5.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\libs-external\junit-4.8.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\bindist;F:\Projects\prom-exogenous-data\ExogenousData\ivy\AcceptingPetriNet-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\AccessCPN-unknown.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\Alignment-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\Animation-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\ApacheUtils-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\BPMN-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\BasicStochasticMiner-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\BasicUtils-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\CNet-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\CNetReplayer-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\CPNet-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\CohortAnalysis-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\DataAwareExplorer-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\DataAwareReplayer-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\DataAwareReplayerLGPL-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\DataDiscovery-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\DataExpression-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\DataPetriNets-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\DataPetriNetsLGPL-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\DirectlyFollowsModelMiner-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\EMF-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\EPC-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\EarthMoversStochasticConformanceChecking-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\EfficientStorage-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\EvolutionaryTreeMiner-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\FastDTW-unknown.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\FilterableSortableTablePanel-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\GraphViz-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\GuideTreeMiner-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\ILPMiner-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\InductiveMiner-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\InductiveMinerDeprecated-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\InductiveVisualMiner-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\InteractiveVisualization-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\IntervalTree-unknown.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\JAXB-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\JRI-unknown.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\JRIEngine-unknown.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\KitFox-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\LPEngine-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\LTL2Automaton-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\Log-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\LogAbstractions-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\LogDialog-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\LogEnhancement-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\LpSolve-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\ModelRepair-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\Monte-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\Murata-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\OSService-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\OpenXES-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\PNetAlignmentAnalysis-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\PNetReplayer-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\PTConversions-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\PTMerge-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\Performance-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\PetriNets-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\ProM-Contexts-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\ProM-Framework-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\ProM-Models-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\ProM-Plugins-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\ProcessTree-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\Properties-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\REngine-unknown.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\RTED-1.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\Sat4j-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\Saxon-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\SparseBitSet-1.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\Spex-1.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\StatisticalTests-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\StochasticLabelledDataPetriNet-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\StochasticLabelledPetriNets-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\StochasticPetriNets-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\TableLayout-20050920.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\TraceAlignmentWithGuideTree-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\TransitionSystems-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\UITopiaResources-0.6-20190913.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\Uitopia-0.6-20190913.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\Uma-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\Visualisation3D-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\Weka-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\Widgets-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\XESAlignmentExtension-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\XESLite-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\YAWL-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\YAWLEditor-2.3.5.wo.jgraph.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\ant-1.9.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\antlr-2.7.7.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\antlr-runtime-3.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\antlr4-runtime-4.5.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\approxlib-1.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\arpack_combined_all-0.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\asm-5.0.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\autocomplete-2.5.8.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\axis-1.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-anim-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-awt-util-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-bridge-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-codec-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-css-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-dom-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-ext-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-extension-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-gui-util-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-gvt-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-parser-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-rasterizer-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-script-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-svg-dom-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-svggen-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-swing-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-transcoder-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-util-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\batik-xml-1.9.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\bounce-0.18.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\bsh-2.0b4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\collections-generic-4.01.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\colt-1.2.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\commons-beanutils-1.9.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\commons-cli-1.3.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\commons-collections-3.2.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\commons-collections4-4.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\commons-compress-1.13.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\commons-digester-2.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\commons-io-2.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\commons-lang3-3.12.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\commons-logging-1.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\commons-math3-3.6.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\commons-text-1.9.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\compress-lzf-1.0.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\concurrent-trees-2.6.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\cqengine-2.7.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\dictomaton-1.2.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\exp4j-0.3.8.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\fastutil-7.1.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\flanagan-0.9alpha.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\flatlaf-2.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\fop-2.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\freehep-graphics2d-2.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\freehep-graphicsbase-2.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\freehep-graphicsio-2.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\freehep-graphicsio-emf-2.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\freehep-graphicsio-java-2.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\freehep-graphicsio-pdf-2.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\freehep-graphicsio-ps-2.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\freehep-graphicsio-svg-2.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\freehep-graphicsio-swf-2.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\freehep-graphicsio-tests-2.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\freehep-io-2.2.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gluegen-2.3.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gluegen-rt-2.3.2-javadoc.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gluegen-rt-2.3.2-natives-android-armv6.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gluegen-rt-2.3.2-natives-linux-amd64.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gluegen-rt-2.3.2-natives-linux-armv6.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gluegen-rt-2.3.2-natives-linux-armv6hf.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gluegen-rt-2.3.2-natives-linux-i586.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gluegen-rt-2.3.2-natives-macosx-universal.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gluegen-rt-2.3.2-natives-solaris-amd64.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gluegen-rt-2.3.2-natives-solaris-i586.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gluegen-rt-2.3.2-natives-windows-amd64.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gluegen-rt-2.3.2-natives-windows-i586.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gluegen-rt-2.3.2-sources.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gluegen-rt-2.3.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gson-2.3.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\guava-16.0.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\gurobi-6.5.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\hamcrest-all-1.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\hamcrest-core-1.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\high-scale-lib-1.1.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\istack-commons-runtime-3.0.12.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\itextpdf-5.5.11.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\j2ssh-common-0.2.9.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\j2ssh-core-0.2.9.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jackson-annotations-2.8.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jackson-core-2.8.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jackson-databind-2.8.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jakarta.activation-1.2.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jakarta.activation-api-1.2.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jakarta.xml.bind-api-2.3.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jama-1.0.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\japura-1.12.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jargs-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jas-plotter-2.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\java-cup-11b-2015.03.26.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\java-cup-11b-20160615.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\java-cup-11b-runtime-2015.03.26.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\java-cup-runtime-11b-20160615.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\java-merge-sort-1.0.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\java-sizeof-0.0.5.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\javabdd-1.0b2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\javacsv-2.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\javailp-1.2a.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\javassist-3.18.2-GA.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\javassist-unknown.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\javax.activation-api-1.2.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\javolution-5.2.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jaxb-api-2.4.0-b180830.0359.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jaxb-runtime-2.3.5.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jblas-1.2.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jbpt-0.2.429.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jcalendar-1.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jclipboardhelper-0.1.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jcommon-1.0.24.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jdom-legacy-1.1.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jep-2.4.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jetm-1.2.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jfilechooser-bookmarks-0.1.6.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jfreechart-1.5.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jfreesvg-3.4.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jgraph-5.13.0.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jgrapht-jdk1.6.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jlfgr-1_0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jmathplot-unknown.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\joda-time-2.9.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-2.3.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-all-2.3.2-javadoc.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-all-2.3.2-natives-android-armv6.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-all-2.3.2-natives-linux-amd64.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-all-2.3.2-natives-linux-armv6.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-all-2.3.2-natives-linux-armv6hf.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-all-2.3.2-natives-linux-i586.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-all-2.3.2-natives-macosx-universal.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-all-2.3.2-natives-solaris-amd64.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-all-2.3.2-natives-solaris-i586.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-all-2.3.2-natives-windows-amd64.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-all-2.3.2-natives-windows-i586.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-all-2.3.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-all-main-2.3.2-javadoc.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-all-main-2.3.2-sources.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jogl-all-main-2.3.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jscience-4.3.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\json-simple-1.1.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jung-algorithms-2.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jung-api-2.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jung-graph-impl-2.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jung-io-2.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jung-visualization-2.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\junit-4.12.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\juniversalchardet-1.0.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jxl-2.6.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\jython-standalone-2.7.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\kryo-3.0.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\kryo-serializers-0.37.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\lombok-1.18.20.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\lz4-1.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\mapdb-2.0-beta13.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\minlog-1.3.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\mtj-1.0.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\nativewindow-2.3.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\netlib-java-1.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\objenesis-2.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\opencsv-2.4-patched.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\opencsv-5.5.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\openide-lookup-1.9-patched-1.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\oplall-6.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\optics_dbScan-1.0.4.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\org.eclipse.emf.common-2.7.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\org.eclipse.emf.ecore-2.8.3.v20130125-0546.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\org.eclipse.emf.ecore.xmi-2.5.0.v20100521-1846.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\org.eclipse.uml2.common-1.5.0.v201005031530.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\org.eclipse.uml2.uml-3.1.2.v201010261927.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\org.mozilla.javascript-1.7.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\pnapi-java-1.0.5.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\prefuse-core-1.0.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\protobuf-java-2.6.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\reflectasm-1.10.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\reflections-0.9.10.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\rhino-1.7.7.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\rsyntaxtextarea-2.5.8.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\saxon-9he.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\simmetrics-latest.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\simple-xml-2.7.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\simpleEducationalLearningSchemes-1.0.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\slickerbox-1.0rc1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\sqlite-jdbc-3.15.1.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\stringtemplate-3.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\trove4j-3.0.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\txw2-2.3.5.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\ujmp-complete-0.2.5.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\uma-1.3.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\uncommons-maths-1.2.3.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\univocity-parsers-2.2.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\weka-stable-3.8.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\xercesImpl-2.11.0.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\xmlParserAPIs-2.6.2.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\xpp3-1.1.4c.jar;F:\Projects\prom-exogenous-data\ExogenousData\ivy\xstream-1.4.9.jar;F:\Projects\prom-exogenous-data\ExogenousData\tests\bin-test;F:\tools\apache-ant-1.10.14-bin\apache-ant-1.10.14\lib\ant-launcher.jar;F:\tools\apache-ant-1.10.14-bin\apache-ant-1.10.14\lib\ant.jar;F:\tools\apache-ant-1.10.14-bin\apache-ant-1.10.14\lib\ant-junit.jar;F:\tools\apache-ant-1.10.14-bin\apache-ant-1.10.14\lib\ant-junit4.jar" />
+    <property name="java.vm.vendor" value="Oracle Corporation" />
+    <property name="sun.arch.data.model" value="64" />
+    <property name="user.variant" value="" />
+    <property name="java.vendor.url" value="https://openjdk.java.net/" />
+    <property name="user.timezone" value="" />
+    <property name="net.sourceforge.cobertura.datafile" value="F:\Projects\prom-exogenous-data\ExogenousData\tests\cobertura.ser" />
+    <property name="os.name" value="Windows 10" />
+    <property name="java.vm.specification.version" value="11" />
+    <property name="test.basedir" value="F:\Projects\prom-exogenous-data\ExogenousData\tests" />
+    <property name="sun.java.launcher" value="SUN_STANDARD" />
+    <property name="user.country" value="AU" />
+    <property name="dir.testfiles" value="F:\Projects\prom-exogenous-data\ExogenousData\tests\testfiles" />
+    <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-11.0.7\bin" />
+    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner org.processmining.qut.exogenousaware.stochastic.conformance.eduEMSCTest skipNonTests=false filtertrace=true haltOnError=false haltOnFailure=false showoutput=false outputtoformatters=true logfailedtests=true threadid=0 logtestlistenerevents=false formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,F:\Projects\prom-exogenous-data\ExogenousData\tests\TEST-org.processmining.qut.exogenousaware.stochastic.conformance.eduEMSCTest.xml crashfile=F:\Projects\prom-exogenous-data\ExogenousData\tests\junitvmwatcher110404645591496568.properties propsfile=F:\Projects\prom-exogenous-data\ExogenousData\tests\junit12638547519489508099.properties" />
+    <property name="jdk.debug" value="release" />
+    <property name="sun.cpu.endian" value="little" />
+    <property name="user.home" value="C:\Users\adam" />
+    <property name="user.language" value="en" />
+    <property name="sun.stderr.encoding" value="cp437" />
+    <property name="java.specification.vendor" value="Oracle Corporation" />
+    <property name="ant.file.type.ExogenousData.test" value="file" />
+    <property name="java.version.date" value="2020-04-14" />
+    <property name="dir.test-src" value="F:\Projects\prom-exogenous-data\ExogenousData\tests\src-test" />
+    <property name="java.home" value="C:\Program Files\Java\jdk-11.0.7" />
+    <property name="basedir" value="F:\Projects\prom-exogenous-data\ExogenousData\tests" />
+    <property name="file.separator" value="\" />
+    <property name="java.vm.compressedOopsMode" value="32-bit" />
+    <property name="sun.stdout.encoding" value="cp437" />
+    <property name="line.separator" value="&#xd;&#xa;" />
+    <property name="ant.java.version" value="11" />
+    <property name="java.vm.specification.vendor" value="Oracle Corporation" />
+    <property name="java.specification.name" value="Java Platform API Specification" />
+    <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment" />
+    <property name="user.script" value="" />
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers" />
+    <property name="dir.test-instrument" value="F:\Projects\prom-exogenous-data\ExogenousData\tests\bin-test-instrument" />
+    <property name="dir.test-bin" value="F:\Projects\prom-exogenous-data\ExogenousData\tests\bin-test" />
+    <property name="java.runtime.version" value="11.0.7+8-LTS" />
+    <property name="user.name" value="adam" />
+    <property name="ant.file" value="F:\Projects\prom-exogenous-data\ExogenousData\tests\build.xml" />
+    <property name="path.separator" value=";" />
+    <property name="cobertura.datafile" value="F:\Projects\prom-exogenous-data\ExogenousData\tests\cobertura.ser" />
+    <property name="ant.file.ExogenousData.test" value="F:\Projects\prom-exogenous-data\ExogenousData\tests\build.xml" />
+    <property name="os.version" value="10.0" />
+    <property name="test.testFileRoot" value="F:\Projects\prom-exogenous-data\ExogenousData\tests\testfiles" />
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment" />
+    <property name="file.encoding" value="Cp1252" />
+    <property name="ant.project.invoked-targets" value="check" />
+    <property name="dir.coveragereport.html" value="F:\Projects\prom-exogenous-data\ExogenousData\tests\cover-html" />
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM" />
+    <property name="java.vendor.version" value="18.9" />
+    <property name="ant.core.lib" value="F:\tools\apache-ant-1.10.14-bin\apache-ant-1.10.14\lib\ant.jar" />
+    <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/" />
+    <property name="java.io.tmpdir" value="C:\Users\adam\AppData\Local\Temp\" />
+    <property name="java.version" value="11.0.7" />
+    <property name="src" value="F:\Projects\prom-exogenous-data\ExogenousData\src" />
+    <property name="user.dir" value="F:\Projects\prom-exogenous-data\ExogenousData" />
+    <property name="os.arch" value="amd64" />
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification" />
+    <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob" />
+    <property name="ant.home" value="F:\tools\apache-ant-1.10.14-bin\apache-ant-1.10.14\bin\.." />
+    <property name="sun.os.patch.level" value="" />
+    <property name="home" value="F:\Projects\prom-exogenous-data\ExogenousData" />
+    <property name="ant.version" value="Apache Ant(TM) version 1.10.14 compiled on August 16 2023" />
+    <property name="java.library.path" value=".//lib" />
+    <property name="java.vendor" value="Oracle Corporation" />
+    <property name="dir.coveragereport.xml" value="F:\Projects\prom-exogenous-data\ExogenousData\tests\cover-xml" />
+    <property name="java.vm.info" value="mixed mode" />
+    <property name="java.vm.version" value="11.0.7+8-LTS" />
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle" />
+    <property name="java.class.version" value="55.0" />
+    <property name="ant.project.default-target" value="check" />
+  </properties>
+  <testcase classname="org.processmining.qut.exogenousaware.stochastic.conformance.eduEMSCTest" name="testeduEMSC" time="0.682" />
+  <system-out><![CDATA[building choice data...
+LpSolve Libraries Loaded
+looking at an alignment for a trace...
+trace ::  abccd
+moves :: [Sync move, Sync move, Invisible step, Sync move, Invisible step, Sync move, Sync move]
+found pair at (0,1)
+class org.processmining.models.graphbased.directed.petrinet.elements.Transition
+b added time of 3.5572727E-317
+found pair at (1,3)
+class org.processmining.models.graphbased.directed.petrinet.elements.Transition
+c added time of 1.0671818E-316
+found pair at (3,5)
+class org.processmining.models.graphbased.directed.petrinet.elements.Transition
+c added time of 7.1145453E-317
+found pair at (5,6)
+class org.processmining.models.graphbased.directed.petrinet.elements.Transition
+d added time of 5.335909E-317
+looking at an alignment for a trace...
+trace ::  abebd
+moves :: [Sync move, Sync move, Invisible step, Log move, Sync move, Sync move]
+found pair at (0,1)
+class org.processmining.models.graphbased.directed.petrinet.elements.Transition
+b added time of 7.1145453E-317
+found pair at (1,3)
+class org.deckfour.xes.classification.XEventClass
+found pair at (3,4)
+class org.processmining.models.graphbased.directed.petrinet.elements.Transition
+b added time of 1.24504543E-316
+looking at an alignment for a trace...
+trace ::  afezd
+moves :: [Sync move, Model move, Log move, Log move, Log move, Sync move]
+found pair at (0,2)
+class org.deckfour.xes.classification.XEventClass
+looking at an alignment for a trace...
+trace ::  acb
+moves :: [Sync move, Sync move, Invisible step, Sync move, Model move]
+found pair at (0,1)
+class org.processmining.models.graphbased.directed.petrinet.elements.Transition
+c added time of 3.5572727E-317
+found pair at (1,3)
+class org.processmining.models.graphbased.directed.petrinet.elements.Transition
+b added time of 1.0671818E-316
+looking at an alignment for a trace...
+trace ::  fbzd
+moves :: [Model move, Log move, Sync move, Log move, Sync move]
+found pair at (1,2)
+class org.processmining.models.graphbased.directed.petrinet.elements.Transition
+b added time of 1.77863633E-316
+collected sojourn times...
+built lazy iterator for choice data...
+left_rem : []
+curr :Sync move
+right_rem :[Sync move, Invisible step, Sync move, Invisible step, Sync move, Sync move]
+determined sync power
+asked to find event as of step number : 1
+Returning :: 0
+left_rem : [Sync move]
+curr :Sync move
+right_rem :[Invisible step, Sync move, Invisible step, Sync move, Sync move]
+determined sync power
+asked to find event as of step number : 2
+Returning :: 1
+left_rem : [Sync move, Sync move]
+curr :Invisible step
+right_rem :[Sync move, Invisible step, Sync move, Sync move]
+determined silent power
+left_rem : [Sync move, Sync move, Invisible step]
+curr :Sync move
+right_rem :[Invisible step, Sync move, Sync move]
+determined sync power
+asked to find event as of step number : 4
+Returning :: 2
+left_rem : [Sync move, Sync move, Invisible step, Sync move]
+curr :Invisible step
+right_rem :[Sync move, Sync move]
+determined silent power
+left_rem : [Sync move, Sync move, Invisible step, Sync move, Invisible step]
+curr :Sync move
+right_rem :[Sync move]
+determined sync power
+asked to find event as of step number : 6
+Returning :: 3
+left_rem : [Sync move, Sync move, Invisible step, Sync move, Invisible step, Sync move]
+curr :Sync move
+right_rem :[]
+determined sync power
+asked to find event as of step number : 7
+Returning :: 4
+theta operations :: SyncPower->SyncPower->SilentPower->SyncPower->SilentPower->SyncPower->SyncPower
+Dataset (X) mean computed :: 333.0
+Dataset (X) std computed :: 5.758775460954228
+Dataset (Y) mean computed :: 273.0
+Dataset (Y) std computed :: 8.261355820929154
+Dataset (Z) mean computed :: 30.0
+Dataset (Z) std computed :: 0.0
+(a, <0.7900,0.3682,0.0000>, a)
+(b|c, <0.6387,0.3359,0.0000>, b)
+(tau|d, <0.2628,0.1416,0.0000>, tau)
+(b|c, <0.2628,0.1416,0.0000>, c)
+(tau|d, <0.7835,0.4147,0.0000>, tau)
+(b|c, <0.7835,0.4147,0.0000>, c)
+(tau|d, <0.8573,0.4701,0.0000>, d)
+left_rem : []
+curr :Sync move
+right_rem :[Sync move, Invisible step, Log move, Sync move, Sync move]
+determined sync power
+asked to find event as of step number : 1
+Returning :: 0
+left_rem : [Sync move]
+curr :Sync move
+right_rem :[Invisible step, Log move, Sync move, Sync move]
+determined sync power
+asked to find event as of step number : 2
+Returning :: 1
+left_rem : [Sync move, Sync move]
+curr :Invisible step
+right_rem :[Log move, Sync move, Sync move]
+determined silent power
+left_rem : [Sync move, Sync move, Invisible step]
+curr :Log move
+right_rem :[Sync move, Sync move]
+determined log power
+left_rem : [Sync move, Sync move, Invisible step, Log move]
+curr :Sync move
+right_rem :[Sync move]
+determined sync power
+asked to find event as of step number : 5
+Returning :: 3
+left_rem : [Sync move, Sync move, Invisible step, Log move, Sync move]
+curr :Sync move
+right_rem :[]
+determined sync power
+asked to find event as of step number : 6
+Returning :: 4
+theta operations :: SyncPower->SyncPower->SilentPower->skipped->SyncPower->SyncPower
+(a, <0.0083,?,0.0000>, a)
+(b|c, <0.0885,?,0.0000>, b)
+(tau|d, <0.5008,?,0.0000>, tau)
+(b|c, <0.5008,?,0.0000>, b)
+(tau|d, <0.6191,?,0.0000>, d)
+left_rem : []
+curr :Sync move
+right_rem :[Model move, Log move, Log move, Log move, Sync move]
+determined sync power
+asked to find event as of step number : 1
+Returning :: 0
+left_rem : [Sync move]
+curr :Model move
+right_rem :[Log move, Log move, Log move, Sync move]
+determined betweensync power
+asked to find event as of step number : 1
+Returning :: 0
+asked to find event as of step number : 6
+Returning :: 4
+left_rem : [Sync move, Model move]
+curr :Log move
+right_rem :[Log move, Log move, Sync move]
+determined log power
+left_rem : [Sync move, Model move, Log move]
+curr :Log move
+right_rem :[Log move, Sync move]
+determined log power
+left_rem : [Sync move, Model move, Log move, Log move]
+curr :Log move
+right_rem :[Sync move]
+determined log power
+left_rem : [Sync move, Model move, Log move, Log move, Log move]
+curr :Sync move
+right_rem :[]
+determined sync power
+asked to find event as of step number : 6
+Returning :: 4
+theta operations :: SyncPower->BetweenSync->skipped->skipped->skipped->SyncPower
+starting between syn with sojourn size of :: 5
+starting between syn with sojourn size of :: 5
+(a, <0.3239,?,0.0000>, a)
+(b|c, <0.2638,?,0.0000>, b)
+(tau|d, <0.3533,?,0.0000>, d)
+left_rem : []
+curr :Sync move
+right_rem :[Sync move, Invisible step, Sync move, Model move]
+determined sync power
+asked to find event as of step number : 1
+Returning :: 0
+left_rem : [Sync move]
+curr :Sync move
+right_rem :[Invisible step, Sync move, Model move]
+determined sync power
+asked to find event as of step number : 2
+Returning :: 1
+left_rem : [Sync move, Sync move]
+curr :Invisible step
+right_rem :[Sync move, Model move]
+determined silent power
+left_rem : [Sync move, Sync move, Invisible step]
+curr :Sync move
+right_rem :[Model move]
+determined sync power
+asked to find event as of step number : 4
+Returning :: 2
+left_rem : [Sync move, Sync move, Invisible step, Sync move]
+curr :Model move
+right_rem :[]
+determined preceding power
+asked to find event as of step number : 3
+Returning :: 1
+theta operations :: SyncPower->SyncPower->SilentPower->SyncPower->PrecedingSync
+starting preceeding syn with sojourn size of :: 1
+starting preceeding syn with sojourn size of :: 1
+(a, <?,0.3077,0.0000>, a)
+(b|c, <?,0.1435,0.0000>, c)
+(tau|d, <?,0.2266,0.0000>, tau)
+(b|c, <?,0.2266,0.0000>, b)
+(tau|d, <?,0.3318,0.0000>, d)
+left_rem : []
+curr :Model move
+right_rem :[Log move, Sync move, Log move, Sync move]
+determined proceding power
+asked to find event as of step number : 2
+Returning :: 0
+proceeding made targetting :: 0
+left_rem : [Model move]
+curr :Log move
+right_rem :[Sync move, Log move, Sync move]
+determined log power
+left_rem : [Model move, Log move]
+curr :Sync move
+right_rem :[Log move, Sync move]
+determined sync power
+asked to find event as of step number : 3
+Returning :: 1
+left_rem : [Model move, Log move, Sync move]
+curr :Log move
+right_rem :[Sync move]
+determined log power
+left_rem : [Model move, Log move, Sync move, Log move]
+curr :Sync move
+right_rem :[]
+determined sync power
+asked to find event as of step number : 5
+Returning :: 3
+theta operations :: ProceddingSync->skipped->SyncPower->skipped->SyncPower
+sending choice data to equalities factory...
+created variable :: BW_node_a49e5ae4-592d-4877-9393-d6e283d9ec78
+created variable :: AX_node_a49e5ae4-592d-4877-9393-d6e283d9ec78_X
+created variable :: NAX_node_a49e5ae4-592d-4877-9393-d6e283d9ec78_X
+created variable :: AX_node_a49e5ae4-592d-4877-9393-d6e283d9ec78_Y
+created variable :: NAX_node_a49e5ae4-592d-4877-9393-d6e283d9ec78_Y
+created variable :: AX_node_a49e5ae4-592d-4877-9393-d6e283d9ec78_Z
+created variable :: NAX_node_a49e5ae4-592d-4877-9393-d6e283d9ec78_Z
+created variable :: BW_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3
+created variable :: AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_X
+created variable :: NAX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_X
+created variable :: AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Y
+created variable :: NAX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Y
+created variable :: AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Z
+created variable :: NAX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Z
+created variable :: BW_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8
+created variable :: AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_X
+created variable :: NAX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_X
+created variable :: AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Y
+created variable :: NAX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Y
+created variable :: AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Z
+created variable :: NAX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Z
+created variable :: BW_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4
+created variable :: AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_X
+created variable :: NAX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_X
+created variable :: AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Y
+created variable :: NAX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Y
+created variable :: AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Z
+created variable :: NAX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Z
+created variable :: BW_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1
+created variable :: AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_X
+created variable :: NAX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_X
+created variable :: AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Y
+created variable :: NAX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Y
+created variable :: AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Z
+created variable :: NAX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Z
+prepared variables...
+working on (tau|d, <0.8573,0.4701,0.0000>, d) with size of 1
+(zero removed) constructed :: 1.0=((BW_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1) * (((AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_X^0.8573038841759654) * (AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Y^0.47011444786036305)) * (AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Z^0.0))) / ((((BW_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4) * (((AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_X^0.8573038841759654) * (AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Y^0.47011444786036305)) * (AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Z^0.0)))) + ((BW_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1) * (((AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_X^0.8573038841759654) * (AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Y^0.47011444786036305)) * (AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Z^0.0))))@1
+working on (tau|d, <0.3533,?,0.0000>, d) with size of 1
+(zero removed) constructed :: 1.0=((BW_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1) * (((AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_X^0.35327224283868286) * (NAX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Y)) * (AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Z^0.0))) / ((((BW_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4) * (((AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_X^0.35327224283868286) * (NAX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Y)) * (AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Z^0.0)))) + ((BW_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1) * (((AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_X^0.35327224283868286) * (NAX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Y)) * (AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Z^0.0))))@1
+working on (tau|d, <0.7835,0.4147,0.0000>, tau) with size of 1
+(zero removed) constructed :: 1.0=((BW_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4) * (((AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_X^0.7835222494403415) * (AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Y^0.41472609427727986)) * (AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Z^0.0))) / ((((BW_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4) * (((AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_X^0.7835222494403415) * (AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Y^0.41472609427727986)) * (AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Z^0.0)))) + ((BW_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1) * (((AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_X^0.7835222494403415) * (AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Y^0.41472609427727986)) * (AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Z^0.0))))@1
+working on (tau|d, <0.5008,?,0.0000>, tau) with size of 1
+(zero removed) constructed :: 1.0=((BW_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4) * (((AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_X^0.5007864541179362) * (NAX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Y)) * (AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Z^0.0))) / ((((BW_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4) * (((AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_X^0.5007864541179362) * (NAX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Y)) * (AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Z^0.0)))) + ((BW_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1) * (((AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_X^0.5007864541179362) * (NAX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Y)) * (AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Z^0.0))))@1
+working on (tau|d, <0.6191,?,0.0000>, d) with size of 1
+(zero removed) constructed :: 1.0=((BW_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1) * (((AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_X^0.6191486903083873) * (NAX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Y)) * (AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Z^0.0))) / ((((BW_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4) * (((AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_X^0.6191486903083873) * (NAX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Y)) * (AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Z^0.0)))) + ((BW_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1) * (((AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_X^0.6191486903083873) * (NAX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Y)) * (AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Z^0.0))))@1
+working on (b|c, <0.7835,0.4147,0.0000>, c) with size of 1
+(zero removed) constructed :: 1.0=((BW_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8) * (((AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_X^0.7835222494403415) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Y^0.41472609427727986)) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Z^0.0))) / ((((BW_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3) * (((AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_X^0.7835222494403415) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Y^0.41472609427727986)) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Z^0.0)))) + ((BW_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8) * (((AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_X^0.7835222494403415) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Y^0.41472609427727986)) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Z^0.0))))@1
+working on (b|c, <0.6387,0.3359,0.0000>, b) with size of 1
+(zero removed) constructed :: 1.0=((BW_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3) * (((AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_X^0.6386987613251499) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Y^0.3359220965671278)) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Z^0.0))) / ((((BW_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3) * (((AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_X^0.6386987613251499) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Y^0.3359220965671278)) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Z^0.0)))) + ((BW_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8) * (((AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_X^0.6386987613251499) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Y^0.3359220965671278)) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Z^0.0))))@1
+working on (b|c, <?,0.1435,0.0000>, c) with size of 1
+(zero removed) constructed :: 1.0=((BW_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8) * (((NAX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_X) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Y^0.14352712817906615)) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Z^0.0))) / ((((BW_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3) * (((NAX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_X) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Y^0.14352712817906615)) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Z^0.0)))) + ((BW_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8) * (((NAX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_X) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Y^0.14352712817906615)) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Z^0.0))))@1
+working on (tau|d, <0.2628,0.1416,0.0000>, tau) with size of 1
+(zero removed) constructed :: 1.0=((BW_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4) * (((AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_X^0.26275226608689506) * (AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Y^0.14162829759285317)) * (AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Z^0.0))) / ((((BW_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4) * (((AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_X^0.26275226608689506) * (AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Y^0.14162829759285317)) * (AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Z^0.0)))) + ((BW_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1) * (((AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_X^0.26275226608689506) * (AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Y^0.14162829759285317)) * (AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Z^0.0))))@1
+working on (b|c, <0.2628,0.1416,0.0000>, c) with size of 1
+(zero removed) constructed :: 1.0=((BW_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8) * (((AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_X^0.26275226608689506) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Y^0.14162829759285317)) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Z^0.0))) / ((((BW_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3) * (((AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_X^0.26275226608689506) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Y^0.14162829759285317)) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Z^0.0)))) + ((BW_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8) * (((AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_X^0.26275226608689506) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Y^0.14162829759285317)) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Z^0.0))))@1
+working on (b|c, <0.0885,?,0.0000>, b) with size of 1
+(zero removed) constructed :: 1.0=((BW_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3) * (((AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_X^0.08846094686969924) * (NAX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Y)) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Z^0.0))) / ((((BW_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3) * (((AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_X^0.08846094686969924) * (NAX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Y)) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Z^0.0)))) + ((BW_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8) * (((AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_X^0.08846094686969924) * (NAX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Y)) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Z^0.0))))@1
+working on (b|c, <0.5008,?,0.0000>, b) with size of 1
+(zero removed) constructed :: 1.0=((BW_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3) * (((AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_X^0.5007864541179362) * (NAX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Y)) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Z^0.0))) / ((((BW_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3) * (((AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_X^0.5007864541179362) * (NAX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Y)) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Z^0.0)))) + ((BW_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8) * (((AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_X^0.5007864541179362) * (NAX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Y)) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Z^0.0))))@1
+working on (b|c, <0.2638,?,0.0000>, b) with size of 1
+(zero removed) constructed :: 1.0=((BW_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3) * (((AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_X^0.2638408058398191) * (NAX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Y)) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Z^0.0))) / ((((BW_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3) * (((AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_X^0.2638408058398191) * (NAX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Y)) * (AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Z^0.0)))) + ((BW_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8) * (((AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_X^0.2638408058398191) * (NAX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Y)) * (AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Z^0.0))))@1
+constructed equalities...
+constructed 13 equalities....
+solving equalities...
+[1] validating :: {1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1}
+[2] validating :: {1; 1; 1; 1; 1; 1; 1; -0.8245975379; 461.7014597061; 0.3092026811; -2.0029337643; 4.7790824921; 1; 1; 1; 461.5413998949; 1; -5.593856702; 1; 1; 1; -384.4209612957; 3.5089966091; 1; -11.8943763383; 364.7615688114; 1; 1; -387.9074958854; 1; 1; 1; 370.1468608475; 1; 1}
+[3] validating :: {1; 1; 1; 1; 1; 1; 1; -0.8245975379; 119.4815293085; 0.3092026811; 1.5620468824; 4.7790824921; 1; 1; 1; 119.3214694973; 1; -2.0288760553; 1; 1; 1; -96.7762561458; 3.5089966091; 1; -11.8943763383; 92.5034240977; 1; 1; -100.2627907354; 1; 1; 1; 97.8887161338; 1; 1}
+[4] validating :: {1; 1; 1; 1; 1; 1; 1; -0.8245975379; 31.6716075348; 0.3092026811; 2.4767822438; 4.7790824921; 1; 1; 1; 31.5115477236; 1; -1.1141406939; 1; 1; 1; -22.9697451443; 3.5089966091; 1; -11.8943763383; 22.6449375924; 1; 1; -26.4562797339; 1; 1; 1; 28.0302296284; 1; 1}
+[5] validating :: {1; 1; 1; 1; 1; 1; 1; -0.8245975379; 8.0853396425; 0.3092026811; 2.7224856091; 4.7790824921; 1; 1; 1; 7.9252798313; 1; -0.8684373286; 1; 1; 1; -3.144876775; 3.5089966091; 1; -11.8943763383; 3.8805321131; 1; 1; -6.6314113647; 1; 1; 1; 9.2658241491; 1; 1}
+[6] validating :: {1; 1; 1; 1; 1; 1; 1; 0.0428562582; 1.3729259493; -0.0093857581; 0.9669450985; 3.6813452958; 1; 1; 1; 0.6270740507; 1; 1.0330549015; 1; 1; 1; 2.2952726606; 0.4473209453; 1; -3.8802010134; -0.4753774701; 1; 1; -0.2952726606; 1; 1; 1; 2.4753774701; 1; 1}
+[7] validating :: {1; 1; 1; 1; 1; 1; 1; 1.0400365408; 1.3363593388; -0.1212023165; -0.2211391735; 2.1737377862; 1; 1; 1; 0.6636406612; 1; 2.2211391735; 1; 1; 1; 1.2229201874; 0.765825641; 1; 0.8297434855; 0.6020885672; 1; 1; 0.7770798126; 1; 1; 1; 1.3979114328; 1; 1}
+[8] validating :: {1; 1; 1; 1; 1; 1; 1; 0.9540263575; 1.3363593388; -0.0001662134; 0.0032285969; 2.1737377862; 1; 1; 1.0894537335; -0.131869179; 1; 2.2211391735; 0.0890456734; 1; 1; 1.599217339; 0.5363079813; 1; 0.2685597502; 0.3006160643; 1; 1; 0.3897466802; 1; 1; 1.6670454224; 1.7111969062; 1; 1}
+[9] validating :: {1; 1; 1; 1; 1; 1; 1; 1.1297252261; 1.3363593388; 0.0001179755; 0.0019353646; 2.1737377862; 1; 1; 0.9067204899; 0.2115002368; 1; 2.2211391735; 0.6362821325; 1; 1; 1.316162181; 0.7042448957; 1; 0.7239817474; 0.5234520278; 1; 1; 0.6811032332; 1; 1; 1.12571263; 1.4796292852; 1; 1}
+[10] validating :: {1; 1; 1; 1; 1; 1; 1; 0.9275784821; 1.3363593388; 0.0000559784; 0.0031033143; 2.3460331981; 1; 1; 1.1585845193; -0.0320067291; 1; 2.2211391735; 0.047667384; 1; 1; 1.6383676906; 0.4782659609; 1; 0.2377625885; 0.2195883636; 1; 1; 0.3619225641; 1; 1; 1.7103239051; 1.4796292852; 1; 1}
+[11] validating :: {1; 1; 1; 1; 1; 1; 1; 1.1375664262; 1.3363593388; 0.0000796155; 0.0022299443; 2.2102662957; 1; 1; 0.8969507741; 0.1504781407; 1; 2.2211391735; 0.5114893758; 1; 1; 1.3544543153; 0.6744097283; 1; 0.6705236468; 0.4901541355; 1; 1; 0.6431705825; 1; 1; 1.1899886006; 1.4796292852; 1; 1}
+[12] validating :: {1; 1; 1; 1; 1; 1; 1; 1.1375664262; 1.4497454702; 0.0002336276; 0.0024689183; 2.2102662957; 1; 1; 0.9864054773; 0.1111586719; 1; 2.2211391735; 0.2782263639; 1; 1; 1.4647346937; 0.6079032203; 1; 0.5050325682; 0.4222388118; 1; 1; 0.5365267942; 1.092186009; 1; 1.1899886006; 1.5600797521; 1; 1}
+[13] validating :: {1; 1; 1; 1; 1; 1; 1; 0.9295937476; 1.6328315096; 0.0001265816; 0.0029459494; 2.2102662957; 1; 1; 1.2262487691; 0.0660784466; 1; 2.2211391735; 0.0078402599; 1; 1; 1.6674913054; 0.4885836025; 1; 0.249779241; 0.2605864983; 1; 1; 0.3551762411; 1.092186009; 1; 1.6057288447; 1.5600797521; 1; 1}
+[14] validating :: {1; 1; 1; 1; 1; 1; 1; 0.4457549839; 1.6328315096; 0.0001015333; 0.0040004913; 2.2103311287; 1; 1; 1.5930368963; 0.0008453931; 1; 2.2211391735; -0.0044665328; 1; 1; 1.6674913054; 0.4494399474; 1; -0.1044264981; 0.0407415707; 1; 1; 0.0324343742; 1.1591897644; 1; 2.4668654883; 1.5600797521; 1; 1}
+[15] validating :: {1; 1; 1; 1; 1; 1; 1; 0.8267752594; 1.6328315096; 0.00008641; 0.0030906462; 2.2102956393; 1; 1; 1.3041933316; 0.0574263025; 1; 2.2211391735; 0.0022701632; 1; 1; 1.6674913054; 0.4719721234; 1; 0.2032301395; 0.2325615157; 1; 1; 0.303784459; 1.1206205402; 1; 1.7188979229; 1.5600797521; 1; 1}
+[16] validating :: {1; 1; 1; 1; 1; 1; 1; 0.6491419337; 1.6328315096; 0.0003175162; 0.0034966797; 2.2103003564; 1; 1; 1.4168015127; 0.0357683408; 1; 2.2211391735; 0.0000333856; 1; 1; 1.7938333361; 0.4283113338; 1; 0.1027927156; 0.1728702845; 1; 1; 0.2266684832; 1.1960147672; 1; 1.7188979229; 1.5600797521; 1; 1}
+[17] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3484567113; 1.8872611914; 0.0002235444; 0.0040048953; 2.2103003564; 1; 1; 1.5545677312; 0.0139304332; 1; 2.2211391735; -0.0001722642; 1; 1; 2.0372609843; 0.4021587322; 1; -0.0338679751; 0.0622454984; 1; 1; 0.1039771913; 1.2422086695; 1; 1.7188979229; 1.5600797521; 1; 1}
+[18] validating :: {1; 1; 1; 1; 1; 1; 1; 0.5874891286; 1.673785774; 0.0002720813; 0.0035880651; 2.2103003564; 1; 1; 1.4450492388; 0.0322532028; 1; 2.2211391735; 0.0001905371; 1; 1; 1.8299258682; 0.4225351814; 1; 0.0895565041; 0.1578922824; 1; 1; 0.2084772899; 1.2062173094; 1; 1.7188979229; 1.5600797521; 1; 1}
+[19] validating :: {1; 1; 1; 1; 1; 1; 1; 0.4858744912; 1.7653628617; 0.0002137019; 0.0037924283; 2.2103003564; 1; 1; 1.4879683087; 0.0249082465; 1; 2.2211391735; 0.0000230105; 1; 1; 1.8299258682; 0.4156456527; 1; 0.0563156942; 0.1353858447; 1; 1; 0.170273393; 1.2184339757; 1; 1.7188979229; 1.634819071; 1; 1}
+[20] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3735235279; 1.7653628617; 0.0001519161; 0.0040811902; 2.2103010976; 1; 1; 1.5424859876; 0.0153058135; 1; 2.2211391735; -0.0000432451; 1; 1; 1.9797396192; 0.4058183697; 1; 0.0057465536; 0.0789800046; 1; 1; 0.1110325998; 1.235865586; 1; 1.7188979229; 1.634819071; 1; 1}
+[21] validating :: {1; 1; 1; 1; 1; 1; 1; 0.4175283667; 1.7653628617; 0.0001701841; 0.0039783573; 2.2103009784; 1; 1; 1.5211328848; 0.0191231971; 1; 2.2211391735; 0.0000441515; 1; 1; 1.9121587155; 0.4068549089; 1; 0.0308036188; 0.1054080634; 1; 1; 0.1377560902; 1.2340269753; 1; 1.7188979229; 1.634819071; 1; 1}
+[22] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3403049013; 1.7653628617; 0.0001195119; 0.0041444578; 2.2103019486; 1; 1; 1.5632442702; 0.0132235458; 1; 2.2211391735; -0.0000376305; 1; 1; 1.9121587155; 0.4347181054; 1; -0.0041220803; 0.0642595117; 1; 1; 0.0762559463; 1.1845701686; 1; 1.7188979229; 1.827408514; 1; 1}
+[23] validating :: {1; 1; 1; 1; 1; 1; 1; 0.4069957402; 1.7653628617; 0.0001623198; 0.0040051535; 2.2103014167; 1; 1; 1.526876521; 0.0183868903; 1; 2.2211391735; 0.0002570754; 1; 1; 1.9121587155; 0.4114103145; 1; 0.0286838724; 0.1010126496; 1; 1; 0.1313270303; 1.2259411903; 1; 1.7188979229; 1.6553911266; 1; 1}
+[24] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3885393541; 1.790504806; 0.0001489559; 0.0040459591; 2.2103014167; 1; 1; 1.5371213049; 0.0171948052; 1; 2.2211391735; 0.0000842811; 1; 1; 1.9424953425; 0.4111883476; 1; 0.0231807598; 0.0920854964; 1; 1; 0.12145672; 1.2263422177; 1; 1.7188979229; 1.6553911266; 1; 1}
+[25] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3629170451; 1.790504806; 0.0001282745; 0.0041067783; 2.2103022818; 1; 1; 1.5518501423; 0.0152941423; 1; 2.2211391735; 0.0000809827; 1; 1; 1.9978491939; 0.4130630862; 1; 0.0141051923; 0.0761525313; 1; 1; 0.1044588416; 1.2229580641; 1; 1.7188979229; 1.6553911266; 1; 1}
+[26] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3312368627; 1.790504806; 0.0000983795; 0.0041447678; 2.2103034168; 1; 1; 1.5710172058; 0.0129657922; 1; 2.2211391735; 0.0000155813; 1; 1; 1.9978491939; 0.4431925808; 1; 0.0020133846; 0.0539371493; 1; 1; 0.0716169553; 1.168171143; 1; 1.7188979229; 1.7970823716; 1; 1}
+[27] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3451900614; 1.790504806; 0.0001115061; 0.0041383517; 2.21030326; 1; 1; 1.562575277; 0.0140037766; 1; 2.2211391735; 0.0000825113; 1; 1; 1.9978491939; 0.4279913483; 1; 0.0087043595; 0.0651828568; 1; 1; 0.0883146195; 1.1958127857; 1; 1.7188979229; 1.7253564704; 1; 1}
+[28] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3201999667; 1.8280966653; 0.0000863145; 0.0041187939; 2.2103044824; 1; 1; 1.562575277; 0.012636414; 1; 2.2211391735; 0.0000242427; 1; 1; 2.0987465224; 0.4501634803; 1; 0.001494701; 0.0418122341; 1; 1; 0.0647138392; 1.1530900082; 1; 1.7188979229; 1.7253564704; 1; 1}
+[29] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3159018184; 1.8280966653; 0.0004524753; 0.0041016151; 2.2103056186; 1; 1; 1.5654653145; 0.0122858028; 1; 2.2211391735; 0.0001079699; 1; 1; 2.1470262145; 0.5000158656; 1; 0.0017035657; 0.0333797017; 1; 1; 0.0555066501; 1.0483112562; 1; 1.7188979229; 1.7253564704; 1; 1}
+[30] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3077074898; 1.8465570915; 0.0003453266; 0.0040097833; 2.2103056186; 1; 1; 1.5710331529; 0.0116861569; 1; 2.2211391735; 0.0000069645; 1; 1; 2.2428798909; 0.5226271363; 1; 0.0001660632; 0.0239025822; 1; 1; 0.0401460064; 1.0483112562; 1; 1.7188979229; 1.8585503854; 1; 1}
+[31] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3140864653; 1.832120851; 0.0004309446; 0.0040904012; 2.2103056186; 1; 1; 1.5666988009; 0.0121550861; 1; 2.2211391735; 0.0000401289; 1; 1; 2.1605826976; 0.4992417275; 1; 0.0014163108; 0.0317939647; 1; 1; 0.0533342107; 1.0483112562; 1; 1.7188979229; 1.7476428326; 1; 1}
+[32] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3113262008; 1.832120851; 0.0003920365; 0.0040650571; 2.2103067847; 1; 1; 1.5685829413; 0.0119252202; 1; 2.2211391735; 0.00011106; 1; 1; 2.190665325; 0.5069685943; 1; 0.0009952996; 0.0281849501; 1; 1; 0.0486397106; 1.0285003527; 1; 1.7188979229; 1.7476428326; 1; 1}
+[33] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3077932042; 1.832120851; 0.0003286052; 0.0040045315; 2.2103068509; 1; 1; 1.5710103623; 0.0115877728; 1; 2.2211391735; 0.0000133963; 1; 1; 2.190665325; 0.5293536059; 1; 0.0004355165; 0.0228531159; 1; 1; 0.0395517829; 0.9690965614; 1; 1.7188979229; 1.8345154743; 1; 1}
+[34] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3046964107; 1.832120851; 0.0002393762; 0.0038618184; 2.2103083067; 1; 1; 1.5731563799; 0.0111583427; 1; 2.2211391735; 0.0000309076; 1; 1; 2.190665325; 0.6053002443; 1; 0.0001215039; 0.0142127655; 1; 1; 0.0238244112; 0.9690965614; 1; 2.101280692; 1.9998815808; 1; 1}
+[35] validating :: {1; 1; 1; 1; 1; 1; 1; 0.303407252; 1.832120851; 0.0001309261; 0.0034891362; 2.2103098294; 1; 1; 1.5740565838; 0.0105014104; 1; 2.2211391735; 0.000016169; 1; 1; 2.190665325; 0.6809512614; 1; -0.0001243472; 0.0032100837; 1; 1; 0.0064964447; 0.7147072879; 1; 2.101280692; 2.3128901436; 1; 1}
+[36] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3044727394; 1.832120851; 0.0002242656; 0.0038334435; 2.2103094278; 1; 1; 1.5733125668; 0.0110964215; 1; 2.2211391735; 0.0001437728; 1; 1; 2.190665325; 0.6217300136; 1; 0.0001180316; 0.012866311; 1; 1; 0.0221061604; 0.9138486976; 1; 2.101280692; 2.0381860426; 1; 1}
+[37] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3040862322; 1.832120851; 0.0001951603; 0.0037686392; 2.2103095382; 1; 1; 1.5735826313; 0.0109711224; 1; 2.2211391735; 0.0000220752; 1; 1; 2.2291127863; 0.6301780948; 1; 0.0000698254; 0.0107701384; 1; 1; 0.019549169; 0.8842487101; 1; 2.101280692; 2.0381860426; 1; 1}
+[38] validating :: {1; 1; 1; 1; 1; 1; 1; 0.304429014; 1.832120851; 0.000220957; 0.0038270505; 2.2103094741; 1; 1; 1.5733431191; 0.0110829843; 1; 2.2211391735; 0.0000927327; 1; 1; 2.1940994908; 0.6220743324; 1; 0.0001127234; 0.0126394481; 1; 1; 0.0218777674; 0.9126422897; 1; 2.101280692; 2.0381860426; 1; 1}
+[39] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3043098444; 1.8329447614; 0.0002145108; 0.0038139076; 2.2103103021; 1; 1; 1.5733431191; 0.0110588227; 1; 2.2211391735; 0.0002374921; 1; 1; 2.2018636401; 0.623858434; 1; 0.0001034918; 0.0122164393; 1; 1; 0.021364865; 0.906386074; 1; 2.101280692; 2.0381860426; 1; 1}
+[40] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3041485955; 1.8329447614; 0.0002023784; 0.0037876728; 2.2103105472; 1; 1; 1.5734558482; 0.0110092041; 1; 2.2211391735; 0.0000739064; 1; 1; 2.2018636401; 0.6287538066; 1; 0.0000866628; 0.011513226; 1; 1; 0.0202598456; 0.8892734329; 1; 2.101280692; 2.0609040902; 1; 1}
+[41] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042900426; 1.8329447614; 0.0002132306; 0.0038112821; 2.2103103665; 1; 1; 1.5733569626; 0.0110538794; 1; 2.2211391735; 0.0001944813; 1; 1; 2.2018636401; 0.6243421977; 1; 0.0001018806; 0.0121388844; 1; 1; 0.0212574566; 0.9046949922; 1; 2.101280692; 2.0406915374; 1; 1}
+[42] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042542204; 1.8329447614; 0.0002106924; 0.0038060174; 2.2103104399; 1; 1; 1.5733820068; 0.0110438636; 1; 2.2211391735; 0.0001346735; 1; 1; 2.2050861245; 0.6251847378; 1; 0.0000986104; 0.0119813887; 1; 1; 0.021049525; 0.9017520911; 1; 2.101280692; 2.0406915374; 1; 1}
+[43] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042861758; 1.8329447614; 0.0002129739; 0.0038107548; 2.2103103767; 1; 1; 1.5733596659; 0.0110528857; 1; 2.2211391735; 0.0001862129; 1; 1; 2.202193872; 0.6244361759; 1; 0.0001015601; 0.0121233475; 1; 1; 0.0212361483; 0.9043667366; 1; 2.101280692; 2.0406915374; 1; 1}
+[44] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042786518; 1.8329447614; 0.0002124619; 0.0038097008; 2.2103103945; 1; 1; 1.5733649262; 0.0110508916; 1; 2.2211391735; 0.0001710242; 1; 1; 2.202193872; 0.6246279074; 1; 0.0001009185; 0.0120928241; 1; 1; 0.0211932137; 0.903697199; 1; 2.101280692; 2.0416832632; 1; 1}
+[45] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042622125; 1.833077995; 0.0002114403; 0.0038075766; 2.2103104224; 1; 1; 1.5733649262; 0.0110469942; 1; 2.2211391735; 0.0001451684; 1; 1; 2.2035031412; 0.6249811152; 1; 0.0000996205; 0.012030915; 1; 1; 0.0211089616; 0.9024641719; 1; 2.101280692; 2.0416832632; 1; 1}
+[46] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042771315; 1.8329583837; 0.0002123593; 0.0038094893; 2.2103103978; 1; 1; 1.5733649262; 0.0110504931; 1; 2.2211391735; 0.0001680316; 1; 1; 2.2023269999; 0.6246658129; 1; 0.0001007902; 0.0120867049; 1; 1; 0.0211846469; 0.9035648729; 1; 2.101280692; 2.0416832632; 1; 1}
+[47] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042741285; 1.8329583837; 0.0002121542; 0.0038090662; 2.2103104039; 1; 1; 1.5733670258; 0.0110496947; 1; 2.2211391735; 0.0001622514; 1; 1; 2.2025917746; 0.6247398444; 1; 0.0001005329; 0.0120744263; 1; 1; 0.0211676146; 0.9033064589; 1; 2.101280692; 2.0416832632; 1; 1}
+[48] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042678468; 1.8330129132; 0.0002117411; 0.0038082104; 2.210310415; 1; 1; 1.5733714177; 0.0110480998; 1; 2.2211391735; 0.0001513662; 1; 1; 2.2031283763; 0.6248923084; 1; 0.0001000176; 0.0120497154; 1; 1; 0.0211331211; 0.9033064589; 1; 2.101280692; 2.0416832632; 1; 1}
+[49] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042547161; 1.833120304; 0.0002109182; 0.0038064938; 2.210310415; 1; 1; 1.5733805982; 0.011044959; 1; 2.2211391735; 0.0001323332; 1; 1; 2.2031283763; 0.6252074334; 1; 0.0000989887; 0.0120014924; 1; 1; 0.0210633771; 0.9022064236; 1; 2.101280692; 2.043258519; 1; 1}
+[50] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042665923; 1.8330238069; 0.0002116585; 0.0038080392; 2.210310415; 1; 1; 1.5733722947; 0.0110477812; 1; 2.2211391735; 0.0001492201; 1; 1; 2.2031283763; 0.6249230985; 1; 0.0000999152; 0.012044797; 1; 1; 0.0211262159; 0.9031989774; 1; 2.101280692; 2.0418439273; 1; 1}
+[51] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042677222; 1.8330140046; 0.0002117329; 0.0038081933; 2.210310415; 1; 1; 1.5733715048; 0.0110480679; 1; 2.2211391735; 0.0001511488; 1; 1; 2.2031283763; 0.6248953755; 1; 0.0001000073; 0.0120492223; 1; 1; 0.0211324315; 0.9032957524; 1; 2.101280692; 2.0416993692; 1; 1}
+[52] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042674726; 1.8330161865; 0.0002117163; 0.0038081591; 2.210310415; 1; 1; 1.5733716793; 0.011048004; 1; 2.2211391735; 0.0001507153; 1; 1; 2.2031498701; 0.624901522; 1; 0.0000999869; 0.0120482369; 1; 1; 0.0211310518; 0.9032957524; 1; 2.101280692; 2.0417315608; 1; 1}
+[53] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042676972; 1.8330142229; 0.0002117312; 0.0038081899; 2.210310415; 1; 1; 1.5733715222; 0.0110480615; 1; 2.2211391735; 0.0001511054; 1; 1; 2.2031305246; 0.624895989; 1; 0.0001000053; 0.0120491237; 1; 1; 0.0211322936; 0.9032957524; 1; 2.101280692; 2.0417025901; 1; 1}
+[54] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042676467; 1.8330142229; 0.0002117279; 0.003808183; 2.2103104151; 1; 1; 1.5733715576; 0.0110480485; 1; 2.2211391735; 0.0001510173; 1; 1; 2.2031305246; 0.6248972338; 1; 0.0001000011; 0.0120489238; 1; 1; 0.0211320139; 0.9032914071; 1; 2.10129868; 2.0417025901; 1; 1}
+[55] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042675456; 1.8330142229; 0.0002117212; 0.0038081691; 2.2103104153; 1; 1; 1.5733716283; 0.0110480226; 1; 2.2211391735; 0.000150841; 1; 1; 2.2031305246; 0.6248997275; 1; 0.0000999928; 0.0120485234; 1; 1; 0.0211314537; 0.9032827018; 1; 2.10129868; 2.0417156688; 1; 1}
+[56] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042676366; 1.8330142229; 0.0002117272; 0.0038081816; 2.2103104151; 1; 1; 1.5733715646; 0.0110480459; 1; 2.2211391735; 0.0001509996; 1; 1; 2.2031305246; 0.6248974831; 1; 0.0001000003; 0.0120488837; 1; 1; 0.0211319579; 0.9032905369; 1; 2.10129868; 2.0417038983; 1; 1}
+[57] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042676163; 1.8330144002; 0.0002117259; 0.0038081788; 2.2103104151; 1; 1; 1.5733715788; 0.0110480407; 1; 2.2211391735; 0.0001509643; 1; 1; 2.2031305246; 0.6248979817; 1; 0.0000999986; 0.0120488036; 1; 1; 0.0211318459; 0.9032887962; 1; 2.10129868; 2.0417065144; 1; 1}
+[58] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042676346; 1.8330142406; 0.0002117271; 0.0038081813; 2.2103104151; 1; 1; 1.573371566; 0.0110480454; 1; 2.2211391735; 0.0001509961; 1; 1; 2.2031305246; 0.6248975329; 1; 0.0001000001; 0.0120488757; 1; 1; 0.0211319467; 0.9032903628; 1; 2.10129868; 2.0417041599; 1; 1}
+[59] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042676305; 1.8330142406; 0.0002117268; 0.0038081807; 2.2103104151; 1; 1; 1.5733715689; 0.0110480444; 1; 2.2211391735; 0.000150989; 1; 1; 2.2031308747; 0.624897633; 1; 0.0000999998; 0.0120488596; 1; 1; 0.0211319242; 0.9032900136; 1; 2.10129868; 2.0417041599; 1; 1}
+[60] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042676342; 1.8330142406; 0.000211727; 0.0038081812; 2.2103104151; 1; 1; 1.5733715663; 0.0110480453; 1; 2.2211391735; 0.0001509954; 1; 1; 2.2031305596; 0.624897543; 1; 0.0001000001; 0.0120488741; 1; 1; 0.0211319444; 0.9032903279; 1; 2.10129868; 2.0417041599; 1; 1}
+[61] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042676333; 1.8330142406; 0.000211727; 0.0038081811; 2.2103104151; 1; 1; 1.5733715669; 0.0110480451; 1; 2.2211391735; 0.000150994; 1; 1; 2.2031305596; 0.624897563; 1; 0.0001; 0.0120488709; 1; 1; 0.0211319399; 0.9032903279; 1; 2.1012989691; 2.0417042649; 1; 1}
+[62] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042676317; 1.8330142406; 0.0002117269; 0.0038081809; 2.2103104151; 1; 1; 1.5733715681; 0.0110480447; 1; 2.2211391735; 0.0001509911; 1; 1; 2.2031307028; 0.6248976039; 1; 0.0000999999; 0.0120488643; 1; 1; 0.0211319307; 0.903290185; 1; 2.1012989691; 2.0417042649; 1; 1}
+[63] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042676332; 1.8330142406; 0.000211727; 0.0038081811; 2.2103104151; 1; 1; 1.573371567; 0.0110480451; 1; 2.2211391735; 0.0001509937; 1; 1; 2.2031305739; 0.6248975671; 1; 0.0001; 0.0120488702; 1; 1; 0.021131939; 0.9032903136; 1; 2.1012989691; 2.0417042649; 1; 1}
+[64] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042676328; 1.8330142406; 0.0002117269; 0.0038081811; 2.2103104151; 1; 1; 1.5733715672; 0.011048045; 1; 2.2211391735; 0.0001509931; 1; 1; 2.2031305739; 0.6248975752; 1; 0.0001; 0.0120488689; 1; 1; 0.0211319372; 0.903290285; 1; 2.1012989691; 2.0417043078; 1; 1}
+[65] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042676331; 1.8330142406; 0.000211727; 0.0038081811; 2.2103104151; 1; 1; 1.573371567; 0.011048045; 1; 2.2211391735; 0.0001509936; 1; 1; 2.2031305739; 0.6248975679; 1; 0.0001; 0.0120488701; 1; 1; 0.0211319388; 0.9032903107; 1; 2.1012989691; 2.0417042692; 1; 1}
+[66] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042676331; 1.8330142406; 0.000211727; 0.0038081811; 2.2103104151; 1; 1; 1.5733715671; 0.011048045; 1; 2.2211391735; 0.0001509935; 1; 1; 2.2031305739; 0.6248975695; 1; 0.0001; 0.0120488698; 1; 1; 0.0211319385; 0.903290305; 1; 2.1012989691; 2.0417042778; 1; 1}
+[67] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042676329; 1.8330142406; 0.000211727; 0.0038081811; 2.2103104151; 1; 1; 1.5733715672; 0.011048045; 1; 2.2211391735; 0.0001509933; 1; 1; 2.2031305854; 0.6248975728; 1; 0.0001; 0.0120488693; 1; 1; 0.0211319377; 0.9032902936; 1; 2.1012989691; 2.0417042778; 1; 1}
+[68] validating :: {1; 1; 1; 1; 1; 1; 1; 0.3042676331; 1.8330142406; 0.000211727; 0.0038081811; 2.2103104151; 1; 1; 1.5733715671; 0.011048045; 1; 2.2211391735; 0.0001509935; 1; 1; 2.2031305751; 0.6248975698; 1; 0.0001; 0.0120488698; 1; 1; 0.0211319384; 0.9032903039; 1; 2.1012989691; 2.0417042778; 1; 1}
+equalities solved...
+Solved variable : BW_node_a49e5ae4-592d-4877-9393-d6e283d9ec78 as : 1.0
+Solved variable : AX_node_a49e5ae4-592d-4877-9393-d6e283d9ec78_X as : 1.0
+Solved variable : NAX_node_a49e5ae4-592d-4877-9393-d6e283d9ec78_X as : 1.0
+Solved variable : AX_node_a49e5ae4-592d-4877-9393-d6e283d9ec78_Y as : 1.0
+Solved variable : NAX_node_a49e5ae4-592d-4877-9393-d6e283d9ec78_Y as : 1.0
+Solved variable : AX_node_a49e5ae4-592d-4877-9393-d6e283d9ec78_Z as : 1.0
+Solved variable : NAX_node_a49e5ae4-592d-4877-9393-d6e283d9ec78_Z as : 1.0
+Solved variable : BW_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3 as : 0.3042676330611937
+Solved variable : AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_X as : 1.8330142406131162
+Solved variable : NAX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_X as : 2.1172696245230654E-4
+Solved variable : AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Y as : 0.0038081810900103467
+Solved variable : NAX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Y as : 2.2103104151331237
+Solved variable : AX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Z as : 1.0
+Solved variable : NAX_node_2014b49c-a481-4192-b1c8-fb9fbbd556c3_Z as : 1.0
+Solved variable : BW_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8 as : 1.5733715670879904
+Solved variable : AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_X as : 0.011048045029356454
+Solved variable : NAX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_X as : 1.0
+Solved variable : AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Y as : 2.2211391735111103
+Solved variable : NAX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Y as : 1.5099348160867146E-4
+Solved variable : AX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Z as : 1.0
+Solved variable : NAX_node_9e708c1d-6c2c-4d2b-825f-e229250b84a8_Z as : 1.0
+Solved variable : BW_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4 as : 2.2031305750556203
+Solved variable : AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_X as : 0.6248975698356639
+Solved variable : NAX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_X as : 1.0
+Solved variable : AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Y as : 1.0000000304586199E-4
+Solved variable : NAX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Y as : 0.012048869780415725
+Solved variable : AX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Z as : 1.0
+Solved variable : NAX_node_6dc145a7-82a6-4aa9-9926-8acfa6b615a4_Z as : 1.0
+Solved variable : BW_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1 as : 0.021131938391256596
+Solved variable : AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_X as : 0.9032903038762197
+Solved variable : NAX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_X as : 1.0
+Solved variable : AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Y as : 2.10129896910617
+Solved variable : NAX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Y as : 2.0417042777657826
+Solved variable : AX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Z as : 1.0
+Solved variable : NAX_node_1d66faa2-4bba-4b9a-9750-5b6639ee64d1_Z as : 1.0
+creating slpned...
+{X=0, Y=1, Z=2}
+returning slpned...
+but not before exporting visualisation data.
+finished exporting sample data.
+processing activity sequences...
+finished...
+processing data sequences...
+finished...
+show act seq of [f, b, z, d] with data [(?,0.30765737183681985,?), (?,0.30765737183681985,?), (?,0.30765737183681985,?), (?,0.15315387122302315,?), (?,0.25627315596337186,?), (?,0.25627315596337186,?)] with freq of 1
+show act seq of [a, f, e, z, d] with data [(0.323910183019165,?,?), (0.323910183019165,?,?), (0.323910183019165,?,?), (0.17672381332899062,?,?), (0.16977315168061066,?,?), (0.207896839623518,?,?)] with freq of 1
+show act seq of [a, c, b] with data [(?,0.30765737183681985,?), (?,0.30765737183681985,?), (?,0.30765737183681985,?), (?,0.14352712817906615,?), (?,0.14352712817906615,?), (?,0.14352712817906615,?)] with freq of 1
+show act seq of [a, b, e, b, d] with data [(0.008250249767037771,?,?), (0.008250249767037771,?,?), (0.008250249767037771,?,?), (0.08846094686969924,?,?), (0.2662922717927783,?,?), (0.5007864541179362,?,?)] with freq of 1
+show act seq of [a, b, c, c, d] with data [(0.7900182805863718,0.36818013350963685,?), (0.7900182805863718,0.36818013350963685,?), (0.7900182805863718,0.36818013350963685,?), (0.6386987613251499,0.3359220965671278,?), (0.26275226608689506,0.14162829759285317,?), (0.7835222494403415,0.41472609427727986,?)] with freq of 1
+(concurrent) log, sum of probs over D given A: 0.20
+(concurrent) log, sum of probs over D given A: 0.20
+(concurrent) log, sum of probs over D given A: 0.20
+(concurrent) log, sum of probs over D given A: 0.20
+(concurrent) log, sum of probs over D given A: 0.19935614136996029008
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
