@@ -1,6 +1,8 @@
 package org.processmining.qut.exogenousdata;
 
+import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -65,7 +67,7 @@ public class ExogenousDataPlugins {
 	
 	
 	@Plugin(
-			name = "Exogenous Annotated Log Preparation",
+			name = "Exogenous Annotated Log Preparation (XLogs)",
 			parameterLabels = {"Event Log", "Exo-Panels"},
 			returnLabels = {"Exogenous Annotated Log"},
 			returnTypes = {ExogenousAnnotatedLog.class},
@@ -91,7 +93,7 @@ public class ExogenousDataPlugins {
 			email = authorEmail,
 			pack = packageName
 	)
-	public ExogenousAnnotatedLog preperation(final UIPluginContext context, 
+	public ExogenousAnnotatedLog preperationWithXLogs(final UIPluginContext context, 
 			final XLog endogenous, final XLog[] exogenous) throws Throwable{
 		final List<ExogenousDataset> exoLogs = new ArrayList<ExogenousDataset>();
 		for(final XLog elog: exogenous) {
@@ -125,11 +127,57 @@ public class ExogenousDataPlugins {
 				.build()
 				.setup(context);
 		return annotated;
-		
 	}
 	
 	@Plugin(
-			name = "Exogenous Annotated Log Preparation (AIIM 2022)",
+			name = "Exogenous Annotated Log Preparation",
+			parameterLabels = {"Event Log", "Exo-Panels"},
+			returnLabels = {"Exogenous Annotated Log"},
+			returnTypes = {ExogenousAnnotatedLog.class},
+			help="Given an event log and several exo-panels, this plugin allows"
+					+ " users to create determinations as identified by xPM [1]."
+					+ " After building determinations, each one will be applied"
+					+ " to all traces seen in the event log. Note that an xlog "
+					+ "will be made but all changes will be done in place. This"
+					+ " process is not memory efficient and may require systems "
+					+ "to have more than 12 GB of heap available depending on the"
+					+ " size of the exo-panels and event log. [1] xPM: Enhancing"
+					+ " Exogenous Data Visibility. Adam Banham et. al. Artificial"
+					+ " Intelligence in Medicine 2022 <br> See "
+					+ " <a href=\"https://youtu.be/iSklEeNUJSc\" target=\"_blank\">"
+					+ "https://youtu.be/iSklEeNUJSc</a> for a walkthough of tooling."
+					+ version,
+			categories={PluginCategory.Analytics, PluginCategory.Enhancement},
+			userAccessible = true
+	)
+	@UITopiaVariant(
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
+	)
+	public ExogenousAnnotatedLog preperation(final UIPluginContext context, 
+			final XLog endogenous, final ExogenousDataset[] exogenous) throws Throwable{
+		final List<ExogenousDataset> exoLogs = Arrays.asList(exogenous);
+
+		final ExogenousAnnotatedLog annotated = ExogenousAnnotatedLog
+				.builder()
+				.endogenousLog(endogenous)
+				.exogenousDatasets(exoLogs)
+				.classifiers(endogenous.getClassifiers())
+				.extensions(endogenous.getExtensions())
+				.useDefaultConfiguration(false)
+				.globalEventAttributes(endogenous.getGlobalEventAttributes())
+				.globalTraceAttributes(endogenous.getGlobalTraceAttributes())
+				.attributes(endogenous.getAttributes())
+				.parsed(false)
+				.build()
+				.setup(context);
+		return annotated;
+	}
+	
+	@Plugin(
+			name = "Exogenous Annotated Log Preparation (AIIM 2022) (XLogs)",
 			parameterLabels = {"Event Log", "Exo-Panels"},
 			returnLabels = {"Exogenous Annotated Log"},
 			returnTypes = {ExogenousAnnotatedLog.class},
@@ -147,7 +195,7 @@ public class ExogenousDataPlugins {
 			email = authorEmail,
 			pack = packageName
 	)
-	public ExogenousAnnotatedLog AIIM2022preperation(final UIPluginContext context, 
+	public ExogenousAnnotatedLog AIIM2022preperationWithXLogs(final UIPluginContext context, 
 			final XLog endogenous, final XLog[] exogenous) throws Throwable {
 		final List<ExogenousDataset> exoLogs = new ArrayList<ExogenousDataset>();
 		for(final XLog elog: exogenous) {
@@ -185,6 +233,46 @@ public class ExogenousDataPlugins {
 		
 	}
 	
+	@Plugin(
+			name = "Exogenous Annotated Log Preparation (AIIM 2022)",
+			parameterLabels = {"Event Log", "Exo-Panels"},
+			returnLabels = {"Exogenous Annotated Log"},
+			returnTypes = {ExogenousAnnotatedLog.class},
+			help="Given an event log and several exo-panels, this plugin allows"
+				 + " users to reproduce the xPM instantition used in :"
+				 + " xPM: Enhancing Exogenous Data Visibility. Adam "
+				 + "Banham et. al. Artificial Intelligence in Medicine 2022"
+				 + version,
+			categories={PluginCategory.Analytics, PluginCategory.Enhancement},
+			userAccessible = true
+	)
+	@UITopiaVariant(
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
+	)
+	public ExogenousAnnotatedLog AIIM2022preperation(final UIPluginContext context, 
+			final XLog endogenous, final ExogenousDataset[] exogenous) throws Throwable {
+		final List<ExogenousDataset> exoLogs = Arrays.asList(exogenous);
+		
+		final ExogenousAnnotatedLog annotated = ExogenousAnnotatedLog
+				.builder()
+				.endogenousLog(endogenous)
+				.exogenousDatasets(exoLogs)
+				.classifiers(endogenous.getClassifiers())
+				.extensions(endogenous.getExtensions())
+				.useDefaultConfiguration(true)
+				.determinations(AIIM2022.getConfiguration(exoLogs))
+				.globalEventAttributes(endogenous.getGlobalEventAttributes())
+				.globalTraceAttributes(endogenous.getGlobalTraceAttributes())
+				.attributes(endogenous.getAttributes())
+				.parsed(false)
+				.build()
+				.setup(context);
+		return annotated;
+		
+	}
 	
 	
 	@Plugin(
@@ -519,7 +607,7 @@ public class ExogenousDataPlugins {
 			categories={PluginCategory.Analytics},
 			help="This plugin allows users describe exogneous dataset."
 					+ version,
-			returnLabels = {"Description of Dataset"}, returnTypes = {HTMLToString.class}, 
+			returnLabels = {"Description of ExogenousDataset"}, returnTypes = {HTMLToString.class}, 
 			userAccessible = true
 	)
 	@UITopiaVariant(
@@ -537,9 +625,21 @@ public class ExogenousDataPlugins {
 
 			public String toHTMLString(boolean includeHTMLTags) {
 				
-				return "Dataset Type: " + dataset.getDataType().toString() + "\n"
-					   +"Data Mean : " + mean + "\n"
-					   +"Dataset Std : " + std;
+				Color colour = dataset.getColourBase();
+				String hexcode = String.format("#%02X%02X%02X", 
+						colour.getRed(), colour.getGreen(), colour.getBlue());  
+				System.out.println(hexcode);
+				
+				return "<p>"
+					   + "<b>Name:</b> " + dataset.getName() + "<br>"
+					   + "<b>Size:</b> " + dataset.getSource().size() + "<br> "
+					   + "<b>Preferred Colour:</b> " + colour.toString() 
+					   		+ " ("+ hexcode + ") <br>"
+					   + "<b>Dataset Type:</b> " + dataset.getDataType().toString() 
+					   + "<br>"
+					   + "<b>Data Mean:</b> " + mean + "<br>"
+					   + "<b>Dataset Std:</b> " + std + "<br>"
+					   + "</p>";
 			}
 		};
 	}
