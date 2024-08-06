@@ -5,7 +5,7 @@ import java.util.Map;
 import org.deckfour.xes.model.XLog;
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithData;
-import org.processmining.qut.exogenousdata.decisionmining.conformance.Determinism;
+import org.processmining.qut.exogenousdata.conformance.Determinism;
 import org.processmining.qut.exogenousdata.gui.panels.ExogenousDiscoveryProgresser;
 import org.processmining.qut.exogenousdata.gui.panels.ExogenousDiscoveryProgresser.ProgressState;
 import org.processmining.qut.exogenousdata.gui.panels.ExogenousDiscoveryProgresser.ProgressType;

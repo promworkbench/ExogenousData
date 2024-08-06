@@ -1,4 +1,4 @@
-package org.processmining.qut.exogenousdata.decisionmining.conformance;
+package org.processmining.qut.exogenousdata.conformance;
 
 import java.util.Collection;
 import java.util.HashMap;
