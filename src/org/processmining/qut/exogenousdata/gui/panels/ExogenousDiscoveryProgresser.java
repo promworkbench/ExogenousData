@@ -368,7 +368,7 @@ public class ExogenousDiscoveryProgresser extends JPanel {
 		Alignment("Alignment Precompute"),
 		Stats("Statistics Precompute"),
 		Investigation("Decision Mining"),
-		Measurements("Data-Aaware Process Conformance");
+		Measurements("Data-Aware Conformance Checking");
 		
 		@Getter private String name;
 		
