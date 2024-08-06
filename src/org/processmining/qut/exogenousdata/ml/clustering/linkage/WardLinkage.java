@@ -76,7 +76,12 @@ public class WardLinkage implements LinkageDistancer {
 		members.addAll(B.getMembers());
 		for(FeatureVector a : members) {
 			for(FeatureVector b: members.subList(submembercount, members.size())) {
-				withinClusterDifference += this.distancer.distance(a, b);
+				try {
+					withinClusterDifference += this.distancer.distance(a, b);
+				} catch (Throwable e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			submembercount++;
 		}

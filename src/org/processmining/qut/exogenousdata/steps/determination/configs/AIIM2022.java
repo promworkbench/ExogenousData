@@ -24,7 +24,8 @@ public class AIIM2022 {
 	
 	private AIIM2022() {}
 	
-	static public List<Determination> getConfiguration(List<ExogenousDataset> datasets) {
+	static public List<Determination> getConfiguration(
+			List<ExogenousDataset> datasets) {
 		List<Determination> configuration = new ArrayList();
 		
 		for(ExogenousDataset dataset: datasets) {
@@ -34,7 +35,8 @@ public class AIIM2022 {
 							Determination.builder() 
 							.panel(dataset)
 							.linker(dataset.getLinker())
-							.slicer( TimeAwareSlicer.builder().timePeriod((long) (range * HOUR)).build())
+							.slicer( TimeAwareSlicer.builder()
+									.timePeriod((long) (range * HOUR)).build())
 							.transformer( SlopeTransformer.builder().build())
 							.build()
 					);
@@ -44,8 +46,10 @@ public class AIIM2022 {
 						Determination.builder()
 						.panel(dataset)
 						.linker(dataset.getLinker())
-						.slicer(FutureOutcomeSlicer.builder().timePeriod(HOUR * 48).build())
-						.transformer(PossibleOutcomeTransformer.builder().Outcome("SEPSIS INFECTION").build())
+						.slicer(FutureOutcomeSlicer.builder()
+								.timePeriod(HOUR * 48).build())
+						.transformer(PossibleOutcomeTransformer.builder()
+								.Outcome("SEPSIS INFECTION").build())
 						.build()
 				);
 			}

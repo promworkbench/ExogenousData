@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.processmining.qut.exogenousdata.ml.data.FeatureVector;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -54,13 +53,13 @@ public class WarpingPath {
 		return cost;
 	}
 	
-	public WarpingPath addWarpElement(WarpElement update) {
+	public WarpingPath addWarpElement(WarpElement update) throws Exception {
 //		check that new element is referencing correct indexes
 		if (!(update.getLID() < this.LeftVector.getSize())) {
-			throw new ValueException("New warp element in path is referring outside the length of the left-hand time series");
+			throw new Exception("New warp element in path is referring outside the length of the left-hand time series");
 		}
 		if(!(update.getRID() < this.RightVector.getSize())) {
-			throw new ValueException("New warp element in path is referring outside the length of the right-hand time series");
+			throw new Exception("New warp element in path is referring outside the length of the right-hand time series");
 		}
 		
 		this.elements = new ArrayList<WarpElement>() {{addAll(elements);add(update); }};

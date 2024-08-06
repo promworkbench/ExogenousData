@@ -22,11 +22,12 @@
    <fileset id="src.coveragereport" dir="${src}">
 		<!-- create coverage report for ProM plugins (can be modified) -->
        <include name="org/processmining/**/*.java" />
+	   <include name="org/processmining/qut/**/*.java"/>
    </fileset>
 	<fileset id="classes.coveragereport" dir="${bin}">
 		<!-- create coverage report for ProM plugins (can be modified) -->
         <include name="org/processmining/**/*.class"/>
-		
+		<include name="org/processmining/qut/**/*.class" />
 		<!-- do not create coverage report for test environment (DO NOT MODIFY) -->
 	    <exclude name="**/test/*.class"/>
 	</fileset>
@@ -109,7 +110,7 @@
 	    <junit fork="true" dir="${home}" includeantruntime="yes" >
 	    	<!-- parameters to run ProM -->
 	    	<jvmarg value="-ea"/>
-	    	<jvmarg value="-Xmx1G"/>
+	    	<jvmarg value="-Xmx2G"/>
 	    	<jvmarg value="-XX:MaxPermSize=256m"/>
 	    	<jvmarg value="-Djava.library.path=.//lib"/>
 	    	<!-- fixed location for cobertura to log method calls and generate report from -->
@@ -142,7 +143,7 @@
 	    <junit fork="true" dir="${home}" includeantruntime="yes" >
 	    	<!-- parameters to run ProM -->
 	    	<jvmarg value="-ea"/>
-	    	<jvmarg value="-Xmx1G"/>
+	    	<jvmarg value="-Xmx2G"/>
 	    	<jvmarg value="-XX:MaxPermSize=256m"/>
 	    	<jvmarg value="-Djava.library.path=.//lib"/>
 	    	<!-- fixed location for cobertura to log method calls and generate report from -->

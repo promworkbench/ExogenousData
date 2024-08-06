@@ -6,9 +6,14 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,10 +23,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XAttributeTimestamp;
@@ -49,6 +57,7 @@ import org.processmining.qut.exogenousdata.gui.colours.ColourScheme;
 import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries;
 import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries.Scaling;
 import org.processmining.qut.exogenousdata.steps.transform.data.TransformedAttribute;
+import org.xeslite.common.XUtils;
 
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -100,6 +109,7 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 	private static String FlipToReduceDim = "Show reduced dimensions?";
 	private static String FlipToShowSax = "Show SAX boundaries?";
 	private static String FlipToWOSAX = "Stop showing SAX?";
+	private static final JFileChooser fc = new JFileChooser();
 	
 	@Override
 	protected JPanel doInBackground() throws Exception {
@@ -513,6 +523,26 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
             	c.gridx += 1;
             	this.target.add(flipper, c);
             }
+//            add export chart data button
+            c.gridx += 1;
+            c.gridwidth = 6;
+            c.fill = GridBagConstraints.BOTH;
+            this.target.add(Box.createHorizontalGlue(),c);
+            JButton exporter = new JButton("export chart data");
+            TraceVisOverviewChart self = this;
+            exporter.addActionListener(new ActionListener() {
+				
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					self.exportChartData(self);
+				}
+			});
+            exporter.setMaximumSize(new Dimension(100,25));
+            c.fill = GridBagConstraints.NONE;
+            c.gridx = 10;
+            c.gridwidth = 1;
+            c.anchor = GridBagConstraints.EAST;
+            this.target.add(exporter,c);
             this.target.repaint();
             this.target.validate();
         } 
@@ -526,13 +556,79 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
         }
     }
 
+	protected void exportChartData(TraceVisOverviewChart self) {
+		String caseName = self.endo.getAttributes().get("concept:name").toString();
+		fc.setSelectedFile(new File("chart_data_for_"+caseName+".csv"));
+		fc.setFileFilter(new FileNameExtensionFilter("csv file", "csv"));
+		int ret = self.fc.showSaveDialog(self.target);
+		if (ret == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+            System.out.println("[TraceVisOverviewChart] exporting chart data...");
+            
+//            for dataset one and two in plot record the information
+            try {
+				PrintWriter writer = new PrintWriter(file);
+				writer.println("series_name,time,value,desc");
+				
+//				get endo moments
+				XYSeriesCollection data = (XYSeriesCollection) 
+						self.chart.getChart().getXYPlot()
+						.getDataset(0);
+				int evid = 0;
+				for( Object series: data.getSeries()) {
+					if (series instanceof XYSeries) {
+						XYSeries datadum = (XYSeries) series;
+						writer.println(
+								"event,"
+								+ datadum.getX(0).toString()
+								+ ","
+								+ ","
+								+ XUtils.getConceptName(self.endo.get(evid))
+						);
+						evid += 1;
+					}
+				}
+				
+//				get exo-series data
+				data = (XYSeriesCollection) 
+						self.chart.getChart().getXYPlot()
+						.getDataset(1);
+				for( Object series: data.getSeries()) {
+					if (series instanceof XYSeries) {
+						XYSeries datadum = (XYSeries) series;
+						for(int idx=0; idx < datadum.getItemCount(); idx++) {
+							writer.println(
+									""
+									+ datadum.getKey()
+									+ ","
+									+ datadum.getX(idx).toString()
+									+ ","
+									+ datadum.getY(idx).toString()
+							);
+						}
+					}
+				}
+				
+				System.out.println("[TraceVisOverviewChart] export complete...");
+				writer.close();
+				
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+	}
+
 	public double getEventTimestampMillis(XEvent ev) {
-		double time = (double) ((XAttributeTimestamp) ev.getAttributes().get("time:timestamp")).getValueMillis();
+		double time = ((XAttributeTimestamp) 
+				ev.getAttributes().get("time:timestamp")).getValueMillis();
 		return time / (1000 * 60 * 60);
 	}
 	
 	public double getExoEventValue(XEvent ev) {
-		return Double.parseDouble(ev.getAttributes().get("exogenous:value").toString());
+		return Double.parseDouble(ev.getAttributes()
+				.get("exogenous:value").toString());
 	}
 	
 	public static String getExogenousName(XTrace trace) {
@@ -581,4 +677,6 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 			owner.source.updateTraceVis(owner.endo, owner.normalize, owner.ppa, !owner.sax);
 		}
 	}
+	
+	
 }

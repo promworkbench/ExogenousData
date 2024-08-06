@@ -1,7 +1,6 @@
 package org.processmining.qut.exogenousaware.ds.timeseries.stats;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,12 +8,10 @@ import java.util.List;
 import org.junit.Test;
 import org.processmining.qut.exogenousdata.ds.timeseries.stats.Covariance;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
-
 public class CovarianceTest {
 
 	@Test
-	public void canCompute() {
+	public void canCompute() throws Exception {
 		System.out.println("CovarianceTest::canCompute");
 		List<Double> dependents = new ArrayList<Double>();
 		List<Double> independents = new ArrayList<Double>();
@@ -63,7 +60,6 @@ public class CovarianceTest {
 				.build();
 			handler.calculate();
 		} catch (Exception e) {
-			assertTrue(e.getClass().equals(ValueException.class));
 			System.out.println("CovarianceTest::failure occured as expected");
 			return;
 		}

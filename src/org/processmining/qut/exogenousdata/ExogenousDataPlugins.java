@@ -1,12 +1,15 @@
 package org.processmining.qut.exogenousdata;
 
+import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JComponent;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.deckfour.xes.model.XLog;
+import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.contexts.uitopia.annotations.Visualizer;
@@ -19,6 +22,7 @@ import org.processmining.models.connections.petrinets.behavioral.InitialMarkingC
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithData;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithDataFactory;
+import org.processmining.models.semantics.petrinet.Marking;
 import org.processmining.processtree.ProcessTree;
 import org.processmining.ptconversions.pn.ProcessTree2Petrinet;
 import org.processmining.ptconversions.pn.ProcessTree2Petrinet.PetrinetWithMarkings;
@@ -55,11 +59,15 @@ import org.processmining.qut.exogenousdata.steps.determination.configs.AIIM2022;
 */
 public class ExogenousDataPlugins {
 	
-	public static final String version = "<br> Package Version: 0.0.6.beta";
+	private static final String packageName = ExogenousDataStatics.packageName;
+	private static final String version = ExogenousDataStatics.version;
+	private static final String authora = ExogenousDataStatics.authora;
+	private static final String authorEmail = ExogenousDataStatics.authoraEmail;
+	private static final String authorAff = ExogenousDataStatics.authoraAff;
 	
 	
 	@Plugin(
-			name = "Exogenous Annotated Log Preparation",
+			name = "Exogenous Annotated Log Preparation (XLogs)",
 			parameterLabels = {"Event Log", "Exo-Panels"},
 			returnLabels = {"Exogenous Annotated Log"},
 			returnTypes = {ExogenousAnnotatedLog.class},
@@ -80,12 +88,12 @@ public class ExogenousDataPlugins {
 			userAccessible = true
 	)
 	@UITopiaVariant(
-			affiliation = "QUT",
-			author = "A. Banham",
-			email = "adam.banham@hdr.qut.edu.au",
-			pack = "ExogenousData"
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
-	public ExogenousAnnotatedLog preperation(final UIPluginContext context, 
+	public ExogenousAnnotatedLog preperationWithXLogs(final UIPluginContext context, 
 			final XLog endogenous, final XLog[] exogenous) throws Throwable{
 		final List<ExogenousDataset> exoLogs = new ArrayList<ExogenousDataset>();
 		for(final XLog elog: exogenous) {
@@ -119,11 +127,57 @@ public class ExogenousDataPlugins {
 				.build()
 				.setup(context);
 		return annotated;
-		
 	}
 	
 	@Plugin(
-			name = "Exogenous Annotated Log Preparation (AIIM 2022)",
+			name = "Exogenous Annotated Log Preparation",
+			parameterLabels = {"Event Log", "Exo-Panels"},
+			returnLabels = {"Exogenous Annotated Log"},
+			returnTypes = {ExogenousAnnotatedLog.class},
+			help="Given an event log and several exo-panels, this plugin allows"
+					+ " users to create determinations as identified by xPM [1]."
+					+ " After building determinations, each one will be applied"
+					+ " to all traces seen in the event log. Note that an xlog "
+					+ "will be made but all changes will be done in place. This"
+					+ " process is not memory efficient and may require systems "
+					+ "to have more than 12 GB of heap available depending on the"
+					+ " size of the exo-panels and event log. [1] xPM: Enhancing"
+					+ " Exogenous Data Visibility. Adam Banham et. al. Artificial"
+					+ " Intelligence in Medicine 2022 <br> See "
+					+ " <a href=\"https://youtu.be/iSklEeNUJSc\" target=\"_blank\">"
+					+ "https://youtu.be/iSklEeNUJSc</a> for a walkthough of tooling."
+					+ version,
+			categories={PluginCategory.Analytics, PluginCategory.Enhancement},
+			userAccessible = true
+	)
+	@UITopiaVariant(
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
+	)
+	public ExogenousAnnotatedLog preperation(final UIPluginContext context, 
+			final XLog endogenous, final ExogenousDataset[] exogenous) throws Throwable{
+		final List<ExogenousDataset> exoLogs = Arrays.asList(exogenous);
+
+		final ExogenousAnnotatedLog annotated = ExogenousAnnotatedLog
+				.builder()
+				.endogenousLog(endogenous)
+				.exogenousDatasets(exoLogs)
+				.classifiers(endogenous.getClassifiers())
+				.extensions(endogenous.getExtensions())
+				.useDefaultConfiguration(false)
+				.globalEventAttributes(endogenous.getGlobalEventAttributes())
+				.globalTraceAttributes(endogenous.getGlobalTraceAttributes())
+				.attributes(endogenous.getAttributes())
+				.parsed(false)
+				.build()
+				.setup(context);
+		return annotated;
+	}
+	
+	@Plugin(
+			name = "Exogenous Annotated Log Preparation (AIIM 2022) (XLogs)",
 			parameterLabels = {"Event Log", "Exo-Panels"},
 			returnLabels = {"Exogenous Annotated Log"},
 			returnTypes = {ExogenousAnnotatedLog.class},
@@ -136,12 +190,12 @@ public class ExogenousDataPlugins {
 			userAccessible = true
 	)
 	@UITopiaVariant(
-			affiliation = "QUT",
-			author = "A. Banham",
-			email = "adam.banham@hdr.qut.edu.au",
-			pack = "ExogenousData"
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
-	public ExogenousAnnotatedLog AIIM2022preperation(final UIPluginContext context, 
+	public ExogenousAnnotatedLog AIIM2022preperationWithXLogs(final UIPluginContext context, 
 			final XLog endogenous, final XLog[] exogenous) throws Throwable {
 		final List<ExogenousDataset> exoLogs = new ArrayList<ExogenousDataset>();
 		for(final XLog elog: exogenous) {
@@ -179,6 +233,46 @@ public class ExogenousDataPlugins {
 		
 	}
 	
+	@Plugin(
+			name = "Exogenous Annotated Log Preparation (AIIM 2022)",
+			parameterLabels = {"Event Log", "Exo-Panels"},
+			returnLabels = {"Exogenous Annotated Log"},
+			returnTypes = {ExogenousAnnotatedLog.class},
+			help="Given an event log and several exo-panels, this plugin allows"
+				 + " users to reproduce the xPM instantition used in :"
+				 + " xPM: Enhancing Exogenous Data Visibility. Adam "
+				 + "Banham et. al. Artificial Intelligence in Medicine 2022"
+				 + version,
+			categories={PluginCategory.Analytics, PluginCategory.Enhancement},
+			userAccessible = true
+	)
+	@UITopiaVariant(
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
+	)
+	public ExogenousAnnotatedLog AIIM2022preperation(final UIPluginContext context, 
+			final XLog endogenous, final ExogenousDataset[] exogenous) throws Throwable {
+		final List<ExogenousDataset> exoLogs = Arrays.asList(exogenous);
+		
+		final ExogenousAnnotatedLog annotated = ExogenousAnnotatedLog
+				.builder()
+				.endogenousLog(endogenous)
+				.exogenousDatasets(exoLogs)
+				.classifiers(endogenous.getClassifiers())
+				.extensions(endogenous.getExtensions())
+				.useDefaultConfiguration(true)
+				.determinations(AIIM2022.getConfiguration(exoLogs))
+				.globalEventAttributes(endogenous.getGlobalEventAttributes())
+				.globalTraceAttributes(endogenous.getGlobalTraceAttributes())
+				.attributes(endogenous.getAttributes())
+				.parsed(false)
+				.build()
+				.setup(context);
+		return annotated;
+		
+	}
 	
 	
 	@Plugin(
@@ -197,10 +291,10 @@ public class ExogenousDataPlugins {
 			userAccessible = true
 	)
 	@UITopiaVariant(
-			affiliation = "QUT",
-			author = "A. Banham",
-			email = "adam.banham@hdr.qut.edu.au",
-			pack = "ExogenousData"
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	@Visualizer
 	public JComponent exogenousAnnotationViewing(final UIPluginContext context, 
@@ -235,10 +329,11 @@ public class ExogenousDataPlugins {
 					+ version,
 			userAccessible = true
 	)
-	@UITopiaVariant(affiliation = "QUT",
-		author = "A. Banham", 
-		email = "adam.banham@hdr.qut.edu.au",
-		pack = "ExogenousData"
+	@UITopiaVariant(
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public ExogenousDiscoveryInvestigator NonExogenousDiscovery_DPN(
 			final UIPluginContext context, final XLog eventlog,
@@ -280,10 +375,11 @@ public class ExogenousDataPlugins {
 					+ version,
 			userAccessible = true
 	)
-	@UITopiaVariant(affiliation = "QUT",
-		author = "A. Banham", 
-		email = "adam.banham@hdr.qut.edu.au",
-		pack = "ExogenousData"
+	@UITopiaVariant(
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public ExogenousDiscoveryInvestigator ExogenousDiscovery_DPN(
 			final UIPluginContext context, final ExogenousAnnotatedLog exogenous,
@@ -318,10 +414,11 @@ public class ExogenousDataPlugins {
 					+ version,
 			userAccessible = true
 	)
-	@UITopiaVariant(affiliation = "QUT",
-		author = "A. Banham", 
-		email = "adam.banham@hdr.qut.edu.au",
-		pack = "ExogenousData"
+	@UITopiaVariant(
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public ExogenousDiscoveryInvestigator ExogenousDiscovery_PN(
 			final UIPluginContext context, final ExogenousAnnotatedLog exogenous,
@@ -360,10 +457,11 @@ public class ExogenousDataPlugins {
 					+ version,
 			userAccessible = true
 	)
-	@UITopiaVariant(affiliation = "QUT",
-		author = "A. Banham", 
-		email = "adam.banham@hdr.qut.edu.au",
-		pack = "ExogenousData"
+	@UITopiaVariant(
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public ExogenousDiscoveryInvestigator ExogenousDiscovery_PT(
 			final UIPluginContext context, final ExogenousAnnotatedLog exogenous,
@@ -377,6 +475,59 @@ public class ExogenousDataPlugins {
 		context.addConnection(new FinalMarkingConnection(pn, result.finalMarking));
 		
 		final PetriNetWithDataFactory factory = new PetriNetWithDataFactory(pn, pn.getLabel());
+		factory.cloneInitialAndFinalConnection(context);
+		final PetriNetWithData dpn = factory.getRetValue();
+		
+		final ExogenousDiscoveryInvestigator edi = ExogenousDiscoveryInvestigator.builder()
+				.source(exogenous)
+				.controlflow(dpn)
+				.context(context)
+				.build()
+				.setup()
+				.precompute();
+		
+		return edi;
+	}
+	
+	@Plugin(
+			name = "Exogenous Aware Discovery (APN)",
+			parameterLabels = {"Exogenous Annotated Log (xlog)","Control Flow (APN)"},
+			returnLabels = {"Exogenous Discovery Investigator"},
+			returnTypes = {ExogenousDiscoveryInvestigator.class},
+			categories={PluginCategory.Analytics, PluginCategory.Enhancement,
+						PluginCategory.Discovery
+			},
+			help="This plugin allows users to perform various process discovery "
+					+ "methods using an xlog and a control flow description. "
+					+ " Such as performing decision mining and then exploring "
+					+ "annotated transition guards using a visual format."
+					+ "<br> See "
+					+ " <a href=\"https://youtu.be/iSklEeNUJSc\" target=\"_blank\">"
+					+ "https://youtu.be/iSklEeNUJSc</a> for a walkthough of tooling."
+					+ version,
+			userAccessible = true
+	)
+	@UITopiaVariant(
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
+	)
+	public ExogenousDiscoveryInvestigator ExogenousDiscovery_APN(
+			final UIPluginContext context, final ExogenousAnnotatedLog exogenous,
+			final AcceptingPetriNet pn) throws Throwable {
+		
+		context.addConnection(new InitialMarkingConnection(pn.getNet(),
+				pn.getInitialMarking()));
+		for(Marking marking: pn.getFinalMarkings()) {
+			context.addConnection(new FinalMarkingConnection(pn.getNet(),
+					marking)
+			);
+		}
+		
+		
+		final PetriNetWithDataFactory factory = 
+				new PetriNetWithDataFactory(pn.getNet(), pn.getNet().getLabel());
 		factory.cloneInitialAndFinalConnection(context);
 		final PetriNetWithData dpn = factory.getRetValue();
 		
@@ -416,10 +567,10 @@ public class ExogenousDataPlugins {
 			returnLabels = {}, returnTypes = {}, userAccessible = true
 	)
 	@UITopiaVariant(
-			affiliation = "QUT",
-			author = "A. Banham",
-			email = "adam.banham@hdr.qut.edu.au",
-			pack = "ExogenousData"
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public void exogenousEnhancement(final UIPluginContext context, 
 			final XLog exogenous, final PetriNetWithData model) throws Throwable {
@@ -430,16 +581,17 @@ public class ExogenousDataPlugins {
 			name = "Make Log into Exogenous Dataset",
 			parameterLabels = {"Dataset Log",},
 			categories={PluginCategory.Analytics},
-			help="This plugin allows users to build an exogneous dataset from a log."
+			help="This plugin allows users to cast an event log into an "
+					+ "exogneous dataset. "
 					+ version,
 			returnLabels = {"Exogenous Dataset"}, returnTypes = {ExogenousDataset.class}, 
 			userAccessible = true
 	)
 	@UITopiaVariant(
-			affiliation = "QUT",
-			author = "A. Banham",
-			email = "adam.banham@hdr.qut.edu.au",
-			pack = "ExogenousData"
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public ExogenousDataset createDataset(final UIPluginContext context, 
 			final XLog datasetLog) throws Throwable {
@@ -455,23 +607,39 @@ public class ExogenousDataPlugins {
 			categories={PluginCategory.Analytics},
 			help="This plugin allows users describe exogneous dataset."
 					+ version,
-			returnLabels = {"Description of Dataset"}, returnTypes = {HTMLToString.class}, 
+			returnLabels = {"Description of ExogenousDataset"}, returnTypes = {HTMLToString.class}, 
 			userAccessible = true
 	)
 	@UITopiaVariant(
-			affiliation = "QUT",
-			author = "A. Banham",
-			email = "adam.banham@hdr.qut.edu.au",
-			pack = "ExogenousData"
+			affiliation = authorAff,
+			author = authora,
+			email = authorEmail,
+			pack = packageName
 	)
 	public HTMLToString describeDataset(final UIPluginContext context, 
 			final ExogenousDataset dataset) throws Throwable {
 		return new HTMLToString() {
+			
+			double mean = dataset.getMean();
+			double std = dataset.getStd();
 
 			public String toHTMLString(boolean includeHTMLTags) {
-				return "Dataset Type: " + dataset.getDataType().toString() + "\n"
-					   +"Data Mean : " + dataset.getMean() + "\n"
-					   +"Dataset Std : " + dataset.getStd();
+				
+				Color colour = dataset.getColourBase();
+				String hexcode = String.format("#%02X%02X%02X", 
+						colour.getRed(), colour.getGreen(), colour.getBlue());  
+				System.out.println(hexcode);
+				
+				return "<p>"
+					   + "<b>Name:</b> " + dataset.getName() + "<br>"
+					   + "<b>Size:</b> " + dataset.getSource().size() + "<br> "
+					   + "<b>Preferred Colour:</b> " + colour.toString() 
+					   		+ " ("+ hexcode + ") <br>"
+					   + "<b>Dataset Type:</b> " + dataset.getDataType().toString() 
+					   + "<br>"
+					   + "<b>Data Mean:</b> " + mean + "<br>"
+					   + "<b>Dataset Std:</b> " + std + "<br>"
+					   + "</p>";
 			}
 		};
 	}

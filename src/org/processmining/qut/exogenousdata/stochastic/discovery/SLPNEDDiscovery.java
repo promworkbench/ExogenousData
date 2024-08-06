@@ -130,10 +130,12 @@ public class SLPNEDDiscovery {
 			String line = "";
 			BitSet enabled = sem.getEnabledTransitions();
 			boolean hasTau = false;
+			boolean added = false;
 			for(int trans = 0;  trans < sem.getNumberOfTransitions(); trans++) {
 				if (enabled.get(trans)) {
 					if (!sem.isTransitionSilent(trans)) {
 						line += sem.getTransitionLabel(trans) + "|";
+						added = true;
 					} else {
 						hasTau = true;
 					}
@@ -142,8 +144,11 @@ public class SLPNEDDiscovery {
 			}
 			if (hasTau) {
 				line += "tau|";
+				added= true;
 			}
-			line = line.substring(0, line.length()-1);
+			if (added) {
+				line = line.substring(0, line.length()-1);
+			}
 			line += ",";
 			
 			double baseTotal = 0.0;

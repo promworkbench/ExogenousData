@@ -26,8 +26,6 @@ import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFacto
 import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVariablePower;
 import org.processmining.stochasticlabelledpetrinets.StochasticLabelledPetriNet;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
-
 public class StochasticLabelledPetriNetWithExogenousData implements StochasticLabelledPetriNet {
 	
 	private AcceptingPetriNet net;
@@ -108,17 +106,23 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 		indexer = 0;
 		for(Place place : net.getNet().getPlaces()) {
 			this.places.put(place, indexer);
-			this.initial_marking[indexer] = net.getInitialMarking().contains(place) ? 1: 0;
-			Collection<PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode>> inedges = net.getNet().getInEdges(place);
-			Collection<PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode>> outedges = net.getNet().getOutEdges(place);
+			this.initial_marking[indexer] = net.getInitialMarking()
+					.contains(place) ? 1: 0;
+			Collection<PetrinetEdge<? extends PetrinetNode,
+					? extends PetrinetNode>> inedges = net.getNet()
+					.getInEdges(place);
+			Collection<PetrinetEdge<? extends PetrinetNode,
+					? extends PetrinetNode>> outedges = net.getNet()
+					.getOutEdges(place);
 //			find out and in transitions for places
 			int[] inplaces = new int[net.getNet().getTransitions().size()];
 			int[] outplaces = new int[net.getNet().getTransitions().size()];
-			for( PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : inedges) {
+			for( PetrinetEdge<? extends PetrinetNode,
+					? extends PetrinetNode> edge : inedges) {
 				inplaces[this.transitions.get(edge.getSource())] = 1;
 			}
-			indexer = 0;
-			for( PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : outedges) {
+			for( PetrinetEdge<? extends PetrinetNode,
+					? extends PetrinetNode> edge : outedges) {
 				outplaces[this.transitions.get(edge.getTarget())] = 1;
 			}
 			this.input_places.put(indexer, inplaces);
@@ -135,7 +139,6 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 			for( PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : inedges) {
 				inplaces[this.places.get(edge.getSource())] = 1;
 			}
-			indexer = 0;
 			for( PetrinetEdge<? extends PetrinetNode, ? extends PetrinetNode> edge : outedges) {
 				outplaces[this.places.get(edge.getTarget())] = 1;
 			}
@@ -267,7 +270,7 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 				return entry.getKey().getLabel();
 			}
 		}
-		throw new ValueException("transition id ("+transition+") not known.");
+		return null;
 	}
 
 	public boolean isTransitionSilent(int transition) {
@@ -276,14 +279,14 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 				return entry.getKey().isInvisible();
 			}
 		}
-		throw new ValueException("transition id ("+transition+") not known.");
+		return false;
 	}
 
 	public int isInInitialMarking(int place) {
 		if (place < initial_marking.length) {
 			return initial_marking[place];
 		}
-		throw new ValueException("place id ("+place+") not known.");
+		return 0;
 	}
 
 	public int[] getInputPlaces(int transition) {

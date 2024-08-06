@@ -80,9 +80,9 @@ public class SLPNEDPrettierVisualizer extends StochasticLabelledPetriNetVisualis
 			DotNode dotNode) {
 //		remake the label of the transition to showcase weights
 		String label = escapeHtml(net.getTransitionLabel(transition));
-		DecimalFormat df = new DecimalFormat("0.000");
-		df.setMaximumFractionDigits(6);
-		df.setMinimumFractionDigits(6);
+		DecimalFormat df = new DecimalFormat("0.0000");
+		df.setMaximumFractionDigits(4);
+		df.setMinimumFractionDigits(4);
 		double base = net.getBaseWeight(transition);
 		Map<String, Tuple<Double, Double>> adjusters = net.getAdjustments(transition);
 //		change shape
@@ -182,9 +182,7 @@ public class SLPNEDPrettierVisualizer extends StochasticLabelledPetriNetVisualis
 						+ ">"
 						+ " * "
 						+ df.format(adjusterValue)
-						+ " ^ |"
-						+ adjuster
-						+ "| "
+						+ "^(TTES) "
 						+ "</TD>");
 				keep = true;
 			} else {

@@ -10,8 +10,10 @@ import org.deckfour.xes.model.XTrace;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
+import lombok.NoArgsConstructor;
 
 /**
  * This slicer will create a slice between an endogenous trace and exogenous time series,
@@ -26,6 +28,8 @@ import lombok.Builder.Default;
  *
  */
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PastOutcomeSlicer implements Slicer {
 	
 	@Default private String shortName = "POS";

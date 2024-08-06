@@ -10,7 +10,7 @@ public interface Distancer {
 	 * @param B a n-dimensional vector
 	 * @return The distance between A and B
 	 */
-	public double distance(FeatureVector A, FeatureVector B);
+	public double distance(FeatureVector A, FeatureVector B) throws Throwable;
 	
 	/**
 	 * Ensures that two vectors are compatible for distance measures. Will throw IllegalStateException if A and B are not compatible.
