@@ -2,25 +2,53 @@
 
 # Exogenous Data ProM Plugin
 
-This is a plugin for the ProM framework, which implements several tools around xPM, a framework for process mining with exogenous data. One of the main features for this plugin is an interative interface for several steps of the framework. i.e. viewing an xlog, performing decision mining with exogenous data and generating Explorative Exogenous Signal Anylsis (EESA) visualisations (and ranking a collection). While this plugin creates a user-friendly way to interface with the xPM framework, the inputs and outputs (exo-panels and their creations) are still unstable and require a complete formalisation. Furthermore, only a limited set of transformers and slicers are supported. Thus, customised implementations are required for non-trivial slices or transforms. Please get in contact if you require assistance with the creation of exo-panels or exo-descriptions, or non-trivial options for creating determinations in a xPM instantiation.
+This is a plugin for the ProM framework, which implements several tools 
+around xPM, a framework for process mining with exogenous data [5]. One 
+of the main features for this plugin is an interative interface for 
+several steps of the framework. i.e. viewing an xlog, performing decision 
+mining with exogenous data and generating Explorative Exogenous Signal 
+Anylsis (EESA) visualisations (and ranking a collection). While this plugin 
+creates a user-friendly way to interface with the xPM framework, the inputs 
+and outputs (exo-panels and their creations) are still somewhat ad-hoc. 
+Furthermore, only a limited set of transformers and slicers are supported. 
+Please get in contact if you require assistance with the creation of
+ exo-panels or exo-descriptions, or non-trivial options for creating 
+ determinations in a xPM instantiation.
 
-The development cycle for this plugin, is that this repo is the source of truth, while the T/ue svn server treated as a production server. As such, only [major releases](https://github.com/AdamBanham/ExogenousData/releases) are pushed to the nightly build of ProM. We tag released versions and an automated workflow is triggered to push to the svn server.
-If you do run into any issues using our plugin, please attempt to reproduce the issue using the code in this repo for testing, as the nightly build may be several commits behind. The current development goals can be seen in the projects attached to this repo, where each interface has ideas and features highlighted by their progress to release.
+The development cycle for this plugin, is that only 
+[major releases](https://github.com/promworkbench/ExogenousData/releases) 
+are pushed to the nightly build of ProM. We tag released versions and an 
+automated workflow action builds the source required for ProM installations.
+If you do run into any issues using our plugin, please attempt to 
+reproduce the issue using the code in this repo for testing, as the nightly 
+build may be several commits behind.
 
 # Exemplar Usage
 
-For thoses that are interested in seeing what the xPM framework can do or want to check out the plugin's tools, we have provided some exemplar logs and an video overview of the plugin.
+For thoses that are interested in seeing what the xPM framework can do or 
+want to check out the plugin's tools, we have provided some exemplar logs 
+and an video overview of the plugin.
 
-See the following write up for more infomation on the exemplar use case [here](exemplar/readme.md).
+See the following write up for more infomation on the exemplar use 
+case [here](exemplar/readme.md).
 
-## Runner configuration
+## Eclipse or other build VM arguments for development
 
--Djava.library.path=C:\Users\Adam_\OneDrive\Desktop\ProM\ProM-nightly-20240208-1.8\ProM-nightly-20240208-1.8\packages\lpsolve-5.5.4\lib\win64
--Djava.system.class.loader=org.processmining.framework.util.ProMClassLoader
+8GB should be enough to run test without any worry, likely could get away 
+with  much less. lpsolve is required for many of the techniques, as 
+alignments are used. For development purposes, the binaries are included in
+`\lib`.
+
+```
+-ea -Xmx8G -XX:MaxPermSize=256m -Djava.library.path=. 
+-Djava.util.Arrays.useLegacyMergeSort=true  -Djava.library.path=.\lib\
+```
 
 ## Features 
 
-The following features have been implemented and can be accessed within ProM via the appropriate plugin. Each the following sections outline the plugin functions and outcomes.
+The following features have been implemented and can be accessed within 
+ProM via the appropriate plugin. The following sections outline 
+plug-ins, features, and outcomes.
 
 ### Exogenous Annotated  Log Explorer
 
@@ -38,14 +66,20 @@ builder pattern.
 
 - Apply one of the following plug-in, "Exogenous Annotated Log Preparation..." 
   to construct determinations and anotate an eventlog:
-  ![Exogenous Annotated Log Preparation Plugin](docs/screens/Exogenous_Annotated_Log_Preparation.png)
+  
+![Exogenous Annotated Log Preparation Plugin](docs/screens/Exogenous_Annotated_Log_Preparation.png)
+
 - After which, a wizard will ask for the types of slicing functions to use, 
   these can be specified for a given exo-panel or generically over all panels
-  ![Exogenous Annotated Log Preparation Plugin](docs/screens/Exogenous_Annotated_Log_Preparation_Slicing.png)
+
+![Exogenous Annotated Log Preparation Plugin](docs/screens/Exogenous_Annotated_Log_Preparation_Slicing.png)
+
 - Next, the wizard will ask for the transformation functions to use with slicing,
   again these can be specified for all slicing, or for a targeted X.
-  ![Exogenous Annotated Log Preparation Plugin](docs/screens/Exogenous_Annotated_Log_Preparation_gtransform.PNG)
-  ![Exogenous Annotated Log Preparation Plugin](docs/screens/Exogenous_Annotated_Log_Preparation_ttransform.PNG)
+
+![Exogenous Annotated Log Preparation Plugin](docs/screens/Exogenous_Annotated_Log_Preparation_gtransform.PNG)
+![Exogenous Annotated Log Preparation Plugin](docs/screens/Exogenous_Annotated_Log_Preparation_ttransform.PNG)
+
 - Finally, the collection of determinations are applied to the log to create an
   xlog.
 
@@ -58,23 +92,27 @@ exogenous data within the xlog. This plugin is also available from the dropdown
  by clicking on the chevrons denoting the sequence of events.
  
 - Visualiser waits for an endogenous trace to be clicked on
-  ![Exogenous Annotated Log Explorer - Landing Page](docs/screens/xlog_explorer_open.png)
+  
+![Exogenous Annotated Log Explorer - Landing Page](docs/screens/xlog_explorer_open.png)
 
 After an endogensou trace has been selected, the right side will population and
 show the exogenous data related to the trace's events.
 
 - The right-side is populated with overview graph at right-top and a breakdown
   of the events at right-bottom,
-  ![Exogenous Annotated Log Explorer - Trace Overview](docs/screens/xlog_explorer_trace.png)
+  
+![Exogenous Annotated Log Explorer - Trace Overview](docs/screens/xlog_explorer_trace.png)
   
 - Clicking on a chevron in the breakdown at right-bottom, highlights the where
   the event is in the right-top.
-  ![Exogenous Annotated Log Explorer - Trace Overview](docs/screens/xlog_explorer_trace_endo_select.PNG)
+  
+![Exogenous Annotated Log Explorer - Trace Overview](docs/screens/xlog_explorer_trace_endo_select.PNG)
   
 - Clicking one of the buttons under the graph at right-top, will perform a 
   transformation on the shown exo-series (the exo-series shown are the original
   linked exo-series from the exo-panel)
-  ![Exogenous Annotated Log Explorer - Trace Overview](docs/screens/xlog_explorer_trace_exo_transform.PNG)
+  
+![Exogenous Annotated Log Explorer - Trace Overview](docs/screens/xlog_explorer_trace_exo_transform.PNG)
 
 For the graph shown at right-top, the button "export chart data" generates a
 csv file for the revisualisation of the graph in other language, e.g. matplotlib
@@ -155,7 +193,7 @@ engineering steps.
 At this stage, three types of decision mining approaches are supported:
   - Overlapping decision miner, as proposed by Felix Mannhardt et. al [1];
   - Discrimating decision miner, as proposed by M. de Leoni et. al [2];
-  - and, by applying C4.5 as proposed by Quinlan, J. R. [3].
+  - and, the basic application of C4.5 as proposed by Quinlan, J. R. [3].
 
 Limited support is supplied for future engineering efforts proposed by 
  to include features for time series data in decision mining. Further work 
@@ -190,9 +228,9 @@ ORing between paths through the decision trees.
 ### Conformance Checking over outcomes
 
 After an investigation (decision miner called and model updated with 
-guards) is completed, the user can view the process model to quantify the
-quality of the resulting Petri net with Data. To help the understandability,
-the visualisation of the process model is updated to denote, for a measure,
+guards) is completed, the user quantify the quality of the resulting Petri 
+net with Data. To help the understandability, the visualisation of the 
+process model is updated to denote, for a measure,
 how much the transition played a positive role within quantification.
 
 To trigger quantification for an outcome, press the button "Measure Model".
