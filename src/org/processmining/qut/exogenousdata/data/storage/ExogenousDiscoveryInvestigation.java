@@ -136,6 +136,9 @@ public class ExogenousDiscoveryInvestigation {
 		this.source.getProgresser().getState(ProgressType.Investigation).setCurrent(
 				this.source.getProgresser().getState(ProgressType.Investigation).getTotal()
 		);
+		this.source.getProgresser().getState(ProgressType.Investigation).setProgress(
+				(int) this.source.getProgresser().getState(ProgressType.Investigation).getTotal()
+		);
 		this.source.createModelView(this.task.getConveretedNames(), this.outcome, this.transMap);
 	
 	}
