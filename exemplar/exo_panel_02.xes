@@ -3,11 +3,8 @@
 	<string key="concept:name" value="ExogenousData - Exemplar - exo-panel for iron" />
 	<string key="exogenous:dataset" value="TRUE">
 		<string key="exogenous:type" value="numerical" />
-		<string key="exogenous:link:method" value="match" />
-		<string key="exogenous:link:matching" value="">
-			<string key="attribute_1" value="trace:exogenous_iron" />
-</string>
-</string>
+		<string key="exogenous:link:method" value="any" />
+	</string>
 	<trace>
 		<string key="concept:name" value="xtrace_1" />
 		<string key="exogenous:name" value="iron" />
