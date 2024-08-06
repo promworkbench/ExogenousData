@@ -38,14 +38,14 @@ builder pattern.
 
 - Apply one of the following plug-in, "Exogenous Annotated Log Preparation..." 
   to construct determinations and anotate an eventlog:
-  ![Exogenous Annotated Log Preparation Plugin|200](docs/screens/Exogenous_Annotated_Log_Preparation.png)
+  ![Exogenous Annotated Log Preparation Plugin](docs/screens/Exogenous_Annotated_Log_Preparation.png)
 - After which, a wizard will ask for the types of slicing functions to use, 
   these can be specified for a given exo-panel or generically over all panels
   ![Exogenous Annotated Log Preparation Plugin](docs/screens/Exogenous_Annotated_Log_Preparation_Slicing.png)
 - Next, the wizard will ask for the transformation functions to use with slicing,
   again these can be specified for all slicing, or for a targeted X.
-  ![Exogenous Annotated Log Preparation Plugin](docs/screens/Exogenous_Annotated_Log_Preparation_gtransform.png)
-  ![Exogenous Annotated Log Preparation Plugin](docs/screens/Exogenous_Annotated_Log_Preparation_ttransform.png)
+  ![Exogenous Annotated Log Preparation Plugin](docs/screens/Exogenous_Annotated_Log_Preparation_gtransform.PNG)
+  ![Exogenous Annotated Log Preparation Plugin](docs/screens/Exogenous_Annotated_Log_Preparation_ttransform.PNG)
 - Finally, the collection of determinations are applied to the log to create an
   xlog.
 
@@ -69,12 +69,12 @@ show the exogenous data related to the trace's events.
   
 - Clicking on a chevron in the breakdown at right-bottom, highlights the where
   the event is in the right-top.
-  ![Exogenous Annotated Log Explorer - Trace Overview](docs/screens/xlog_explorer_trace_endo_select.png)
+  ![Exogenous Annotated Log Explorer - Trace Overview](docs/screens/xlog_explorer_trace_endo_select.PNG)
   
 - Clicking one of the buttons under the graph at right-top, will perform a 
   transformation on the shown exo-series (the exo-series shown are the original
   linked exo-series from the exo-panel)
-  ![Exogenous Annotated Log Explorer - Trace Overview](docs/screens/xlog_explorer_trace_exo_transform.png)
+  ![Exogenous Annotated Log Explorer - Trace Overview](docs/screens/xlog_explorer_trace_exo_transform.PNG)
 
 For the graph shown at right-top, the button "export chart data" generates a
 csv file for the revisualisation of the graph in other language, e.g. matplotlib
@@ -83,7 +83,7 @@ for python.
 All graphs shown in this screen can be exported as png or svg for uses outside
 ProM, by right clicking a graph and selecting "save as".
 
-![Exogenous Annotated Log Explorer - Trace Overview](docs/screens/xlog_explorer_trace_graph_export.png)
+![Exogenous Annotated Log Explorer - Trace Overview](docs/screens/xlog_explorer_trace_graph_export.PNG)
 
 The exported graph:
 ![Exogenous Annotated Log Explorer - Trace Overview](docs/screens/exported_graph.png)
@@ -100,7 +100,7 @@ events, or event if one is selected. These graphs can be filtered by exo-panel,
 and the slices shown in these graphs can be filtered by the silicer type.
 When no button has been pressed (green highlight) all slices are shown.
 
-![Exogenous Annotated Log Explorer - Trace Overview](docs/screens/xlog_explorer_trace_exo_filter.png)
+![Exogenous Annotated Log Explorer - Trace Overview](docs/screens/xlog_explorer_trace_exo_filter.PNG)
 
 ### Performing Exogenous Aware Discovery
 
@@ -125,7 +125,7 @@ mismatch can have extreme follow on effects.
 Best efforts have been taken to ensure that only one alignment is computed 
 and is cached for other techniques.
 
-![Exogenous Aware Discovery - Plugin](docs/screens/Exogenous_Aware_Discovery_Plugin_Mapping.png)
+![Exogenous Aware Discovery - Plugin](docs/screens/Exogenous_Aware_Discovery_Plugin_Mapping.PNG)
 
 Once the interface is set up from user confirmation of the mapping, an alignment
 is precomputed (progress towards finishing is shown in the interface) and some
@@ -174,7 +174,7 @@ reinforcements (see Section V.B in [4]). These guards are read left to right,
 where a blue box denotes a weakening, a red box denotes a strengthening, and
 any other box denotes a guard.
 
-![Exogenous Aware Discovery - Outcome](docs/screens/guard_visualisation.png)
+![Exogenous Aware Discovery - Outcome](docs/screens/guard_visualisation.PNG)
 
 For instance, the above visualisation for a transition "H" is annotated with
 a weakening across, three guards, two reinforcements and a guard (R9) of 
@@ -207,7 +207,7 @@ Support for following will be implemented in ProM soon:
   - guard-recall, as proposed in [4];
   - guard-precision, as proposed in [4].
 
-![Exogenous Aware Enhancement - Landing Page](docs/screens/Exogenous_Aware_Discovery_outcome_measure.png)
+![Exogenous Aware Enhancement - Landing Page](docs/screens/Exogenous_Aware_Discovery_outcome_measure.PNG)
 
 Each computed measure will be displayed at the top-left and across the screen, 
 as shown above.
