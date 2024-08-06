@@ -681,8 +681,11 @@ public class InvestigationTask extends SwingWorker<DiscoveredPetriNetWithData, I
 				traceSkipped += alignment.getTraceIndex().size();
 			}
 		}
-		
-		progress.setMaximum(traceFutures.size()+ estimators.entrySet().size());
+		int progressPool = traceFutures.size()+ estimators.entrySet().size();
+		int measurePool = (int) (progressPool * 0.1);
+		int measureIncr = measurePool/ estimators.entrySet().size();
+		progressPool = progressPool + measurePool;
+		progress.setMaximum(progressPool);
 		
 		for (Future<Integer> traceFuture : traceFutures) {
 			// This blocks until the trace processor is done
@@ -805,7 +808,9 @@ public class InvestigationTask extends SwingWorker<DiscoveredPetriNetWithData, I
 							+ "with f-score %s",
 							place.getLabel(), result.getQualityMeasure())
 					);
-					progress.inc();
+					for(int p=0; p <measureIncr; p++) {
+						progress.inc();
+					}
 					return result;
 				}
 

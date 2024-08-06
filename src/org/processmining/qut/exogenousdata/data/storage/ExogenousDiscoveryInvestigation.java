@@ -121,7 +121,6 @@ public class ExogenousDiscoveryInvestigation {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		for (Transition transition : this.outcome.getTransitions()) {
 			PNWDTransition transitionInPNWithData = (PNWDTransition) transition;
 			if (transitionInPNWithData.hasGuardExpression()) {
@@ -134,8 +133,9 @@ public class ExogenousDiscoveryInvestigation {
 			}
 		}
 		this.transMap = this.task.getTransMap();
-		float fin = this.source.getProgresser().getState(ProgressType.Investigation).getTotal();
-		this.source.getProgresser().getState(ProgressType.Investigation).setCurrent(fin);
+		this.source.getProgresser().getState(ProgressType.Investigation).setCurrent(
+				this.source.getProgresser().getState(ProgressType.Investigation).getTotal()
+		);
 		this.source.createModelView(this.task.getConveretedNames(), this.outcome, this.transMap);
 	
 	}
