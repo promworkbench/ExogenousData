@@ -27,4 +27,8 @@ public class WedgeBuilderFactory {
 		return new TraceHighlightWedger(traceNumber);
 	}
 	
+	public static DefaultWedgeBuilder createTraceHighlight(String concept) {
+		return new TraceHighlightWedger(concept);
+	}
+	
 }

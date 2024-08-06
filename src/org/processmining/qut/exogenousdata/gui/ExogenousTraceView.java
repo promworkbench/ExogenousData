@@ -42,6 +42,7 @@ import org.processmining.qut.exogenousdata.gui.promlist.WedgeBuilderFactory;
 import org.processmining.qut.exogenousdata.gui.workers.TraceVisEventChart;
 import org.processmining.qut.exogenousdata.gui.workers.TraceVisOverviewChart;
 import org.processmining.qut.exogenousdata.gui.workers.TraceVisTraceBreakdownCharts;
+import org.xeslite.common.XUtils;
 
 import com.fluxicon.slickerbox.ui.SlickerScrollBarUI;
 
@@ -457,7 +458,15 @@ public class ExogenousTraceView extends JPanel {
 		public void traceMouseDoubleClicked(XTrace trace, int traceIndex, int eventIndex, MouseEvent e) {
 			boolean changed = this.source.setSelectEndogenous(trace);
 			int target = changed ? traceIndex: -1;
-			this.controller.setWedgeBuilder(WedgeBuilderFactory.createTraceHighlight(target));
+			if (changed) {
+				this.controller.setWedgeBuilder(
+						WedgeBuilderFactory.createTraceHighlight( 
+								XUtils.getConceptName(trace)
+				));
+			} else {
+				this.controller.setWedgeBuilder(
+						WedgeBuilderFactory.createTraceHighlight(-1));
+			}
 			this.builder.selection.clear();
 			this.source.getTraceBreakdownView().clearFilters();
 			if (changed) {
@@ -471,7 +480,15 @@ public class ExogenousTraceView extends JPanel {
 		public void traceMouseClicked(XTrace trace, int traceIndex, int eventIndex, MouseEvent e) {
 			boolean changed = this.source.setSelectEndogenous(trace);
 			int target = changed ? traceIndex: -1;
-			this.controller.setWedgeBuilder(WedgeBuilderFactory.createTraceHighlight(target));
+			if (changed) {
+				this.controller.setWedgeBuilder(
+						WedgeBuilderFactory.createTraceHighlight( 
+								XUtils.getConceptName(trace)
+				));
+			} else {
+				this.controller.setWedgeBuilder(
+						WedgeBuilderFactory.createTraceHighlight(-1));
+			}
 			this.builder.selection.clear();
 			this.source.getTraceBreakdownView().clearFilters();
 			if (changed) {
