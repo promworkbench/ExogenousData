@@ -28,7 +28,8 @@ import lombok.NonNull;
 import lombok.Setter;
 
 @Builder
-public class ExogenousDiscoveryStatisticWorker extends SwingWorker<ProcessModelStatistics, Integer> {
+public class ExogenousDiscoveryStatisticWorker extends 
+	SwingWorker<ProcessModelStatistics, Integer> {
 
 //	builder parameters 
 	@NonNull private PNRepResult alignment;
@@ -42,7 +43,8 @@ public class ExogenousDiscoveryStatisticWorker extends SwingWorker<ProcessModelS
 //	internal variables
 	@Default @Setter boolean cancelled = false;
 	private ProgressState state;
-	@Default private Map<Transition, Integer> seenObserverations = new HashMap();
+	@Default private Map<Transition, Integer> seenObserverations = 
+			new HashMap();
 	@Default private List<Place> decisionPlaces = new ArrayList();
 	@Default private List<DecisionPoint> decisionPoints = new ArrayList();
 	
@@ -65,7 +67,8 @@ public class ExogenousDiscoveryStatisticWorker extends SwingWorker<ProcessModelS
 			}
 		}
 		
-		System.out.println("[ExogenousDiscoveryStatisticWorker] No. of Decision Points :: " + decisionPlaces.size());
+		System.out.println("[ExogenousDiscoveryStatisticWorker] "
+				+ "No. of Decision Points :: " + decisionPlaces.size());
 		
 		state.setTotal(alignment.size() + (50f * decisionPlaces.size()) );
 		return this;
@@ -89,11 +92,15 @@ public class ExogenousDiscoveryStatisticWorker extends SwingWorker<ProcessModelS
 //			walk alignment and count when needed
 			for(int i=0; i < sync.getNodeInstance().size(); i++) {
 				
-				if (sync.getStepTypes().get(i) == StepTypes.LMGOOD || sync.getStepTypes().get(i) == StepTypes.MINVI) {
+				if (sync.getStepTypes().get(i) == StepTypes.LMGOOD ||
+					sync.getStepTypes().get(i) == StepTypes.MINVI) {
 					Object node = sync.getNodeInstance().get(i);
 					
 					if ( controlflow.getTransitions().contains(node) ) {
-						seenObserverations.put((Transition) node, seenObserverations.get(node)+ mut);
+						seenObserverations.put(
+								(Transition) node, 
+								seenObserverations.get(node)+ mut
+						);
 					}
 				}
 				
@@ -153,9 +160,11 @@ public class ExogenousDiscoveryStatisticWorker extends SwingWorker<ProcessModelS
 //		find global frequencies
 		float total = 0.0f;
 		for(DecisionPoint dp: decisionPoints) {
-			dp.setRelativeFrequency( dp.getTotalInstances() /(totalDecisionInstances * 1.0f));
+			dp.setRelativeFrequency( dp.getTotalInstances() /
+					(totalDecisionInstances * 1.0f));
 			state.increment(10);
-			System.out.println("[ExogenousDiscoveryStatisticWorker] "+ dp.toString());
+			System.out.println("[ExogenousDiscoveryStatisticWorker] " + 
+					dp.toString());
 			total += dp.getRelativeFrequency();
 		}
 		
