@@ -6,7 +6,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
 import java.nio.file.Path;
 
 import javax.swing.JButton;
@@ -19,6 +18,7 @@ import org.processmining.qut.exogenousdata.gui.dot.ExoDotTransition;
 import org.processmining.qut.exogenousdata.gui.panels.ExogenousEnhancementAnalysis;
 import org.processmining.qut.exogenousdata.gui.panels.ExogenousEnhancementDotPanel;
 import org.processmining.qut.exogenousdata.gui.workers.EnhancementGraphExporter;
+import org.processmining.qut.exogenousdata.utils.FilelyUtils;
 
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -227,17 +227,21 @@ public class ExogenousEnhancementTracablity {
 				
 		public void mouseClicked(MouseEvent e) {
 //			create worker to start building out export dumps
-			Path dirPath = new File("C:\\Users\\n7176546\\OneDrive - Queensland University of Technology\\Desktop\\narratives\\dump_temp").toPath();
-			worker = EnhancementGraphExporter.builder()
-					.gui(source)
-					.datacontroller(this.source.analysis)
-					.dirPath(dirPath)
-					.build();
-			worker.execute();
-			this.button.setEnabled(false);
-			this.button.setText("Exporting...");
-			this.source.back.setEnabled(false);
-			this.source.right.setEnabled(false);
+			Path dirPath = FilelyUtils.getDirectoryPathFromUser(source.main);
+			
+			if (dirPath != null) {
+				worker = EnhancementGraphExporter.builder()
+						.gui(source)
+						.datacontroller(this.source.analysis)
+						.dirPath(dirPath)
+						.build();
+				worker.execute();
+				this.button.setEnabled(false);
+				this.button.setText("Exporting...");
+				this.source.back.setEnabled(false);
+				this.source.right.setEnabled(false);
+			}
+			
 		}
 
 		public void mousePressed(MouseEvent e) {

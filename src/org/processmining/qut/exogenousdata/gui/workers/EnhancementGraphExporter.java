@@ -41,7 +41,7 @@ public class EnhancementGraphExporter extends SwingWorker<Boolean, Integer> {
 			}
 			System.out.println("[EnhancementGraphExporter]-"+transCounter+" Starting on trans="+tran.getTransLabel());
 //			call build graphs for transition
-			tran.setTransLabel(String.format("%03d - %s", transCounter, tran.getTransLabel()));
+			tran.setTransLabel(String.format("(%03d) %s", transCounter, tran.getTransLabel()));
 			gui.getVis().updateSelectedNode(tran);
 			gui.getVis().getVis().changeDot(gui.getVis().getVis().getDot(), false);
 			datacontroller.updateAnalysis(tran);

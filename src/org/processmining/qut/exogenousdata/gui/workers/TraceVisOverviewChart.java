@@ -29,7 +29,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XAttributeTimestamp;
@@ -57,6 +56,7 @@ import org.processmining.qut.exogenousdata.gui.colours.ColourScheme;
 import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries;
 import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries.Scaling;
 import org.processmining.qut.exogenousdata.steps.transform.data.TransformedAttribute;
+import org.processmining.qut.exogenousdata.utils.FilelyUtils;
 import org.xeslite.common.XUtils;
 
 import lombok.Builder;
@@ -558,11 +558,9 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 
 	protected void exportChartData(TraceVisOverviewChart self) {
 		String caseName = self.endo.getAttributes().get("concept:name").toString();
-		fc.setSelectedFile(new File("chart_data_for_"+caseName+".csv"));
-		fc.setFileFilter(new FileNameExtensionFilter("csv file", "csv"));
-		int ret = self.fc.showSaveDialog(self.target);
-		if (ret == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
+		File file = FilelyUtils.getFileFromUser(
+				"chart_data_for_"+caseName, "csv", "csv file", self.target);
+		if (file != null) {
             System.out.println("[TraceVisOverviewChart] exporting chart data...");
             
 //            for dataset one and two in plot record the information

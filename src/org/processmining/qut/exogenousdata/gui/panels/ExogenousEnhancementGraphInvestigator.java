@@ -13,6 +13,7 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,6 +42,7 @@ import org.processmining.qut.exogenousdata.ml.clustering.distance.DynamicTimeWar
 import org.processmining.qut.exogenousdata.ml.data.FeatureVector;
 import org.processmining.qut.exogenousdata.ml.data.FeatureVectorImpl;
 import org.processmining.qut.exogenousdata.stats.tests.WilcoxonSignedRankTester;
+import org.processmining.qut.exogenousdata.utils.FilelyUtils;
 
 import com.kitfox.svg.SVGElement;
 
@@ -614,17 +616,21 @@ public class ExogenousEnhancementGraphInvestigator {
 		
 		public void mouseClicked(MouseEvent e) {
 			if (this.button.isEnabled()) {
-//				create worker and move to progress panel
-				progressLabel.setText("Exporting graphs in ranked order...");
-				this.gui.changeToProgress();
-				EnhancementRankExporter.builder()
-					.gui(gui)
-					.ranks(gui.rankerWorker.getOutcome())
-					.progress(gui.progresser)
-					.build()
-					.execute();
-				this.button.setEnabled(false);
-				this.gui.getBack().setEnabled(false);
+				Path dir = FilelyUtils.getDirectoryPathFromUser(main);
+				if (dir != null) {
+	//				create worker and move to progress panel
+					progressLabel.setText("Exporting graphs in ranked order...");
+					this.gui.changeToProgress();
+					EnhancementRankExporter.builder()
+						.gui(gui)
+						.ranks(gui.rankerWorker.getOutcome())
+						.progress(gui.progresser)
+						.dumpLocation(dir.toAbsolutePath().toString())
+						.build()
+						.execute();
+					this.button.setEnabled(false);
+					this.gui.getBack().setEnabled(false);
+				}
 			}
 			
 		}

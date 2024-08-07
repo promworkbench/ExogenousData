@@ -71,6 +71,9 @@ public class ExogenousEnhancementAnalysis {
 	
 	public ExogenousEnhancementAnalysis setup() {
 		this.selectedGrouper = sepsisInfectionGrouper;
+//		new ConceptSearchGrouper(
+//				LoggyUtils.getAllEventConcepts(source.getSource().getSource())
+//		);
 //		link main and scroll
 		this.scroll.setViewportView(this.main);
 		this.scroll.setBorder(BorderFactory.createEmptyBorder());

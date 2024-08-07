@@ -14,7 +14,6 @@ import org.processmining.qut.exogenousdata.gui.panels.ExogenousEnhancementGraphI
 import org.processmining.qut.exogenousdata.gui.panels.ExogenousEnhancementGraphInvestigator.RankedListItem;
 
 import lombok.Builder;
-import lombok.Builder.Default;
 import lombok.NonNull;
 
 @Builder
@@ -23,8 +22,7 @@ public class EnhancementRankExporter extends SwingWorker<Boolean, Integer> {
 	@NonNull ExogenousEnhancementGraphInvestigator gui;
 	@NonNull List<RankedListItem> ranks;
 	@NonNull JProgressBar progress;
-	
-	@Default private String dumpLocation = "C:\\Users\\n7176546\\OneDrive - Queensland University of Technology\\Desktop\\narratives\\dump_temp\\ranks\\"; 
+	@NonNull private String dumpLocation; 
 	
 	
 	protected Boolean doInBackground() throws Exception {
