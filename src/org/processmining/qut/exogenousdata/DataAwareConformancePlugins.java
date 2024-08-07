@@ -51,7 +51,7 @@ public class DataAwareConformancePlugins {
 			help="Computes a playout transition tree for a given graph.\n"
 				 + "version: "
 				 + version,
-			categories={PluginCategory.Discovery},
+			categories={PluginCategory.Discovery,PluginCategory.ConformanceChecking},
 			userAccessible = true
 	)
 	@UITopiaVariant(
@@ -63,7 +63,7 @@ public class DataAwareConformancePlugins {
 	public PNWDTransitionTree generatePlayoutTree(final UIPluginContext context, 
 			PetriNetWithData dpn) {
 		return new PNWDTransitionTree(
-				new PNWDPlayoutEngine().generateTraces(dpn, 4)
+				new PNWDPlayoutEngine().generateTraces(dpn, 6)
 		);
 	}
 	
