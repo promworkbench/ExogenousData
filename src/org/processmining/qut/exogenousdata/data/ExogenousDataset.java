@@ -42,22 +42,29 @@ public class ExogenousDataset {
 			// attempt to determine data type for measurements in log
 			try {
 				dataType = ExogenousUtils.findDataType(source);
-				System.out.println("[ExogenousDataset] data type set as :: "+dataType.toString());
+				System.out.println("[ExogenousDataset] "
+						+ "data type set as :: "+dataType.toString());
 			} catch (ExogenousAttributeNotFoundException e) {
-				System.out.println("[ExogenousDataset] Unable to determine datatype of log :: "+this.source.getAttributes().get("concept:name").toString());
+				System.out.println("[ExogenousDataset] "
+						+ "Unable to determine datatype of log :: "
+						+this.source.getAttributes().get("concept:name").toString());
 				throw new CannotConvertException(source, this);
 			}
 			// attempt to determine link type for data set
 			try {
 				linkType = ExogenousUtils.findLinkType(source);
-				System.out.println("[ExogenousDataset] link type set as :: "+linkType.toString());
+				System.out.println("[ExogenousDataset] "
+						+ "link type set as :: "+linkType.toString());
 			} catch (ExogenousAttributeNotFoundException e) {
-				System.out.println("[ExogenousDataset] Unable to determine datatype of log :: "+this.source.getAttributes().get("concept:name").toString());
+				System.out.println("[ExogenousDataset] "
+						+ "Unable to determine datatype of log :: "
+						+this.source.getAttributes().get("concept:name").toString());
 				throw new CannotConvertException(source, this);
 			}		
 			// attempt to construct a linker for data set
 			linker = ExogenousUtils.constructLinker(source, this);
-			System.out.println("[ExogenousDataset] linker created as :: "+linker.getClass().getSimpleName());
+			System.out.println("[ExogenousDataset] "
+					+ "linker created as :: "+linker.getClass().getSimpleName());
 
 		} else {
 			throw new CannotConvertException(source, this);
@@ -122,6 +129,14 @@ public class ExogenousDataset {
 							mean+= (int) val;
 						} else if (val instanceof Double) {
 							mean+= (double) val;
+						} else if (val instanceof String) {
+							mean+= Double.parseDouble((String) val);
+						} else {
+							System.out.println("[ExogenousDataset]"
+									+ "Opps couldnt find transform for: "
+									+ val.getClass()
+									+"|"
+									+ val);
 						}
 						total += 1;
 					}
@@ -129,10 +144,12 @@ public class ExogenousDataset {
 				}
 				this.mean = mean / total;
 				this.computedMean = true;
-				System.out.println("Dataset ("+getName()+") mean computed :: "+mean);
+				System.out.println("[ExogenousDataset]"
+						+ "Dataset ("+getName()+") mean computed :: "+mean);
 				return this.mean;
 			} else {
-				throw new Exception("Unable to compute mean on non-numerical datasets.");
+				throw new Exception("[ExogenousDataset]"
+						+ "Unable to compute mean on non-numerical datasets.");
 			}
 		} else {
 			return this.mean;
@@ -149,21 +166,33 @@ public class ExogenousDataset {
 				for( XTrace xseries : source) {
 					for(XEvent ev : xseries) {
 						Object val = ExogenousDatasetAttributes.extractExogenousValue(ev);
+						double valer = 0.0;
 						if (val instanceof Integer) {
-							std += Math.pow(((int) ExogenousDatasetAttributes.extractExogenousValue(ev)) - mean, 2.0);
+							valer += (int) val;
 						} else if (val instanceof Double) {
-							std += Math.pow(((double) ExogenousDatasetAttributes.extractExogenousValue(ev)) - mean, 2.0);
+							valer+= (double) val;
+						} else if (val instanceof String) {
+							valer+= Double.parseDouble((String) val);
+						} else {
+							System.out.println("[ExogenousDataset]"
+									+ "Opps couldnt find transform for: "
+									+ val.getClass()
+									+"|"
+									+ val);
 						}
+						std += Math.pow(valer - mean, 2.0);
 						total += 1;
 					}
 					
 				}
 				this.std = Math.sqrt(std / total);
-				System.out.println("Dataset ("+getName()+") std computed :: "+this.std);
+				System.out.println("[ExogenousDataset]"
+						+ "Dataset ("+getName()+") std computed :: "+this.std);
 				this.computedStd = true;
 				return this.std;
 			} else {
-				throw new Exception("Unable to compute mean on non-numerical datasets.");
+				throw new Exception("[ExogenousDataset]"
+						+ "Unable to compute mean on non-numerical datasets.");
 			}
 		} else {
 			return this.std;
