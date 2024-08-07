@@ -28,9 +28,9 @@ public class StochasticExogenousDepenencies {
 	private static final String authorAff = ExogenousDataStatics.authoraAff;
 	
 	@Plugin(
-			name = "Discover Stochastic Exogenous Depenencies in a Petri Net (xLog).",
+			name = "Discover Stochastic Exogenous Depenencies in a Petri Net (Exo-SLPN)(xLog).",
 			parameterLabels = {"Exogenous Annotated Log", "Accepting Petri net"},
-			returnLabels = {"Stochastic Labelled Petri Net with Exogenous Dependencies"},
+			returnLabels = {"Exo-SLPN"},
 			returnTypes = {StochasticLabelledPetriNetWithExogenousData.class},
 			help="Discovers adjustment and base weights based on the following paper [x] (TODO)"
 					+ version,
@@ -50,9 +50,9 @@ public class StochasticExogenousDepenencies {
 	}
 	
 	@Plugin(
-			name = "Discover Stochastic Exogenous Depenencies in a Petri Net (Datasets).",
+			name = "Discover Stochastic Exogenous Depenencies in a Petri Net (Exo-SLPN)(Datasets).",
 			parameterLabels = {"Exogenous Annotated Log", "Accepting Petri net", "Exogenous Datasets"},
-			returnLabels = {"Stochastic Labelled Petri Net with Exogenous Dependencies"},
+			returnLabels = {"Exo-SLPN"},
 			returnTypes = {StochasticLabelledPetriNetWithExogenousData.class},
 			help="Discovers adjustment and base weights based on the following paper [x] (TODO)"
 					+ version,
@@ -76,8 +76,8 @@ public class StochasticExogenousDepenencies {
 	}
 	
 	@Plugin(
-			name = "Compute duEMSC for SLPNED (Datasets).",
-			parameterLabels = {"Log", "SLPNED", "Exogenous Datasets"},
+			name = "Compute duEMSC for Exo-SLPN (Datasets).",
+			parameterLabels = {"Log", "Exo-SLPN", "Exogenous Datasets"},
 			returnLabels = {"duEMSC"},
 			returnTypes = {HTMLToString.class},
 			help="Computes duEMSC for an SLPNED, by casting the exogenous factors to data attributes. [x] (TODO)"
