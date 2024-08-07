@@ -503,7 +503,7 @@ public class ChoiceCollector {
 							.powers(thetas[gen])
 							.firingSeq(findFiringSeq(gen))
 							.build();
-					System.out.println(point.toString());
+//					System.out.println(point.toString());
 					ret[genIndex] = point;
 					genIndex++;
 				} catch (Exception e) {
@@ -800,6 +800,7 @@ public class ChoiceCollector {
 									.build();
 						} catch (Throwable e) {
 //							already checked, shouldn't happen
+							e.printStackTrace();
 						}
 						
 				} else {
