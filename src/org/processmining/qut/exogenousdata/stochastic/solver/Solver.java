@@ -26,7 +26,7 @@ public class Solver {
 
 	public static final double lowest = 0.0001;
 	
-//	Controls for the paramter values
+//	Controls for the parameter values
 //	having a wider range is better than a small range for solver
 	public static double MIN = 0.0001;
 	public static double MAX = 100000.0;
