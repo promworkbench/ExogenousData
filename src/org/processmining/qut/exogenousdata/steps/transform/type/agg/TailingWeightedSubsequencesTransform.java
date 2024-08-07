@@ -94,6 +94,10 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 					relativeTimes.stream()
 						.mapToDouble(t -> 1.0/ (1.0 + Math.abs(t)))
 						.reduce(0.0, Double::sum);
+			if (norm == 0.0) {
+				System.out.println("[TailingWeightedSubsequencesTransform] "
+						+ "Computed norm is zero, transform is unlikely to work");
+			}
 			agg = 
 				IntStream.range(0, values.size()-1)
 					.mapToDouble(i -> 
@@ -105,7 +109,8 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 		}
 			
 		if (Double.isNaN(agg) || Double.isInfinite(agg)) {
-			System.out.println("opps returning bad transform ::"+agg);
+			System.out.println("[TailingWeightedSubsequencesTransform] "
+					+ "opps returning bad transform ::"+agg);
 			agg = 0;
 		}
 		return new TransformedAttribute(
