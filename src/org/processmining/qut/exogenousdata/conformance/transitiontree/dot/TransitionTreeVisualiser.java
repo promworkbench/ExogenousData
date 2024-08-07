@@ -51,7 +51,7 @@ public class TransitionTreeVisualiser {
 		dot.setNodeOption("height", "0.75");
 		dot.setNodeOption("fontname", "serif");
 		dot.setNodeOption("fontsize", "12");
-		dot.setNodeOption("fontcolor", "white");
+		dot.setNodeOption("fontcolor", "black");
 		dot.setNodeOption("fillcolor", "cadetblue");
 		dot.setNodeOption("style", "filled");
 		dot.setNodeOption("shape", "circle");
@@ -94,14 +94,16 @@ public class TransitionTreeVisualiser {
 						+ flow.guard().cannonRepresentation()
 							.replace("<", "&lt;")
 							.replace(">", "&gt;")
+							.replace("&&", "&amp;&amp;")
+							.replace("$3A", ":")
 							.replace("gT", "g<sub>T</sub>")
-						+ "]>");
+						+ " ]>");
 			} else {
 				dotEdge.setOption("taillabel", "<"
 						+ "["
 						+ flow.label()
 						+ ",g<sub>T</sub> "
-						+ "]>");
+						+ " ]>");
 			}
 			dotEdge.setOption("headlabel", "<"
 					+ "<font color=\"darkgray\">"
