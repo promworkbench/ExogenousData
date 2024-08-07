@@ -28,7 +28,7 @@ public class StochasticExogenousDepenencies {
 	private static final String authorAff = ExogenousDataStatics.authoraAff;
 	
 	@Plugin(
-			name = "Discover Stochastic Exogenous Depenencies in a Petri Net (Exo-SLPN)(xLog).",
+			name = "Discover Stochastic Exogenous Dependencies in a Petri Net (Exo-SLPN)(xLog).",
 			parameterLabels = {"Exogenous Annotated Log", "Accepting Petri net"},
 			returnLabels = {"Exo-SLPN"},
 			returnTypes = {StochasticLabelledPetriNetWithExogenousData.class},
@@ -50,7 +50,7 @@ public class StochasticExogenousDepenencies {
 	}
 	
 	@Plugin(
-			name = "Discover Stochastic Exogenous Depenencies in a Petri Net (Exo-SLPN)(Datasets).",
+			name = "Discover Stochastic Exogenous Dependencies in a Petri Net (Exo-SLPN)(Datasets).",
 			parameterLabels = {"Exogenous Annotated Log", "Accepting Petri net", "Exogenous Datasets"},
 			returnLabels = {"Exo-SLPN"},
 			returnTypes = {StochasticLabelledPetriNetWithExogenousData.class},
@@ -106,7 +106,7 @@ public class StochasticExogenousDepenencies {
 		return new HTMLToString() {
 
 			public String toHTMLString(boolean includeHTMLTags) {
-				return "data-aware Earth Movers' Stochastic Conformance: " + measure;
+				return "Data-aware Earth Movers' Stochastic Conformance: " + measure;
 			}
 		};
 	}
