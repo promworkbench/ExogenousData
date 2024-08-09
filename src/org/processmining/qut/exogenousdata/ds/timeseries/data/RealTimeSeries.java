@@ -3,6 +3,7 @@ package org.processmining.qut.exogenousdata.ds.timeseries.data;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.processmining.qut.exogenousdata.ds.timeseries.approx.TimeSeriesSaxApproximator;
 import org.processmining.qut.exogenousdata.ds.timeseries.norm.TimeSeriesGuassianNormaliser;
@@ -180,6 +181,22 @@ public class RealTimeSeries implements TimeSeries<Double, Double, RealTimePoint>
 				getName(),
 				getColor(),
 				splitPoints 
+		);
+	}
+	
+	/**
+	 * Reduce series to only points from between the given times.
+	 * @param start
+	 * @param end
+	 * @return A new reduced series
+	 */
+	public RealTimeSeries reduceToBetweenTime(double start, double end) {
+		return new RealTimeSeries( 
+			getName(), getColor(),
+			sequence.stream()
+				.filter(s -> s.getTime() >= start && s.getTime() <= end)
+				.map(s -> new RealTimePoint(s.getTime(), s.getValue()))
+				.collect(Collectors.toList())
 		);
 	}
 	

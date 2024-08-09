@@ -22,6 +22,9 @@ public class PiecewiseAggregateReduction implements TimeSeriesReducer<RealTimeSe
 					"[PiecewiseAggregateReduction] PPA window reduced from %d to...",
 					numOfWindows)
 			);
+			if (series.getSize() < 2) {
+				return series;
+			}
 			if (series.getSize() < 20) {
 				numOfWindows = 1;
 			} else {
@@ -34,12 +37,13 @@ public class PiecewiseAggregateReduction implements TimeSeriesReducer<RealTimeSe
 		List<Double> retValues = new ArrayList<Double>(numOfWindows);
 		List<Double> retTimes = new ArrayList<Double>(numOfWindows);
 		// perform aggregation
+		Double start = series.getTimes().get(0);
+		Double end = series.getTimes().get(series.getSize()-1);
+		Double step = (end - start) / numOfWindows;
+		end = start + step;
 		// c^_i = w/n * sum(c_j)
 		for(int i=1;i <= numOfWindows; i++) {
-			int start = ((series.getSize()/ numOfWindows) * (i - 1)) + 1;
-			int end = (series.getSize()/numOfWindows) * i;
-			RealTimeSeries frame = series.splitSeriesByIndex(start, end+1);
-			
+			RealTimeSeries frame = series.reduceToBetweenTime(start, end);
 			if (frame.getSize() == 1) {
 				RealTimePoint point = frame.getPoints().get(0);
 				retValues.add(point.getValue());
@@ -49,8 +53,10 @@ public class PiecewiseAggregateReduction implements TimeSeriesReducer<RealTimeSe
 			} else {
 				double mean = frame.computeWeightedMean();
 				retValues.add(mean);
-				retTimes.add(frame.getTimes().get(frame.getSize()-1));
+				retTimes.add(start + step/2.0);
 			}
+			start += step;
+			end += step;
 		}
 		
 		if (retValues.size() != numOfWindows) {
