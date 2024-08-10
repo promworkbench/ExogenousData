@@ -59,6 +59,23 @@ public class PNWDTransitionTreeTest {
 		}
 	}
 	
+	
+	@Test
+	public void attemptLongConstructionsWithReworkTest() {
+		PetriNetWithData model = LoadyUtils.loadDPNFromFile(
+				modelReworkPath.toFile());
+		if (model == null) {
+			fail("Unable to load in testing pnml file for DPN.");
+		}
+		try {
+		PNWDTransitionTree tree = new PNWDTransitionTree(
+				new PNWDPlayoutEngine().generateTraces(model, 10));
+		} catch (Exception e) {
+			fail("Unable to build a deep tree with stack::"
+					+e.getStackTrace().toString());
+		}
+			
+	}
 	@Test
 	public void ensureCorrectNodeTests() {
 		PetriNetWithData model = LoadyUtils.loadDPNFromFile(modelReworkPath.toFile());
