@@ -7,7 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.time.StopWatch;
+import org.processmining.contexts.uitopia.UIPluginContext;
+import org.processmining.framework.plugin.Progress;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PNWDTransition;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithData;
@@ -16,17 +20,29 @@ import org.processmining.models.semantics.petrinet.impl.EfficientPetrinetSemanti
 
 public class PNWDPlayoutEngine 
 	implements PlayoutEngine<PetriNetWithData, PlayoutTraceWithGuards> {
+	
+	private UIPluginContext context = null;
+	
+	public PNWDPlayoutEngine() {
+		super();
+	}
+
+	public PNWDPlayoutEngine(UIPluginContext context) {
+		super();
+		this.context = context;
+	}
 
 	public Iterable<PlayoutTraceWithGuards> 
 		generateTraces(PetriNetWithData model, int maxLength) {
 //		construct playouts by firing transition from initial marking
+		setProgCaption("Playing out the model...");
+		setMaxForProg(maxLength);
 		return new Iterable<PlayoutTraceWithGuards>() {
 			
 			public Iterator<PlayoutTraceWithGuards> iterator() {
 				// TODO Auto-generated method stub
 				List<PNWDFiringSequence> incomplete = new ArrayList();
-				Set<PNWDFiringSequence> seen = new HashSet();
-				List<PNWDFiringSequence> complete = new ArrayList();
+				List<PNWDFiringSequence> done = new ArrayList();
 //				start from the initial marking
 				incomplete.add(new PNWDFiringSequence(
 						model,
@@ -35,30 +51,108 @@ public class PNWDPlayoutEngine
 								model.getInitialMarking()
 						)
 				));
+				incMaxForProg();
 				return new Iterator<PlayoutTraceWithGuards>() {
 					
 					public boolean hasNext() {
 						// keep going until incomplete is empty
-						return incomplete.size() > 0;
+						return incomplete.size() > 0 || done.size() > 0;
 					}
 
 					public PlayoutTraceWithGuards next() {
-						// pop out and process sequence
-						PNWDFiringSequence seq = incomplete.remove(0);
-						seen.add(seq);
-						for(PNWDTransition trans : seq.next()) {
-							PNWDFiringSequence pot = seq.fire(trans);
-							if (!seen.contains(pot) 
-								&& pot.visibleLength() <= maxLength) {
-								incomplete.add(pot);
-							}
+						if (done.size() > 0) {
+							return done.remove(0).convertToPlayout();
 						}
-						return seq.convertToPlayout();
+						// pop out and process sequence
+						setProgCaption("working on playoutset of "
+								+ incomplete.size() 
+								+ " (with length of "
+								+ incomplete.get(0).visibleLength()
+								+"/"
+								+ maxLength
+								+ ")...");
+						done.clear();
+						done.addAll(incomplete);
+						incProgess();
+						StopWatch watch = StopWatch.createStarted();
+						System.out.println(
+								"[PNWDPlayoutEngine] started batch..."
+						);
+						List<PNWDFiringSequence> next = new ArrayList();
+						for(List<PNWDFiringSequence> group :incomplete.stream()
+							.parallel()
+							.map(i -> {
+								List<PNWDFiringSequence> nexts = 
+										new ArrayList<PNWDFiringSequence>();
+								for(PNWDTransition trans : i.next()) {
+									PNWDFiringSequence pot = i.fire(trans);
+									if ( pot.visibleLength() <= maxLength) {
+										nexts.add(pot);
+									}
+									
+								}
+								return nexts;
+							}).collect(
+								Collectors.toList()
+							)){
+							next.addAll(group);
+						}
+						watch.stop();
+						System.out.println(
+								"[PNWDPlayoutEngine] finished batch of "
+								+ next.size()
+								+ " after "
+								+ watch.formatTime()
+						);
+//						System.out.println(next);
+						incomplete.clear();
+						incomplete.addAll(next);
+						return done.remove(0).convertToPlayout();
 					}
-		
 				};
 			}
 		};
+	}
+	
+	private void setProgCaption(String caption) {
+		if (context != null) {
+			synchronized (context) {
+				context.log(caption);
+			}
+			
+		}
+	}
+	
+	private void setMaxForProg(int max) {
+		if (context != null) {
+			synchronized (context) {
+				context.getProgress().setMaximum( 
+						context.getProgress().getMaximum() + max);
+			}
+		}
+	}
+	
+	private void incMaxForProg() {
+		if (context != null) {
+			synchronized (context) {
+				Progress progressor = context.getProgress();
+				progressor.setMaximum( progressor.getMaximum() + 1);
+			}
+		}
+	}
+	
+	private void incProgess() {
+		if (context != null) {
+			synchronized (context) {
+				Progress progressor = context.getProgress();
+//				context.log("current ::"
+//						+ progressor.getValue()
+//						+ "/"
+//						+ progressor.getMaximum());
+				progressor.setValue(progressor.getValue()+1);
+				context.notify();
+			}
+		}
 	}
 	
 	public static class PNWDFiringSequence {
@@ -124,8 +218,7 @@ public class PNWDPlayoutEngine
 			nhist.addAll(history);
 			nhist.add(trans);
 			EfficientPetrinetSemanticsImpl nsemantics = new EfficientPetrinetSemanticsImpl(
-					net,
-					semantics.getCurrentState()
+					semantics
 			);
 			nsemantics.directExecuteExecutableTransition(trans);
 			return new PNWDFiringSequence(net, nhist, nsemantics);
