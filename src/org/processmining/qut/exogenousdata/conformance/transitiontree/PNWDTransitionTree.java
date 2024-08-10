@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.qut.exogenousdata.conformance.playout.PlayoutStepWithGuard;
 import org.processmining.qut.exogenousdata.conformance.playout.PlayoutTraceWithGuards;
@@ -34,19 +35,20 @@ public class PNWDTransitionTree implements
 //		go through playouts and generate nodes and flows for the tree.
 		Map<String,TTNode> prevNodes = new HashMap<>(); 
 		prevNodes.put(root.getVariant().toString(), root);
+		StopWatch watch = new StopWatch();
+		watch.start();
+		int steper = 1;		
 		for(PlayoutTraceWithGuards playout : playouts) {
 			TTNode last = root;
 			List<TTFlowWithGuard> path = new ArrayList();
+			List<String> variant = new ArrayList();
+			int len=0;
 			for( PlayoutStepWithGuard step : playout.getSteps()) {
 				if (step.isHalt()) {
 					last.setTerminal(true);
 					break;
 				}
 				TTNode next = PNWDTransitionTreeFactory.constructNode(path);
-				List<String> variant = new ArrayList();
-				for(String label : next.getVariant()) {
-					variant.add(label);
-				}
 				variant.add(step.getLabel());
 				TTFlowWithGuard flow;
 				if (prevNodes.containsKey(variant.toString())) {
@@ -61,9 +63,28 @@ public class PNWDTransitionTree implements
 				path.add(flow);
 				flows.add(flow);
 				last = next;
+				len++;
 			}
+			steper++;
+			if (steper % 5000 == 0) {
+				steper = 1;
+				System.out.println("[PNWDTransitionTree] Handled 5000 playouts "
+						+ "with len of "+ len);
+			}
+			
 		}
+		watch.split();
+		System.out.println(
+				"[PNWDTransitionTree] "
+				+ "constructed tree in "
+				+ watch.formatSplitTime());
 		applyFlowReduction();
+		watch.split();
+		System.out.println(
+				"[PNWDTransitionTree] "
+				+ "flow reduction completed in "
+				+ watch.formatSplitTime());
+		watch.stop();
 	}
 	
 	public void applyFlowReduction() {
