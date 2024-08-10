@@ -41,6 +41,11 @@ public class CManyMatching implements Matching<XEvent, TTFlowWithGuard> {
 		String variant = TraceyUtils.getControlFlowVariant(trace);
 		Iterable<Iterable<MatchingStep<XEvent, TTFlowWithGuard>>> ret;
 		if (history.containsKey(variant)) {
+			System.out.println("looking up "
+				+ variant
+				+ " found "
+				+ history.get(variant)
+			);
 			ret = history.get(variant);
 			return ret;
 		} else {
@@ -79,6 +84,7 @@ public class CManyMatching implements Matching<XEvent, TTFlowWithGuard> {
 		}
 		if (lowestCost == 0) {
 //			no point checking non terminals, if lowest cost is already optimal.
+			history.put(variant, temp);
 			return temp;
 		}
 //		look at nodes with the same length
@@ -130,6 +136,7 @@ public class CManyMatching implements Matching<XEvent, TTFlowWithGuard> {
 			}
 		}
 		ret = temp;
+		history.put(variant, ret);
 		return ret;
 	}
 	
