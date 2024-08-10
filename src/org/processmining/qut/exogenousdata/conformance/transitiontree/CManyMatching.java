@@ -11,7 +11,6 @@ import java.util.Set;
 
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XTrace;
-import org.processmining.qut.exogenousdata.utils.EventyUtils;
 import org.processmining.qut.exogenousdata.utils.TraceyUtils;
 
 public class CManyMatching implements Matching<XEvent, TTFlowWithGuard> {
@@ -41,11 +40,6 @@ public class CManyMatching implements Matching<XEvent, TTFlowWithGuard> {
 		String variant = TraceyUtils.getControlFlowVariant(trace);
 		Iterable<Iterable<MatchingStep<XEvent, TTFlowWithGuard>>> ret;
 		if (history.containsKey(variant)) {
-			System.out.println("looking up "
-				+ variant
-				+ " found "
-				+ history.get(variant)
-			);
 			ret = history.get(variant);
 			return ret;
 		} else {
@@ -138,32 +132,6 @@ public class CManyMatching implements Matching<XEvent, TTFlowWithGuard> {
 		ret = temp;
 		history.put(variant, ret);
 		return ret;
-	}
-	
-	public int computeCost(Iterable<MatchingStep<XEvent, TTFlowWithGuard>> path,
-			XTrace trace) {
-		int len = trace.size();
-		int noskip = 0;
-		int acts = 0;
-		boolean term = false;
-		for(MatchingStep<XEvent, TTFlowWithGuard> step : path) {
-			if (!step.isSkip()) {
-				noskip += 1;
-			}
-			if (step.getModel().isPresent()) {
-				term = step.getModel().get().tgt().isTerminal();
-				String mact = step.getModel().get().label();
-				if (step.getLog().isPresent()) {
-					String lact = EventyUtils.getConcept(step.getLog().get());
-					if (!lact.equals(mact)) {
-						acts += 1;
-					}
-				}
-			} else {
-				term = false;
-			}
-		}
-		return len - noskip + acts + (!term ? 1 : 0);
 	}
 	
 	private Iterable<MatchingStep<XEvent, TTFlowWithGuard>> buildSequence(
