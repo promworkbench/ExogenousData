@@ -27,11 +27,14 @@ public class PNWDTransitionTreeFactory {
 	 * @return
 	 */
 	public static TTNode constructNode(List<TTFlowWithGuard> path) {
-		return new TTNode(new ArrayList() {{ addAll(path); }}, null, new ArrayList());
+		return new TTNode(
+				new ArrayList() {{ addAll(path); }}, null, new ArrayList());
 	}
 	
-	public static TTFlowWithGuard constructFlow(TTNode src, TTNode tgt, PlayoutStepWithGuard step) {
-		TTFlowWithGuard flow = new TTFlowWithGuard(step.getLabel(), step.getGuard(), src, tgt);
+	public static TTFlowWithGuard constructFlow(TTNode src, TTNode tgt, 
+			PlayoutStepWithGuard step) {
+		TTFlowWithGuard flow = new TTFlowWithGuard(
+				step.getLabel(), step.getGuard(), src, tgt);
 		src.addFlowToOutedges(flow);
 		tgt.setSuccFlow(flow);
 		return flow;
