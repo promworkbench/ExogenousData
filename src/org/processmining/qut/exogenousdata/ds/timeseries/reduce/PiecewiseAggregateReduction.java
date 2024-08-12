@@ -37,8 +37,8 @@ public class PiecewiseAggregateReduction implements TimeSeriesReducer<RealTimeSe
 		List<Double> retValues = new ArrayList<Double>(numOfWindows);
 		List<Double> retTimes = new ArrayList<Double>(numOfWindows);
 		// perform aggregation
-		Double start = series.getTimes().get(0);
-		Double end = series.getTimes().get(series.getSize()-1);
+		Double start = series.getTimes().stream().reduce(Double::min).get();
+		Double end = series.getTimes().stream().reduce(Double::max).get();
 		Double step = (end - start) / numOfWindows;
 		end = start + step;
 		// c^_i = w/n * sum(c_j)
@@ -49,7 +49,8 @@ public class PiecewiseAggregateReduction implements TimeSeriesReducer<RealTimeSe
 				retValues.add(point.getValue());
 				retTimes.add(point.getValue());
 			} else if (frame.getSize() < 1) {
-				continue;
+//				dont record a point for this window
+//				Perhaps you could impute the mean
 			} else {
 				double mean = frame.computeWeightedMean();
 				retValues.add(mean);
