@@ -245,7 +245,7 @@ public class TraceVisEventChart {
 		JPanel mainView = new JPanel();
 		mainView.setLayout(new GridBagLayout());
 		c = new GridBagConstraints();
-		c.fill = c.NONE;
+		c.fill = c.HORIZONTAL;
 //		c.gridheight = 3;
 //		c.gridwidth = 2;
 		c.gridx= 0;
@@ -255,6 +255,8 @@ public class TraceVisEventChart {
 		mainView.add(makeTitle(), c);
 		c.gridy++;
 //		add a graph panel to main view
+		plot.getDomainAxis().setAutoRange(true);
+		plot.getRangeAxis().setAutoRange(true);
 		chart = new JFreeChart(plot);
 		chart.setTitle("Slice for "+ exoSet);
 		ChartPanel graph = new ChartPanel(
@@ -262,9 +264,9 @@ public class TraceVisEventChart {
 		);
 		chart.setBackgroundPaint(Color.LIGHT_GRAY);
 		chart.getLegend().setBackgroundPaint(Color.LIGHT_GRAY);
-		graph.setPreferredSize(new Dimension(400,300));
-		graph.setMinimumSize(new Dimension(400,300));
-		graph.setMaximumSize(new Dimension(400,300));
+		graph.setPreferredSize(new Dimension(900,450));
+//		graph.setMinimumSize(new Dimension(400,300));
+//		graph.setMaximumSize(new Dimension(400,300));
 		mainView.add(graph, c);
 //		add a list of transformed attributes
 		c.gridy = 0;

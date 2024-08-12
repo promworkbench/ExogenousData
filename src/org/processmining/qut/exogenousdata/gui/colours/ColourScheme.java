@@ -12,6 +12,7 @@ public class ColourScheme {
 	public static Color pink = new Color(232,90,173);
 	public static Color coral = new Color(236,101,71);
 	public static Color blue = new Color(33,139,255);
+	public static Color teal = new Color(0,128,128);
 	public static Color green = new Color(45,164,78);
 	public static Color yellow = new Color(191,135,0);
 	public static Color orange = new Color(225,111,36);

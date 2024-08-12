@@ -12,11 +12,11 @@ public class ExoPanelPicker {
 
 	@Default private List<Color> colours = new ArrayList<Color>(){{
 		add(ColourScheme.red);
-		add(ColourScheme.purple);
-		add(ColourScheme.pink);
 		add(ColourScheme.blue);
-		add(ColourScheme.coral);
 		add(ColourScheme.green);
+		add(ColourScheme.purple);
+		add(ColourScheme.teal);
+		add(ColourScheme.pink);
 		add(ColourScheme.yellow);
 		add(ColourScheme.orange);
 	}};
