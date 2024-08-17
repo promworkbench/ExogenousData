@@ -53,7 +53,7 @@ public class TTFlowWithGuard implements TransitionTreeFlow {
 	}
 
 	public int hashCode() {
-		return Objects.hash(label, src, tgt);
+		return Objects.hash(label, guard.getID(), src.getVariant(), tgt.getVariant());
 	}
 
 	public boolean equals(Object obj) {
@@ -64,7 +64,11 @@ public class TTFlowWithGuard implements TransitionTreeFlow {
 		if (getClass() != obj.getClass())
 			return false;
 		TTFlowWithGuard other = (TTFlowWithGuard) obj;
-		return Objects.equals(label, other.label) && Objects.equals(src, other.src) && Objects.equals(tgt, other.tgt);
+		return 
+				Objects.equals(label, other.label) 
+				&& Objects.equals(src, other.src) 
+				&& Objects.equals(guard.getID(), other.guard.getID()) 
+				&& Objects.equals(tgt, other.tgt);
 	}
 
 	public String toString() {

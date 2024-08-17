@@ -41,13 +41,15 @@ public class TraversalBookkeepingEngine implements
 			for( Iterable<MatchingStep<String, TTFlowWithGuard>> path :
 				matcher.getAllPaths(trace)) {
 				Map<String,Object> dataState = new HashMap<>();
-				int stepIdx = 0;
+				int stepIdx = -1;
 				for( MatchingStep<String, TTFlowWithGuard> step : path) {
 //					update the datastate as we go
-					dataState = EventyUtils.updateAndExtractDataState(
-							dataState, 
-							trace.get(stepIdx)
-					);
+					if (stepIdx >= 0) {
+						dataState = EventyUtils.updateAndExtractDataState(
+								dataState, 
+								trace.get(stepIdx)
+						);
+					}
 //					check for tree component and see if it matches
 					if (!step.isSkip()) {
 							retTop += weight * ( 
@@ -82,13 +84,15 @@ public class TraversalBookkeepingEngine implements
 				matcher.getAllPaths(trace)) {
 				boolean found = false;
 				Map<String,Object> dataState = new HashMap<>();
-				int stepIdx = 0;
+				int stepIdx = -1;
 				for( MatchingStep<String, TTFlowWithGuard> step : path) {
 //					update the datastate as we go
-					dataState = EventyUtils.updateAndExtractDataState(
-							dataState, 
-							trace.get(stepIdx)
-					);
+					if (stepIdx >= 0) {
+						dataState = EventyUtils.updateAndExtractDataState(
+								dataState, 
+								trace.get(stepIdx)
+						);
+					}
 //					check for tree component and see if it matches
 					if (!step.isSkip()) {
 						if (step.getModel().get().equals(flow)) {

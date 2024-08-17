@@ -17,6 +17,15 @@ public class TTPathWithGuard implements TransitionTreePath<TTFlowWithGuard> {
 		path.add(flow);
 	}
 	
+	public void swap(TTFlowWithGuard oldFlow, TTFlowWithGuard newFlow) {
+		if (path.contains(oldFlow)){
+			path.replaceAll(f -> { 
+				if (f.equals(oldFlow)) { return newFlow;} 
+				return f;
+			});
+		}
+	}
+	
 	public Iterable<String> variant() {
 		// TODO Auto-generated method stub
 		return path.stream()

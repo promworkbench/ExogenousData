@@ -89,11 +89,13 @@ public class BookkeepingMeasures {
 		);
 	}
 	
-	public static double computeGuardPrecision(XLog log, PNWDTransitionTree tree) {
+	public static double computeGuardPrecision(
+			XLog log, PNWDTransitionTree tree) {
 		return 0.0;
 	}
 	
-	public static double computeGuardPrecision(XLog log, PNWDTransitionTree tree,
+	public static double computeGuardPrecision(
+			XLog log, PNWDTransitionTree tree,
 			UIPluginContext context) {
 		Progress prog = context.getProgress();
 		prog.setMaximum(prog.getMaximum() + log.size() * 2);

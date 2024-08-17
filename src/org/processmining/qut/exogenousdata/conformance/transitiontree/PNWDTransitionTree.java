@@ -89,29 +89,35 @@ public class PNWDTransitionTree implements
 	
 	public void applyFlowReduction() {
 		Set<TTFlowWithGuard> rflows = new HashSet();
+		Set<TTNode> rNodes = new HashSet();
 		for(TTNode src : nodes) {
-			Map<TTNode, List<TTFlowWithGuard>> maps = new HashMap();
+			Map<TTNode, Set<TTFlowWithGuard>> maps = 
+					new HashMap<TTNode, Set<TTFlowWithGuard>>();
 			for(TTFlowWithGuard flow : src.getOutgoingFlows()) {
 				if (maps.containsKey(flow.tgt())) {
 					maps.get(flow.tgt()).add(flow);
 				} else {
-					maps.put(flow.tgt(), new ArrayList());
+					maps.put(flow.tgt(), new HashSet());
 					maps.get(flow.tgt()).add(flow);
 				}
 			}
 			src.clearOutEdges();
-			for( Entry<TTNode, List<TTFlowWithGuard>> entry : maps.entrySet()) {
+			for( Entry<TTNode, Set<TTFlowWithGuard>> entry : maps.entrySet()) {
 				TTFlowWithGuard flow = null;
+				List<TTFlowWithGuard> outs = new ArrayList<>();
+				outs.addAll(entry.getValue());
 				if (entry.getValue().size() == 1) {
-					flow = entry.getValue().get(0);
+					flow = outs.get(0);
 				} else {
-					flow = PNWDTransitionTreeFactory.combineFlows(entry.getValue());
+					flow = PNWDTransitionTreeFactory.combineFlows(outs);
+					for(TTFlowWithGuard oFlow : entry.getValue()) {
+						flow.tgt().swapFlowInpath(oFlow, flow);
+					}
 				}
 				src.addFlowToOutedges(flow);
 				flow.tgt().setSuccFlow(flow);
 				rflows.add(flow);
 			}
-			
 		}
 		flows = rflows;
 	}

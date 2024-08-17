@@ -46,12 +46,12 @@ public class PNWDGuard implements Guard {
 		}
 		try {
 			boolean eval = (boolean) guard.evaluate(datastate);
-	//		System.out.println("Testing on datastate :: "
-	//				+ datastate.toString() 
-	//				+" result was "
-	//				+ eval
-	//				+ " for guard :: "
-	//				+ guard.toCanonicalString());
+//			System.out.println("Testing on datastate :: "
+//					+ datastate.toString() 
+//					+" result was "
+//					+ eval
+//					+ " for guard :: "
+//					+ guard.toCanonicalString());
 			if (eval == true) {
 				return GuardOutcomes.TRUE;
 			} else if (eval == false){

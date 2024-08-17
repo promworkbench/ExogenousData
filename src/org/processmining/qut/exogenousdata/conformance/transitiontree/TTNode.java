@@ -45,6 +45,10 @@ public class TTNode implements TransitionTreeNode {
 	public void addToPath(TTFlowWithGuard flow){
 		path.append(flow);
 	}
+	
+	public void swapFlowInpath(TTFlowWithGuard oldFlow, TTFlowWithGuard newFlow) {
+		path.swap(oldFlow, newFlow);
+	}
 
 	public Iterable<String> getVariant() {
 		return path.variant();
