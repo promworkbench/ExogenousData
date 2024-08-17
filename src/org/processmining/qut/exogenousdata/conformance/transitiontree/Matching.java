@@ -1,8 +1,8 @@
 package org.processmining.qut.exogenousdata.conformance.transitiontree;
 
-import org.deckfour.xes.model.XEvent;
+import java.util.List;
+
 import org.deckfour.xes.model.XTrace;
-import org.processmining.qut.exogenousdata.utils.EventyUtils;
 
 public interface Matching<T,V> {
 	
@@ -11,7 +11,7 @@ public interface Matching<T,V> {
 	 * @param trace
 	 * @return
 	 */
-	abstract public Iterable<MatchingStep<T,V>> 
+	abstract public List<MatchingStep<T,V>> 
 		getPath(XTrace trace);
 	
 	/**
@@ -19,35 +19,37 @@ public interface Matching<T,V> {
 	 * @param trace
 	 * @return
 	 */
-	abstract public Iterable<Iterable<MatchingStep<T,V>>> 
+	abstract public Iterable<List<MatchingStep<T,V>>> 
 		getAllPaths(XTrace trace);
 	
 	
 	public default int computeCost(
-			Iterable<MatchingStep<XEvent, TTFlowWithGuard>> path,
+			Iterable<MatchingStep<String, TTFlowWithGuard>> path,
 			XTrace trace) {
 		int len = trace.size();
+		int pathLen = 0;
 		int noskip = 0;
 		int acts = 0;
 		boolean term = false;
-		for(MatchingStep<XEvent, TTFlowWithGuard> step : path) {
-			if (!step.isSkip()) {
-				noskip += 1;
+		for(MatchingStep<String, TTFlowWithGuard> step : path) {
+			pathLen++;
+			if (step.isSkip()) {
+				noskip++;
 			}
 			if (step.getModel().isPresent()) {
 				term = step.getModel().get().tgt().isTerminal();
 				String mact = step.getModel().get().label();
 				if (step.getLog().isPresent()) {
-					String lact = EventyUtils.getConcept(step.getLog().get());
+					String lact = step.getLog().get();
 					if (!lact.equals(mact)) {
-						acts += 1;
+						acts++;
 					}
 				}
 			} else {
 				term = false;
 			}
 		}
-		return len - noskip + acts + (!term ? 1 : 0);
+		return (len - (pathLen - noskip)) + acts + (!term ? 1 : 0);
 	}
 
 }

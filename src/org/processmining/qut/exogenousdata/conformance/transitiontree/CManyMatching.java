@@ -7,38 +7,53 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
-import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XTrace;
+import org.processmining.qut.exogenousdata.utils.EventyUtils;
 import org.processmining.qut.exogenousdata.utils.TraceyUtils;
 
-public class CManyMatching implements Matching<XEvent, TTFlowWithGuard> {
+public class CManyMatching implements Matching<String, TTFlowWithGuard> {
 	
 	private PNWDTransitionTree tree;
 	private Map<String, 
-		Iterable<Iterable<MatchingStep<XEvent, TTFlowWithGuard>>>
+		Iterable<List<MatchingStep<String, TTFlowWithGuard>>>
 	> history;
 	
 	public CManyMatching(PNWDTransitionTree tree) {
 		super();
 		this.tree = tree;
 		this.history = new HashMap<String, 
-				Iterable<Iterable<MatchingStep<XEvent, TTFlowWithGuard>>>>();
+				Iterable<List<MatchingStep<String, TTFlowWithGuard>>>>();
+	}
+	
+	
+	public CManyMatching(PNWDTransitionTree tree, 
+			Map<XTrace, Iterable<List<MatchingStep<String, TTFlowWithGuard>>>> 
+				precompute) {
+		this(tree);
+		for( Entry<XTrace, Iterable<List<MatchingStep<String, TTFlowWithGuard>>>> 
+			entry : precompute.entrySet()) {
+			String variant = TraceyUtils.getControlFlowVariant(entry.getKey());
+			this.history.put(variant, entry.getValue());
+		}
 	}
 
-	public Iterable<MatchingStep<XEvent, TTFlowWithGuard>> 
+	public List<MatchingStep<String, TTFlowWithGuard>> 
 		getPath(XTrace trace) {
-		for( Iterable<MatchingStep<XEvent, TTFlowWithGuard>> ret : getAllPaths(trace)) {
+		String variant = TraceyUtils.getControlFlowVariant(trace);
+		for( List<MatchingStep<String, TTFlowWithGuard>> ret : getAllPaths(trace)) {
 			return ret;
 		}
 		return new ArrayList();	
 	}
 
-	public Iterable<Iterable<MatchingStep<XEvent, TTFlowWithGuard>>> 
+	public Iterable<List<MatchingStep<String, TTFlowWithGuard>>> 
 		getAllPaths(XTrace trace) {
 		String variant = TraceyUtils.getControlFlowVariant(trace);
-		Iterable<Iterable<MatchingStep<XEvent, TTFlowWithGuard>>> ret;
+		Iterable<List<MatchingStep<String, TTFlowWithGuard>>> ret;
+//		check if we already have a path ready to go
 		if (history.containsKey(variant)) {
 			ret = history.get(variant);
 			return ret;
@@ -46,7 +61,7 @@ public class CManyMatching implements Matching<XEvent, TTFlowWithGuard> {
 			history.put(variant, new ArrayList<>());
 		}
 		ret = history.get(variant);
-		Set<Iterable<MatchingStep<XEvent, TTFlowWithGuard>>> temp = 
+		Set<List<MatchingStep<String, TTFlowWithGuard>>> temp = 
 				new HashSet();
 //		look at three sets and then work back
 //		look at terminals with same length or less
@@ -60,7 +75,7 @@ public class CManyMatching implements Matching<XEvent, TTFlowWithGuard> {
 			if (node.getPath().length() == trace.size()) {
 				maybes.add(node);
 				if (node.isTerminal()) {
-					Iterable<MatchingStep<XEvent, TTFlowWithGuard>> maybePath =
+					List<MatchingStep<String, TTFlowWithGuard>> maybePath =
 							buildSequence(trace, node.getPath());
 					int cost = computeCost(
 							maybePath, trace
@@ -83,7 +98,7 @@ public class CManyMatching implements Matching<XEvent, TTFlowWithGuard> {
 		}
 //		look at nodes with the same length
 		for(TTNode node: maybes) {
-			Iterable<MatchingStep<XEvent, TTFlowWithGuard>> maybePath =
+			List<MatchingStep<String, TTFlowWithGuard>> maybePath =
 					buildSequence(trace, node.getPath());
 			if (temp.contains(maybePath)) {
 				continue;
@@ -105,7 +120,7 @@ public class CManyMatching implements Matching<XEvent, TTFlowWithGuard> {
 				Boolean[] mask = new Boolean[trace.size()];
 				Arrays.fill(mask, false);
 				mask[n] = Boolean.TRUE;
-				Iterable<MatchingStep<XEvent, TTFlowWithGuard>> maybePath =
+				List<MatchingStep<String, TTFlowWithGuard>> maybePath =
 						buildSequence(trace, shrt.getPath(),
 						Arrays.asList(mask)
 						);
@@ -134,15 +149,18 @@ public class CManyMatching implements Matching<XEvent, TTFlowWithGuard> {
 		return ret;
 	}
 	
-	private Iterable<MatchingStep<XEvent, TTFlowWithGuard>> buildSequence(
+	private List<MatchingStep<String, TTFlowWithGuard>> buildSequence(
 			XTrace trace,
 			TransitionTreePath<TTFlowWithGuard> path
 			){
-		List<MatchingStep<XEvent, TTFlowWithGuard>> ret = new ArrayList();
+		List<MatchingStep<String, TTFlowWithGuard>> ret = new ArrayList();
 		int n = 0;
 		for(TTFlowWithGuard step : path.getSteps()) {
 			ret.add(
-					new CManyMatchingStep(trace.get(n), step)
+					new CManyMatchingStep(
+							EventyUtils.getConcept(trace.get(n)),
+							step
+					)
 			);
 			n += 1;
 			if (n >= trace.size()) {
@@ -152,12 +170,12 @@ public class CManyMatching implements Matching<XEvent, TTFlowWithGuard> {
 		return ret;
 	}
 	
-	private Iterable<MatchingStep<XEvent, TTFlowWithGuard>> buildSequence(
+	private List<MatchingStep<String, TTFlowWithGuard>> buildSequence(
 			XTrace trace,
 			TransitionTreePath<TTFlowWithGuard> path,
 			Iterable<Boolean> mask
 			){
-		List<MatchingStep<XEvent, TTFlowWithGuard>> ret = new ArrayList();
+		List<MatchingStep<String, TTFlowWithGuard>> ret = new ArrayList();
 		
 		int n = 0;
 		Iterator<TTFlowWithGuard> steps = path.getSteps().iterator();
@@ -165,12 +183,17 @@ public class CManyMatching implements Matching<XEvent, TTFlowWithGuard> {
 		for(boolean skip : mask) {
 			if (skip) {
 				ret.add(
-						new CManyMatchingStep(trace.get(n))
+						new CManyMatchingStep(
+								EventyUtils.getConcept(trace.get(n))
+						)
 				);
 			} else {
 				if (steps.hasNext()) {
 					ret.add(
-							new CManyMatchingStep(trace.get(n), steps.next())
+							new CManyMatchingStep(
+								EventyUtils.getConcept(trace.get(n)),
+								steps.next()
+							)
 					);
 				} else {
 					break;

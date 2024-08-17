@@ -3,29 +3,26 @@ package org.processmining.qut.exogenousdata.conformance.transitiontree;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.deckfour.xes.model.XEvent;
-import org.processmining.qut.exogenousdata.utils.EventyUtils;
-
-public class CManyMatchingStep implements MatchingStep<XEvent, TTFlowWithGuard> {
+public class CManyMatchingStep implements MatchingStep<String, TTFlowWithGuard> {
 	
-	private XEvent event;
+	private String event;
 	private TTFlowWithGuard flow;
 	private StepType type;
 	
-	public CManyMatchingStep(XEvent event, TTFlowWithGuard flow) {
+	public CManyMatchingStep(String event, TTFlowWithGuard flow) {
 		super();
 		this.event = event;
 		this.flow = flow;
 		this.type = StepType.sync;
 	}
 	
-	public CManyMatchingStep(XEvent event) {
+	public CManyMatchingStep(String event) {
 		super();
 		this.event = event;
 		this.type = StepType.logmove;
 	}
 
-	public Optional<XEvent> getLog() {
+	public Optional<String> getLog() {
 		return Optional.ofNullable(event);
 	}
 
@@ -39,16 +36,16 @@ public class CManyMatchingStep implements MatchingStep<XEvent, TTFlowWithGuard> 
 
 	public String toString() {
 		if (type == StepType.sync) {
-			return "("+ EventyUtils.getConcept(event) 
+			return "("+ event
 			+","+flow.toString()+")";
 		} else {
-			return "("+ EventyUtils.getConcept(event) 
+			return "("+ event
 			+","+MatchingStep.SKIPPER+")";
 		}
 	}
 
 	public int hashCode() {
-		return Objects.hash(EventyUtils.getConcept(event), flow, type);
+		return Objects.hash(event, flow, type);
 	}
 
 	public boolean equals(Object obj) {
@@ -60,8 +57,8 @@ public class CManyMatchingStep implements MatchingStep<XEvent, TTFlowWithGuard> 
 			return false;
 		CManyMatchingStep other = (CManyMatchingStep) obj;
 		return Objects.equals(
-				EventyUtils.getConcept(event), 
-				EventyUtils.getConcept(other.event)) 
+				event, 
+				other.event) 
 				&& Objects.equals(flow, other.flow) 
 				&& type == other.type;
 	}

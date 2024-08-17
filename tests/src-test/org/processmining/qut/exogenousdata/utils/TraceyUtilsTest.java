@@ -3,6 +3,7 @@ package org.processmining.qut.exogenousdata.utils;
 import static org.junit.Assert.assertEquals;
 
 import org.deckfour.xes.model.XLog;
+import org.deckfour.xes.model.XTrace;
 import org.junit.Test;
 import org.processmining.log.utils.XLogBuilder;
 
@@ -23,6 +24,14 @@ public class TraceyUtilsTest {
 		assertEquals("<A,B,C>", ret);
 		ret = TraceyUtils.getControlFlowVariant(log.get(1));
 		assertEquals("<>", ret);
+	}
+	
+	@Test
+	public void testConstuctingDummyTrace() {
+		String expected = "<A,B,C>";
+		XTrace ret = TraceyUtils.createDummyVariant("A","B","C");
+		String actual = TraceyUtils.getControlFlowVariant(ret);
+		assertEquals(expected, actual);
 	}
 
 }

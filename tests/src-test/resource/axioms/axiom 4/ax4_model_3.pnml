@@ -2,7 +2,7 @@
 <pnml>
    <net id="net1" type="http://www.pnml.org/version-2009/grammar/pnmlcoremodel">
       <name>
-         <text>Axiom 4 - Model 2 - 100% False</text>
+         <text>Axiom 4 - Model 1 - 100% False</text>
       </name>
       <page id="n0">
          <name>
@@ -64,7 +64,7 @@
                <text>1</text>
             </finalMarking>
          </place>
-         <transition guard="false" id="n6">
+         <transition guard="(d5&lt;5)" id="n6">
             <name>
                <text>A</text>
             </name>
@@ -75,9 +75,9 @@
                <dimension x="25.0" y="20.0"/>
                <fill color="#FFFFFF"/>
             </graphics>
-            <writeVariable>d1</writeVariable>
+            <writeVariable>d5</writeVariable>
          </transition>
-         <transition guard="false" id="n7">
+         <transition guard="(d5&lt;5)" id="n7">
             <name>
                <text>C</text>
             </name>
@@ -89,7 +89,7 @@
                <fill color="#FFFFFF"/>
             </graphics>
          </transition>
-         <transition guard="false" id="n8">
+         <transition guard="(d5&lt;5)" id="n8">
             <name>
                <text>D</text>
             </name>
@@ -101,7 +101,7 @@
                <fill color="#FFFFFF"/>
             </graphics>
          </transition>
-         <transition guard="false" id="n9">
+         <transition guard="(d5&lt;5)" id="n9">
             <name>
                <text>B</text>
             </name>
@@ -113,7 +113,7 @@
                <fill color="#FFFFFF"/>
             </graphics>
          </transition>
-         <transition guard="false" id="n10">
+         <transition guard="(d5&lt;5)" id="n10">
             <name>
                <text>E</text>
             </name>
@@ -125,7 +125,7 @@
                <fill color="#FFFFFF"/>
             </graphics>
          </transition>
-         <transition guard="false" id="n11">
+         <transition guard="(d5&lt;5)" id="n11">
             <name>
                <text>F</text>
             </name>
@@ -137,7 +137,7 @@
                <fill color="#FFFFFF"/>
             </graphics>
          </transition>
-         <transition guard="false" id="n12">
+         <transition guard="(d5&lt;5)" id="n12">
             <name>
                <text>H</text>
             </name>
@@ -149,7 +149,7 @@
                <fill color="#FFFFFF"/>
             </graphics>
          </transition>
-         <transition guard="false" id="n13">
+         <transition guard="(d5&lt;5)" id="n13">
             <name>
                <text>G</text>
             </name>
@@ -327,7 +327,7 @@
       </finalmarkings>
       <variables>
          <variable type="java.lang.Double">
-            <name>d1</name>
+            <name>d5</name>
             <position x="0" y="0"/>
             <dimension height="50" width="50"/>
          </variable>

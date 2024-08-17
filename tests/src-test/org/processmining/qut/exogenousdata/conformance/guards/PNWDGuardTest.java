@@ -19,7 +19,7 @@ import org.processmining.qut.exogenousdata.utils.LoadyUtils;
 public class PNWDGuardTest {
 	
 	Path modelPath = Paths.get(
-			"tests","src-test","resource", "ax3_model_3.pnml");
+			"tests","src-test","resource", "axioms", "axiom 3",  "ax3_model_3.pnml");
 
 	@Test
 	public void test() {

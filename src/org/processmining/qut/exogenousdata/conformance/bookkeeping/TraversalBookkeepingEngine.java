@@ -3,7 +3,6 @@ package org.processmining.qut.exogenousdata.conformance.bookkeeping;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.contexts.uitopia.UIPluginContext;
@@ -30,22 +29,24 @@ public class TraversalBookkeepingEngine implements
 	protected UIPluginContext context;
 	protected double k = 0.9;
 
-	public double computeBookkeeping(TransitionTree<TTNode, TTFlowWithGuard> tree,
-			Matching<XEvent, TTFlowWithGuard> matcher, XLog log) {
-		// TODO Auto-generated method stub
+	public double computeBookkeeping(
+			TransitionTree<TTNode, TTFlowWithGuard> tree,
+			Matching<String, TTFlowWithGuard> matcher, 
+			XLog log) {
 		double retTop = 0.0;
 		double retBottom = 0.0;
 		for (XTrace trace : log) {
 			double weight = weightForPaths(trace, matcher);
 			int pathsForTrace = 0;
-			for( Iterable<MatchingStep<XEvent, TTFlowWithGuard>> path :
+			for( Iterable<MatchingStep<String, TTFlowWithGuard>> path :
 				matcher.getAllPaths(trace)) {
 				Map<String,Object> dataState = new HashMap<>();
-				for( MatchingStep<XEvent, TTFlowWithGuard> step : path) {
+				int stepIdx = 0;
+				for( MatchingStep<String, TTFlowWithGuard> step : path) {
 //					update the datastate as we go
 					dataState = EventyUtils.updateAndExtractDataState(
 							dataState, 
-							step.getLog().get()
+							trace.get(stepIdx)
 					);
 //					check for tree component and see if it matches
 					if (!step.isSkip()) {
@@ -57,6 +58,7 @@ public class TraversalBookkeepingEngine implements
 									1 : 0
 							);
 					}
+					stepIdx++;
 				}
 				pathsForTrace++;
 			}
@@ -71,20 +73,21 @@ public class TraversalBookkeepingEngine implements
 
 	public double computeBookkeeping(
 			TTFlowWithGuard flow,
-			Matching<XEvent, TTFlowWithGuard> matcher, 
+			Matching<String, TTFlowWithGuard> matcher, 
 			XLog log) {
 		double ret = 0.0;
 		for (XTrace trace : log) {
 			double weight = weightForPaths(trace, matcher);
-			for( Iterable<MatchingStep<XEvent, TTFlowWithGuard>> path :
+			for( Iterable<MatchingStep<String, TTFlowWithGuard>> path :
 				matcher.getAllPaths(trace)) {
 				boolean found = false;
 				Map<String,Object> dataState = new HashMap<>();
-				for( MatchingStep<XEvent, TTFlowWithGuard> step : path) {
+				int stepIdx = 0;
+				for( MatchingStep<String, TTFlowWithGuard> step : path) {
 //					update the datastate as we go
 					dataState = EventyUtils.updateAndExtractDataState(
 							dataState, 
-							step.getLog().get()
+							trace.get(stepIdx)
 					);
 //					check for tree component and see if it matches
 					if (!step.isSkip()) {
@@ -101,6 +104,7 @@ public class TraversalBookkeepingEngine implements
 					if (found) {
 						break;
 					}
+					stepIdx++;
 				}
 			}
 		}
@@ -108,15 +112,15 @@ public class TraversalBookkeepingEngine implements
 	}
 
 	public double weightForPaths(XTrace trace,
-			Matching<XEvent, TTFlowWithGuard> matcher) {
+			Matching<String, TTFlowWithGuard> matcher) {
 		int len = 0;
-		double cost = 0.0;
-		for(Iterable<MatchingStep<XEvent, TTFlowWithGuard>> path : 
+		double cost = matcher.computeCost(matcher.getPath(trace), trace);
+		for(Iterable<MatchingStep<String, TTFlowWithGuard>> path : 
 			matcher.getAllPaths(trace)) {
 			len++;
-			cost = matcher.computeCost(path, trace);
 		}
-		return (1.0/len) * Math.pow(k, cost);
+		double ret = (1.0/len) * Math.pow(k, cost);
+		return ret;
 	}
 	
 //	helper functions for ProM

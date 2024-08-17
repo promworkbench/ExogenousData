@@ -12,7 +12,7 @@ import org.processmining.qut.exogenousdata.utils.LoadyUtils;
 public class PNWDPlayoutEngineTest {
 	
 	Path modelPath = Paths.get(
-			"tests","src-test","resource", "ax3_model_3.pnml");
+			"tests","src-test","resource", "axioms", "axiom 3",  "ax3_model_3.pnml");
 	Path testingModelPath = Paths.get( 
 			"tests", "src-test", "resource", "testing_dpn_with_rework.pnml");
 

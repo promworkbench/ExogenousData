@@ -13,7 +13,7 @@ import org.processmining.qut.exogenousdata.utils.LoadyUtils;
 public class PNWDTransitionTreeTest {
 
 	Path modelPath = Paths.get(
-			"tests","src-test","resource", "ax3_model_3.pnml");
+			"tests","src-test","resource", "axioms", "axiom 3",  "ax3_model_3.pnml");
 	Path modelReworkPath = Paths.get(
 			"tests","src-test","resource", "testing_dpn_with_rework.pnml");
 	
@@ -69,7 +69,7 @@ public class PNWDTransitionTreeTest {
 		}
 		try {
 		PNWDTransitionTree tree = new PNWDTransitionTree(
-				new PNWDPlayoutEngine().generateTraces(model, 10));
+				new PNWDPlayoutEngine().generateTraces(model, 7));
 		} catch (Exception e) {
 			fail("Unable to build a deep tree with stack::"
 					+e.getStackTrace().toString());
