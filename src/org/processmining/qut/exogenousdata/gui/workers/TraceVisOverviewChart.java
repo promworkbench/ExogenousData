@@ -49,7 +49,7 @@ import org.processmining.qut.exogenousdata.ds.timeseries.approx.TimeSeriesSaxApp
 import org.processmining.qut.exogenousdata.ds.timeseries.data.DiscreteTimeSeries;
 import org.processmining.qut.exogenousdata.ds.timeseries.data.RealTimePoint;
 import org.processmining.qut.exogenousdata.ds.timeseries.data.RealTimeSeries;
-import org.processmining.qut.exogenousdata.ds.timeseries.norm.TimeSeriesGuassianNormaliser;
+import org.processmining.qut.exogenousdata.ds.timeseries.norm.SimpleTimeSeriesNoramliser;
 import org.processmining.qut.exogenousdata.ds.timeseries.reduce.PiecewiseAggregateReduction;
 import org.processmining.qut.exogenousdata.gui.ExogenousTraceView;
 import org.processmining.qut.exogenousdata.gui.colours.ColourScheme;
@@ -195,11 +195,12 @@ public class TraceVisOverviewChart extends SwingWorker<JPanel, String> {
 		for(SubSeries exo: slices) {
 			RealTimeSeries series = exo.getSourceTimeSeries(Scaling.hour);
 //			check if we have set up bounds before
-			double mean = series.computeWeightedMean();
+			double mean = series.computeMean();
 			double std = series.computeStandardDeviation();
 			// perform normalisation to show time series differences?
 			if (normalize) {
-				TimeSeriesGuassianNormaliser norm = new TimeSeriesGuassianNormaliser();
+				SimpleTimeSeriesNoramliser norm = new SimpleTimeSeriesNoramliser();
+//				TimeSeriesGuassianNormaliser norm = new TimeSeriesGuassianNormaliser();
 				series = norm.normalise(series);
 			}
 			// perform dimensionality reduction via PAA?

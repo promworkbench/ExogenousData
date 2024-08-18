@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.processmining.qut.exogenousdata.ds.timeseries.approx.TimeSeriesSaxApproximator;
-import org.processmining.qut.exogenousdata.ds.timeseries.norm.TimeSeriesGuassianNormaliser;
+import org.processmining.qut.exogenousdata.ds.timeseries.norm.SimpleTimeSeriesNoramliser;
 import org.processmining.qut.exogenousdata.ds.timeseries.reduce.PiecewiseAggregateReduction;
 import org.processmining.qut.exogenousdata.ds.timeseries.sample.EqualDistanceSampler;
 
@@ -131,6 +131,16 @@ public class RealTimeSeries implements TimeSeries<Double, Double, RealTimePoint>
 		return this.max;
 	}
 	
+	public double computeMean() {
+		double ret = 0;
+		List<Double> values = getValues();
+		ret = values.stream().reduce(0.0, Double::sum);
+		if (values.size() == 0) {
+			return 0.0;
+		}
+		return ret / values.size();
+	}
+	
 	public double computeWeightedMean() {
 		if (getSize() == 0) {
 			return 0.0;
@@ -205,7 +215,7 @@ public class RealTimeSeries implements TimeSeries<Double, Double, RealTimePoint>
 	 * @return a discrete representation of the time series.
 	 */
 	public DiscreteTimeSeries createSAXRepresentation() {
-		TimeSeriesGuassianNormaliser normliser  = new TimeSeriesGuassianNormaliser();
+		SimpleTimeSeriesNoramliser normliser  = new SimpleTimeSeriesNoramliser();
 		PiecewiseAggregateReduction reducer = new PiecewiseAggregateReduction(100);
 		TimeSeriesSaxApproximator approximator = new TimeSeriesSaxApproximator();
 		return approximator.approximate(normliser.normalise(this));
