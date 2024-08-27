@@ -4,6 +4,7 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.framework.plugin.Progress;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithData;
+import org.processmining.qut.exogenousdata.conformance.bookkeeping.ExploratoryBookkeepingEngine;
 import org.processmining.qut.exogenousdata.conformance.bookkeeping.TraversalBookkeepingEngine;
 import org.processmining.qut.exogenousdata.conformance.playout.PNWDPlayoutEngine;
 import org.processmining.qut.exogenousdata.conformance.transitiontree.CManyMatching;
@@ -91,7 +92,9 @@ public class BookkeepingMeasures {
 	
 	public static double computeGuardPrecision(
 			XLog log, PNWDTransitionTree tree) {
-		return 0.0;
+		Matching matcher = new CManyMatching(tree);
+		ExploratoryBookkeepingEngine engine = new ExploratoryBookkeepingEngine();
+		return engine.computeBookkeeping(tree, matcher, log);
 	}
 	
 	public static double computeGuardPrecision(
@@ -101,8 +104,9 @@ public class BookkeepingMeasures {
 		prog.setMaximum(prog.getMaximum() + log.size() * 2);
 		context.log("Working on computing guard-precision.");
 		Matching matcher = new CManyMatching(tree);
-		
-		return 0.0;
+		ExploratoryBookkeepingEngine engine = 
+				new ExploratoryBookkeepingEngine(context);
+		return engine.computeBookkeeping(tree, matcher, log);
 	}
 
 
