@@ -328,12 +328,14 @@ public class EqualitiesFactory {
 	 */
 	public static class SLPNEDVariablePower extends VariablePower {
 		
-		private Transition trans;
-		private SLPNEDVarType type;
-		private String dataset;
+		protected Transition trans;
+		protected SLPNEDVarType type;
+		protected String dataset;
+		protected int index;
 		
 		public SLPNEDVariablePower(int parameterIndex, String name, double power, Transition trans, String dname) {
 			super(parameterIndex, name, power);
+			this.index = parameterIndex;
 			this.trans = trans;
 			this.type = SLPNEDVarType.findType(name);
 			if (dname != null) {
@@ -342,6 +344,10 @@ public class EqualitiesFactory {
 				this.dataset = "unsure";
 			}
 			
+		}
+		
+		public int getIndex() {
+			return index;
 		}
 		
 		public Transition getTransition() {
@@ -359,12 +365,14 @@ public class EqualitiesFactory {
 	
 	public static class SLPNEDVariable extends Variable {
 		
-		private Transition trans;
-		private SLPNEDVarType type;
-		private String dataset;
+		protected Transition trans;
+		protected SLPNEDVarType type;
+		protected String dataset;
+		protected int index;
 
 		public SLPNEDVariable(int parameterIndex, String name, Transition trans, String dname) {
 			super(parameterIndex, name);
+			this.index = parameterIndex;
 			this.trans = trans;
 			this.type = SLPNEDVarType.findType(name);
 			if (dname != null) {
@@ -372,6 +380,10 @@ public class EqualitiesFactory {
 			} else {
 				this.dataset = "unsure";
 			}
+		}
+		
+		public int getIndex() {
+			return index;
 		}
 		
 		public Transition getTransition() {

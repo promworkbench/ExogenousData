@@ -14,6 +14,7 @@ import org.deckfour.xes.model.XLog;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.basicstochasticminer.solver.Equation;
 import org.processmining.basicstochasticminer.solver.Function;
+import org.processmining.framework.util.ui.widgets.helper.UserCancelledException;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.qut.exogenousdata.ab.jobs.Tuple;
 import org.processmining.qut.exogenousdata.data.ExogenousAnnotatedLog;
@@ -22,43 +23,92 @@ import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceCollector
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceDataPoint;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceExogenousPoint;
 import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory;
+import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVarType;
+import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVariable;
+import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVariablePower;
 import org.processmining.qut.exogenousdata.stochastic.model.SLPNEDSemantics;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.qut.exogenousdata.stochastic.solver.Solver;
 
 import cern.colt.Arrays;
+import nl.tue.astar.AStarException;
 
 public class SLPNEDDiscovery {
 	
-	private static String dumpLoc = "";
+	protected String dumpLoc = "";
+	protected boolean shouldDump = false;
 	
-	public static void setDumpLoc(String loc) {
+	public void setDumpLoc(String loc) {
 		dumpLoc = loc;
+		shouldDump = true;
 	}
 	
-	public static StochasticLabelledPetriNetWithExogenousData discoverFromLog(
+	public StochasticLabelledPetriNetWithExogenousData discoverFromLog(
 			ExogenousAnnotatedLog xlog, 
 			AcceptingPetriNet net) throws Exception {
 		return discover(xlog.getEndogenousLog(), xlog.getExogenousDatasets(), net);
 	}
 	
-	public static StochasticLabelledPetriNetWithExogenousData discover(
+	public StochasticLabelledPetriNetWithExogenousData discover(
 			XLog xlog,
 			List<ExogenousDataset> datasets,
 			AcceptingPetriNet net) 
 	throws Exception
 	{
+		ProgSetVal(0);
+		ProgSetMax(4 + (shouldDump ? 1:0));
 //		collect choice data
-		System.out.println("building choice data...");
-		Iterator<ChoiceDataPoint> choiceData = ChoiceCollector.collect(xlog, datasets, net, 
+		log("starting discovery of slpned");
+		Map<ChoiceDataPoint, Map<String,Integer>> frequencies = collectChoiceData(
+				xlog, datasets, net);
+		ProgIncr();
+//		System.out.println("constructed immediate choice representation");
+		log("sending choice data to equalities factory...");
+		Tuple<List<Equation>,List<Function>> equalities = 
+				constructEquations( 
+						frequencies, 
+						datasets,
+						net
+		);
+		ProgIncr();
+		log("constructed equalities...");
+		log("constructed "+equalities.getLeft().size()+" equalities....");
+		Map<Function, Double> solvedVariables = solveEquations(equalities);
+		ProgIncr();
+		log("creating slpned...");
+		StochasticLabelledPetriNetWithExogenousData outnet = 
+				makeNet(net, solvedVariables, datasets);
+		ProgIncr();
+		log("returning slpned...");
+		if (shouldDump) {
+			diagonsticDump(frequencies, equalities, solvedVariables, outnet);
+			ProgIncr();
+		}
+		return outnet;
+	}
+
+	/**
+	 * 
+	 * @return
+	 * @throws UserCancelledException 
+	 * @throws AStarException 
+	 */
+	protected Map<ChoiceDataPoint, Map<String,Integer>> collectChoiceData(
+			XLog xlog,
+			List<ExogenousDataset> datasets,
+			AcceptingPetriNet net			
+			) throws AStarException, UserCancelledException {
+		log("building choice data...");
+		Iterator<ChoiceDataPoint> choiceData = ChoiceCollector.collect(
+				xlog, datasets, net, 
 				ChoiceCollector.ChoiceCollectorParameters.builder().build());
-		System.out.println("built lazy iterator for choice data...");
-		Map<ChoiceDataPoint, Map<String,Integer>> frequencies = new HashMap();
+		Map<ChoiceDataPoint, Map<String,Integer>> ret = new HashMap();
+		log("built lazy iterator for choice data...");
 		while( choiceData.hasNext()) {
 			ChoiceDataPoint point = choiceData.next();
 			String label = point.getFired().getId().toString();
-			if (frequencies.containsKey(point)) {
-				Map<String, Integer> points = frequencies.get(point);
+			if (ret.containsKey(point)) {
+				Map<String, Integer> points = ret.get(point);
 				
 				if (points.containsKey(label)) {
 					points.put(label, points.get(label)+1);
@@ -68,48 +118,101 @@ public class SLPNEDDiscovery {
 			} else {
 				Map<String, Integer> newMap = new HashMap();
 				newMap.put(label, 1);
-				frequencies.put(point, newMap);
+				ret.put(point, newMap);
 			}
 		}
-		choiceData = null;
-//		System.out.println("constructed immediate choice representation");
-		System.out.println("sending choice data to equalities factory...");
-		Tuple<List<Equation>,List<Function>> equalities = 
-				EqualitiesFactory.construct( 
-						frequencies, 
-						datasets,
-						net.getNet().getTransitions()
-				);
-		System.out.println("constructed equalities...");
-		System.out.println("constructed "+equalities.getLeft().size()+" equalities....");
+		log("finished lazy iterator for choice data...");
+		return ret;
+	}
+	
+	protected Tuple<List<Equation>,List<Function>> constructEquations(
+			Map<ChoiceDataPoint, Map<String,Integer>> frequencies,
+			List<ExogenousDataset> datasets,
+			AcceptingPetriNet net) {
+		return EqualitiesFactory.construct( 
+				frequencies, 
+				datasets,
+				net.getNet().getTransitions()
+		);
+	}
+	
+	protected Map<Function, Double> solveEquations(
+			Tuple<List<Equation>,List<Function>> equalities) {
+		log("setting up variable matrixes...");
 		int[] fixed = new int[equalities.getRight().size()];
 		int[] nonzero = new int[equalities.getRight().size()];
 		double[] inital = new double[equalities.getRight().size()];
 		for(int i = 0; i < equalities.getRight().size(); i++) {
-			fixed[i] = 0;
-			inital[i] =  1.0;			
-			nonzero[i] = 1;
+			Function func = equalities.getRight().get(i);
+			SLPNEDVarType type= null;
+			int idx = -1;
+			String name = null;
+			if (func instanceof SLPNEDVariablePower) {
+				type = ((SLPNEDVariablePower) func).getType();
+				idx = ((SLPNEDVariablePower) func).getIndex();
+				name = ((SLPNEDVariablePower) func).toString();
+			} else if (func instanceof SLPNEDVariable) {
+				type = ((SLPNEDVariable) func).getType();
+				idx = ((SLPNEDVariable) func).getIndex();
+				name = ((SLPNEDVariable) func).toString();
+			} 
+			
+			if (type == null) {
+				fixed[i] = 0; // should the variable not change
+				inital[i] =  1.0; // the initial guess for solver
+				nonzero[i] = 1; // should the variable not be zero
+			} else if (type == SLPNEDVarType.BASE){
+				fixed[idx] = 0; // should the variable not change
+				inital[idx] =  1.0; // the initial guess for solver
+				nonzero[idx] = 1; // should the variable not be zero
+			} else {
+				fixed[idx] = 0; // should the variable not change
+				inital[idx] =  1.0; // the initial guess for solver
+				nonzero[idx] = 1; // should the variable not be zero
+			}
+			
+			
 		}
-		System.out.println("solving equalities...");
-		double[] solvedvalues = Solver.solve(equalities.getLeft(), equalities.getRight().size(),
+		log("sending equations to solver...");
+		double[] solvedvalues = Solver.solve(
+				equalities.getLeft(), 
+				equalities.getRight().size(),
 				fixed, nonzero, inital);
-		System.out.println("equalities solved...");
 		Map<Function, Double> solvedVariables = new HashMap();
 		for (int i =0; i < equalities.getRight().size(); i++) {
-			System.out.println("Solved variable : "+ equalities.getRight().get(i) + " as : "+solvedvalues[i]);
+			log("Solved variable : "
+					+ equalities.getRight().get(i) 
+					+ " as : "+solvedvalues[i]
+			);
 			solvedVariables.put(equalities.getRight().get(i), solvedvalues[i]);
 		}
-		System.out.println("creating slpned...");
-		StochasticLabelledPetriNetWithExogenousData outnet = 
-				new StochasticLabelledPetriNetWithExogenousData(net, solvedVariables, datasets);
-		System.out.println("returning slpned...");
-		System.out.println("but not before exporting visualisation data.");
-		dumpSampleData(frequencies, outnet);
-		System.out.println("finished exporting sample data.");
-		return outnet;
+		return solvedVariables;
 	}
-
-	public static void dumpSampleData(
+	
+	protected StochasticLabelledPetriNetWithExogenousData makeNet(
+			AcceptingPetriNet net, Map<Function, Double> solution,
+			List<ExogenousDataset> datasets) throws Exception {
+		return new StochasticLabelledPetriNetWithExogenousData(net, solution, datasets);
+	}
+	
+	protected void diagonsticDump(
+			Map<ChoiceDataPoint, Map<String,Integer>> frequencies,
+			Tuple<List<Equation>,List<Function>> equalities,
+			Map<Function, Double> solution,
+			StochasticLabelledPetriNetWithExogenousData outnet
+		) {
+		log("but not before exporting visualisation data.");
+		try {
+			dumpSampleData(frequencies, outnet);
+			log("finished exporting sample data.");
+		} catch (Exception e) {
+			log("failed to perform diagonstic dump.");
+		}
+	}
+	
+	
+//	dump state for visualisation 
+	public void dumpSampleData(
 			Map<ChoiceDataPoint, Map<String,Integer>> frequencies,
 			StochasticLabelledPetriNetWithExogenousData outnet
 		) throws FileNotFoundException {
@@ -236,6 +339,29 @@ public class SLPNEDDiscovery {
 		}
 		
 		w.close();
+	}
+	
+	
+//	helper functions to handle progress to UI or logging
+	
+	protected void log(String message) {
+		System.out.println("[SLPNEDDiscovery] "+message);
+	}
+	
+	protected void ProgSetVal(int val) {
+		
+	}
+	
+	protected void ProgIncr() {
+		
+	}
+	
+	protected void ProgSetMax(int max) {
+		
+	}
+	
+	protected int ProgGetMax() {
+		return 0;
 	}
 
 }

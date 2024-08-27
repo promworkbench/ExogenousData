@@ -16,7 +16,7 @@ import org.processmining.qut.exogenousdata.ExogenousDataStatics;
 import org.processmining.qut.exogenousdata.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.qut.exogenousdata.stochastic.conformance.eduEMSC;
-import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscovery;
+import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryWithContext;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 
 public class StochasticExogenousDepenencies {
@@ -46,7 +46,8 @@ public class StochasticExogenousDepenencies {
 	public StochasticLabelledPetriNetWithExogenousData discoverySLPNEDFromLog(final UIPluginContext context,
 			final ExogenousAnnotatedLog xlog, final AcceptingPetriNet net) 
 	throws Exception {
-		return SLPNEDDiscovery.discoverFromLog(xlog, net);
+		
+		return new SLPNEDDiscoveryWithContext(context).discoverFromLog(xlog, net);
 	}
 	
 	@Plugin(
@@ -72,7 +73,7 @@ public class StochasticExogenousDepenencies {
 		for(ExogenousDataset dataset : datasets) {
 			temp.add(dataset);
 		}
-		return SLPNEDDiscovery.discover(xlog, temp , net);
+		return new SLPNEDDiscoveryWithContext(context).discover(xlog, temp , net);
 	}
 	
 	@Plugin(

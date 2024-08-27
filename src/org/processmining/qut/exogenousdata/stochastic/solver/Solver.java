@@ -16,6 +16,7 @@ import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.util.Pair;
 import org.processmining.basicstochasticminer.solver.Equation;
 import org.processmining.basicstochasticminer.solver.Function;
+import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.framework.plugin.Progress;
 
 public class Solver {
@@ -45,6 +46,7 @@ public class Solver {
 	
 //	for feedback back to prom UI if set
 	public static Progress PROG = null;
+	public static UIPluginContext CONTEXT = null;
 
 	/**
 	 * 
@@ -58,8 +60,12 @@ public class Solver {
 	 * @param initialParameterValues
 	 * @return
 	 */
-	public static double[] solve(List<Equation> equations, int numberOfParameters, int[] fixParameters,
-			int[] nonZeroParameters, double[] initialParameterValues) {
+	public static double[] solve(
+			List<Equation> equations, 
+			int numberOfParameters, 
+			int[] fixParameters,
+			int[] nonZeroParameters, 
+			double[] initialParameterValues) {
 		
 		MultivariateJacobianFunction jfunction = new MultivariateJacobianFunction() {
 
@@ -78,7 +84,7 @@ public class Solver {
 						double derivative = observation.getPartialDerivative(parameterIndex, pointD);
 						if (Double.isInfinite(derivative) || Double.isNaN(derivative)) {
 							double derv = observation.getPartialDerivative(parameterIndex, pointD);
-							System.out.println("bad derivative :: "+derv);
+							log("bad derivative :: "+derv);
 //							System.out.println(observation.toString());
 //							value.setEntry(equationIndex, lowest);
 						}
@@ -90,8 +96,10 @@ public class Solver {
 		};
 
 		final BitSet fixedParametersb = new BitSet();
-		for (int parameter : fixParameters) {
-			fixedParametersb.set(parameter);
+		for (int i=0; i < fixParameters.length; i++) {
+			if (fixParameters[i] == 1) {
+				fixedParametersb.set(i);
+			}
 		}
 		final BitSet nonZeroParametersb = new BitSet();
 		for (int parameter : nonZeroParameters) {
@@ -103,17 +111,21 @@ public class Solver {
 			
 			public RealVector validate(RealVector params) {
 				runs += 1;
-				System.out.println("["+runs+"] "
+				log("["+runs+"] "
 						+ "validating :: " + params);
 				incrementProgressor();
 				for (int i = 0; i < params.getDimension(); i++) {
+					if (fixedParametersb.get(i)) {
+						params.setEntry(i, initialParameterValues[i]);
+						continue;
+					}
 					if (nonZeroParametersb.get(i) && params.getEntry(i) <= 0) {
 						params.setEntry(i, MIN * 5);
-					} else if (fixedParametersb.get(i)) {
-						params.setEntry(i, 1);
-					} else if (params.getEntry(i) < MIN) {
+					} 
+					if (params.getEntry(i) < MIN) {
 						params.setEntry(i, MIN * 5);
-					} else if (params.getEntry(i) > MAX) {
+					} 
+					if (params.getEntry(i) > MAX) {
 						params.setEntry(i, MAX*0.98);
 					}
 				}
@@ -162,11 +174,33 @@ public class Solver {
 		//		System.out.println("RMS: " + optimum.getRMS());
 		//		System.out.println("evaluations: " + optimum.getEvaluations());
 		//		System.out.println("iterations: " + optimum.getIterations());
-
+		double[] ret = optimum.getPoint().toArray();
+		
+		int fixed = 0;
+		for(int i=0; i < ret.length; i++) {
+			if (fixedParametersb.get(i)) {
+				log("ret for fixed parameter was :"
+					+ ret[i]
+					+" but was meant to be :"
+					+ initialParameterValues[i]
+					);
+				fixed+=1;
+			}
+		}
+		log("number of fixed vars :"+fixed);
+		
 		return optimum.getPoint().toArray();
 	}
 	
 //	UI Functions to keep progressor updated during solving
+	public static void log(String message) {
+		System.out.println("[SLPNED-Solver] "+message);
+		if (CONTEXT != null) {
+			CONTEXT.log(message);
+		}
+	}
+	
+	
 	public static void setProgressor(Progress progressor) {
 		PROG = progressor;
 	}

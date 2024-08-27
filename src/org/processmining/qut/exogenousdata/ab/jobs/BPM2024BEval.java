@@ -257,9 +257,11 @@ public class BPM2024BEval {
 			);
 		}
 //		set out location
-		SLPNEDDiscovery.setDumpLoc(outLoc);
+		SLPNEDDiscovery disc = new SLPNEDDiscovery();
+		disc.setDumpLoc(outLoc);
 //		run the discovery
-		StochasticLabelledPetriNetWithExogenousData slpned = SLPNEDDiscovery.discover(log, datasets, loadNet(modelLoc + net));
+		StochasticLabelledPetriNetWithExogenousData slpned = 
+				disc.discover(log, datasets, loadNet(modelLoc + net));
 //		save discovery
 		slpned.exportNet(new File(outLoc + net.split("[.]")[0] + ".slpned"));
 //		perform conformance

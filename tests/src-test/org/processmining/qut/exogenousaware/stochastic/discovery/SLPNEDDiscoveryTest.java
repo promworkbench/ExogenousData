@@ -1,5 +1,10 @@
 package org.processmining.qut.exogenousaware.stochastic.discovery;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,7 +31,10 @@ import org.processmining.qut.exogenousdata.steps.linking.AttributeLinker;
 import org.processmining.qut.exogenousdata.steps.slicing.PastOutcomeSlicer;
 import org.processmining.qut.exogenousdata.steps.transform.type.StochasticTransformer;
 import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscovery;
+import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryWithContext;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
+import org.processmining.qut.exogenousdata.stochastic.model.in.SLPNEDImporter;
+import org.processmining.qut.exogenousdata.stochastic.model.out.SLPNEDExporter;
 
 public class SLPNEDDiscoveryTest {
 	
@@ -391,12 +399,13 @@ public class SLPNEDDiscoveryTest {
 	}
 
 	@Test
-	public void test() {
+	public void testDiscovery() {
 		try {
 			xlog.getEndogenousLog().getClassifiers().add(
 					new XEventNameClassifier()
 			);
-			SLPNEDDiscovery.discoverFromLog(xlog, buildNet());
+			SLPNEDDiscovery slpnedDiscovery = new SLPNEDDiscovery();
+			slpnedDiscovery.discoverFromLog(xlog, buildNet());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -404,11 +413,73 @@ public class SLPNEDDiscoveryTest {
 		}
 	}
 	
+	@Test
+	public void testDiscoveryWithContext() {
+		try {
+			xlog.getEndogenousLog().getClassifiers().add(
+					new XEventNameClassifier()
+			);
+			SLPNEDDiscoveryWithContext slpnedDiscoveryWithContext = new SLPNEDDiscoveryWithContext();
+			slpnedDiscoveryWithContext.discoverFromLog(xlog, buildNet());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			org.junit.Assert.fail();
+		}
+	}
+	
+	@Test
+	public void testExportAndImport() {
+		StochasticLabelledPetriNetWithExogenousData net = null;
+		try {
+			xlog.getEndogenousLog().getClassifiers().add(
+					new XEventNameClassifier()
+			);
+			SLPNEDDiscovery slpnedDiscovery = new SLPNEDDiscovery();
+			net = slpnedDiscovery.discoverFromLog(xlog, buildNet());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			org.junit.Assert.fail();
+		}
+		Path temp = null;
+		try {
+			temp = Files.createTempDirectory("tempfiles");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			org.junit.Assert.fail("Unable to make temp dir");
+		}
+		File tempFile = null;
+		try {
+			tempFile = temp.toFile().createTempFile("test_slpned", ".pnml");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			org.junit.Assert.fail("Unable to make temp file");
+		}
+		try {
+			SLPNEDExporter.export(net, tempFile);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			org.junit.Assert.fail("Unable to export net");
+		}
+		try {
+			net =SLPNEDImporter.read(new FileInputStream(tempFile));
+		} catch (NumberFormatException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			org.junit.Assert.fail("Unable to import net");
+		}
+	}
+	
 	public static StochasticLabelledPetriNetWithExogenousData getNet() throws Exception {
 			xlog.getEndogenousLog().getClassifiers().add(
 					new XEventNameClassifier()
 			);
-			return SLPNEDDiscovery.discoverFromLog(xlog, buildNet());
+			
+			return new SLPNEDDiscovery().discoverFromLog(xlog, buildNet());
 	}
 
 }
