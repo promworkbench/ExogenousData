@@ -30,7 +30,7 @@ public class Solver {
 //	Controls for the parameter values
 //	having a wider range is better than a small range for solver
 	public static double MIN = 0.0001;
-	public static double MAX = 100000.0;
+	public static double MAX = 100.0;
 	public static double GAP = (MAX - MIN) * 0.1;
 	
 //	how long do you want to optimise for
@@ -73,9 +73,12 @@ public class Solver {
 				double[] pointD = point.toArray();
 
 				RealVector value = new ArrayRealVector(equations.size());
-				RealMatrix jacobian = new Array2DRowRealMatrix(equations.size(), numberOfParameters);
+				RealMatrix jacobian = new Array2DRowRealMatrix(
+						equations.size(), numberOfParameters);
 
-				for (int equationIndex = 0; equationIndex < equations.size(); equationIndex++) {
+				for (int equationIndex = 0; 
+					 equationIndex < equations.size(); 
+					 equationIndex++) {
 					Function observation = equations.get(equationIndex).getFunction();
 
 					value.setEntry(equationIndex, observation.getValue(pointD));
@@ -102,8 +105,10 @@ public class Solver {
 			}
 		}
 		final BitSet nonZeroParametersb = new BitSet();
-		for (int parameter : nonZeroParameters) {
-			nonZeroParametersb.set(parameter);
+		for (int i=0; i < nonZeroParameters.length; i++) {
+			if (nonZeroParameters[i] == 1) {
+				nonZeroParametersb.set(i);
+			}
 		}
 		setProgressorMax(MAX_ATTEMPTS);
 		ParameterValidator validator = new ParameterValidator() {
@@ -111,9 +116,6 @@ public class Solver {
 			
 			public RealVector validate(RealVector params) {
 				runs += 1;
-				log("["+runs+"] "
-						+ "validating :: " + params);
-				incrementProgressor();
 				for (int i = 0; i < params.getDimension(); i++) {
 					if (fixedParametersb.get(i)) {
 						params.setEntry(i, initialParameterValues[i]);
@@ -126,9 +128,12 @@ public class Solver {
 						params.setEntry(i, MIN * 5);
 					} 
 					if (params.getEntry(i) > MAX) {
-						params.setEntry(i, MAX*0.98);
+						params.setEntry(i, MAX*0.85);
 					}
 				}
+				log("["+runs+"] "
+						+ "validating :: " + params, false);
+				incrementProgressor();
 				return params;
 			}
 		};
@@ -154,7 +159,7 @@ public class Solver {
 					equations.get(equation).getOccurrences()
 			);
 		}
-
+		log("solver setup completed...");
 		LeastSquaresProblem problem = new LeastSquaresBuilder()//
 				.start(initialGuess)//
 				.model(jfunction)//
@@ -169,33 +174,24 @@ public class Solver {
 				.withCostRelativeTolerance(LEARNING_RATE)
 				.withParameterRelativeTolerance(LEARNING_RATE);
 //		LeastSquaresOptimizer optimiser = new GaussNewtonOptimizer(GaussNewtonOptimizer.Decomposition.CHOLESKY);
+		log("Starting solving...");
 		Optimum optimum = optimiser.optimize(problem);
 
 		//		System.out.println("RMS: " + optimum.getRMS());
 		//		System.out.println("evaluations: " + optimum.getEvaluations());
 		//		System.out.println("iterations: " + optimum.getIterations());
-		double[] ret = optimum.getPoint().toArray();
-		
-		int fixed = 0;
-		for(int i=0; i < ret.length; i++) {
-			if (fixedParametersb.get(i)) {
-				log("ret for fixed parameter was :"
-					+ ret[i]
-					+" but was meant to be :"
-					+ initialParameterValues[i]
-					);
-				fixed+=1;
-			}
-		}
-		log("number of fixed vars :"+fixed);
-		
-		return optimum.getPoint().toArray();
+		double[] ret = optimum.getPoint().toArray();		
+		return ret;
 	}
 	
 //	UI Functions to keep progressor updated during solving
 	public static void log(String message) {
+		log(message,true);
+	}
+	
+	public static void log(String message, boolean toUI) {
 		System.out.println("[SLPNED-Solver] "+message);
-		if (CONTEXT != null) {
+		if (CONTEXT != null && toUI) {
 			CONTEXT.log(message);
 		}
 	}

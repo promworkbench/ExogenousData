@@ -20,12 +20,15 @@ public class SLPNEDDiscoveryWithContext extends SLPNEDDiscovery {
 	
 	
 	protected Map<Function, Double> solveEquations(Tuple<List<Equation>, List<Function>> equalities) {
-		// TODO Auto-generated method stub
-		Solver.CONTEXT = context;
-		Solver.PROG = context.getProgress();
+		if (context != null) {
+			Solver.CONTEXT = context;
+//			Solver.PROG = context.getProgress();
+		}
 		Map<Function, Double> ret = super.solveEquations(equalities);
-		Solver.CONTEXT = null;
-		Solver.PROG = null;
+		if (context != null) {
+			Solver.CONTEXT = null;
+//			Solver.PROG = null;
+		}
 		return ret;
 	}
 
@@ -41,8 +44,12 @@ public class SLPNEDDiscoveryWithContext extends SLPNEDDiscovery {
 	}
 	
 	protected void log(String message) {
+		log(message, true);
+	}
+	
+	protected void log(String message, boolean toUI) {
 		super.log(message);
-		if (context != null) {
+		if (context != null && toUI) {
 			context.log(message);
 		}
 	}
@@ -61,13 +68,19 @@ public class SLPNEDDiscoveryWithContext extends SLPNEDDiscovery {
 
 	protected void ProgSetMax(int max) {
 		if (context != null) {
-			context.getProgress().setMaximum(max);
+			synchronized (context) {
+				context.getProgress().setMaximum(max);
+			}
+			
 		}
 	}
 
 	protected int ProgGetMax() {
 		if (context != null) {
-			return context.getProgress().getMaximum();
+			synchronized (context) {
+				return context.getProgress().getMaximum();
+			}
+			
 		}
 		return super.ProgGetMax();
 	}
