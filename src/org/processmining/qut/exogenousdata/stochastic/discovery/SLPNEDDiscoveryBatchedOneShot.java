@@ -157,7 +157,8 @@ public class SLPNEDDiscoveryBatchedOneShot implements SLPNEDDiscoverer{
 				+ " to "
 				+ ((i+1) * batchsize));
 			double[] solvedvalues = Solver.solve(
-					equalities.getLeft().subList((i) * batchsize, Math.min((i+1) * batchsize,equalities.getLeft().size()-1)), 
+					equalities.getLeft().subList((i) * batchsize, 
+							Math.min((i+1) * batchsize,equalities.getLeft().size()-1)), 
 					equalities.getRight().size(),
 					fixed, nonzero, inital);
 			for(int j=0; j < meanSolves.length; j++) {
