@@ -25,11 +25,11 @@ public class Solver {
 
 	//https://scipopt.org/index.php#license
 
-	public static final double lowest = 0.0001;
+	public static final double lowest = 0.001;
 	
 //	Controls for the parameter values
 //	having a wider range is better than a small range for solver
-	public static double MIN = 0.0001;
+	public static double MIN = 0.001;
 	public static double MAX = 100.0;
 	public static double GAP = (MAX - MIN) * 0.1;
 	

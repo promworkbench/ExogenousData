@@ -1,10 +1,5 @@
 package org.processmining.qut.exogenousaware.stochastic.discovery;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,13 +25,12 @@ import org.processmining.qut.exogenousdata.steps.determination.Determination;
 import org.processmining.qut.exogenousdata.steps.linking.AttributeLinker;
 import org.processmining.qut.exogenousdata.steps.slicing.PastOutcomeSlicer;
 import org.processmining.qut.exogenousdata.steps.transform.type.StochasticTransformer;
+import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryBatchedOneShot;
+import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryBatchedTwoShot;
 import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryOneShot;
-import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryOneShotWithContext;
-import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
-import org.processmining.qut.exogenousdata.stochastic.model.in.SLPNEDImporter;
-import org.processmining.qut.exogenousdata.stochastic.model.out.SLPNEDExporter;
+import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryTwoShot;
 
-public class SLPNEDDiscoveryTest {
+public class SLPNEDDiscoveryStratagem {
 	
 	static public ExogenousDataset Y = ExogenousDataset.builder()
 			.dataType(ExogenousDatasetType.NUMERICAL)
@@ -398,8 +392,10 @@ public class SLPNEDDiscoveryTest {
 		return new AcceptingPetriNetImpl(pnet, initialMarking , finalMarking);
 	}
 
+	
+	
 	@Test
-	public void testDiscovery() {
+	public void testDiscoveryOneShot() {
 		try {
 			xlog.getEndogenousLog().getClassifiers().add(
 					new XEventNameClassifier()
@@ -414,13 +410,13 @@ public class SLPNEDDiscoveryTest {
 	}
 	
 	@Test
-	public void testDiscoveryWithContext() {
+	public void testDiscoveryTwoShot() {
 		try {
 			xlog.getEndogenousLog().getClassifiers().add(
 					new XEventNameClassifier()
 			);
-			SLPNEDDiscoveryOneShotWithContext slpnedDiscoveryWithContext = new SLPNEDDiscoveryOneShotWithContext();
-			slpnedDiscoveryWithContext.discoverFromLog(xlog, buildNet());
+			SLPNEDDiscoveryTwoShot slpnedDiscovery = new SLPNEDDiscoveryTwoShot();
+			slpnedDiscovery.discoverFromLog(xlog, buildNet());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -429,59 +425,33 @@ public class SLPNEDDiscoveryTest {
 	}
 	
 	@Test
-	public void testExportAndImport() {
-		StochasticLabelledPetriNetWithExogenousData net = null;
+	public void testDiscoveryBatchedOneShot() {
 		try {
 			xlog.getEndogenousLog().getClassifiers().add(
 					new XEventNameClassifier()
 			);
-			SLPNEDDiscoveryOneShot slpnedDiscovery = new SLPNEDDiscoveryOneShot();
-			net = slpnedDiscovery.discoverFromLog(xlog, buildNet());
+			SLPNEDDiscoveryBatchedOneShot slpnedDiscovery = new SLPNEDDiscoveryBatchedOneShot();
+			slpnedDiscovery.discoverFromLog(xlog, buildNet());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			org.junit.Assert.fail();
 		}
-		Path temp = null;
-		try {
-			temp = Files.createTempDirectory("tempfiles");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			org.junit.Assert.fail("Unable to make temp dir");
-		}
-		File tempFile = null;
-		try {
-			tempFile = temp.toFile().createTempFile("test_slpned", ".pnml");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			org.junit.Assert.fail("Unable to make temp file");
-		}
-		try {
-			SLPNEDExporter.export(net, tempFile);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			org.junit.Assert.fail("Unable to export net");
-		}
-		try {
-			net =SLPNEDImporter.read(new FileInputStream(tempFile));
-		} catch (NumberFormatException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			org.junit.Assert.fail("Unable to import net");
-		}
 	}
 	
-	public static StochasticLabelledPetriNetWithExogenousData getNet() throws Exception {
+	@Test
+	public void testDiscoveryBatchedTwoShot() {
+		try {
 			xlog.getEndogenousLog().getClassifiers().add(
 					new XEventNameClassifier()
 			);
-			
-			return new SLPNEDDiscoveryOneShot().discoverFromLog(xlog, buildNet());
+			SLPNEDDiscoveryBatchedTwoShot slpnedDiscovery = new SLPNEDDiscoveryBatchedTwoShot();
+			slpnedDiscovery.discoverFromLog(xlog, buildNet());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			org.junit.Assert.fail();
+		}
 	}
-	
-	
 
 }

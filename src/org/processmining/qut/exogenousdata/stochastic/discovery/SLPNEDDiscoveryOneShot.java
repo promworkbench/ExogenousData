@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.stream.IntStream;
 
 import org.deckfour.xes.model.XLog;
@@ -25,16 +24,13 @@ import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceCollector
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceDataPoint;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceExogenousPoint;
 import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory;
-import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVarType;
-import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVariable;
-import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVariablePower;
 import org.processmining.qut.exogenousdata.stochastic.model.SLPNEDSemantics;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.qut.exogenousdata.stochastic.solver.Solver;
 
 import nl.tue.astar.AStarException;
 
-public class SLPNEDDiscovery {
+public class SLPNEDDiscoveryOneShot implements SLPNEDDiscoverer{
 	
 	protected String dumpLoc = "";
 	protected boolean shouldDump = false;
@@ -145,107 +141,25 @@ public class SLPNEDDiscovery {
 		int[] nonzero = new int[equalities.getRight().size()];
 		double[] inital = new double[equalities.getRight().size()];
 		for(int i = 0; i < equalities.getRight().size(); i++) {
-			Function func = equalities.getRight().get(i);
-			SLPNEDVarType type= null;
-			int idx = -1;
-			String name = null;
-			if (func instanceof SLPNEDVariablePower) {
-				type = ((SLPNEDVariablePower) func).getType();
-				idx = ((SLPNEDVariablePower) func).getIndex();
-				name = ((SLPNEDVariablePower) func).toString();
-			} else if (func instanceof SLPNEDVariable) {
-				type = ((SLPNEDVariable) func).getType();
-				idx = ((SLPNEDVariable) func).getIndex();
-				name = ((SLPNEDVariable) func).toString();
-			} 
-			
-			if (type == null) {
 				fixed[i] = 0; // should the variable not change
 				inital[i] =  1.0; // the initial guess for solver
 				nonzero[i] = 1; // should the variable not be zero
-			} else if (type == SLPNEDVarType.BASE){
-				fixed[idx] = 0; // should the variable not change
-				inital[idx] =  new Random().nextInt(9) + 1.0; // the initial guess for solver
-				nonzero[idx] = 1; // should the variable not be zero
-			} else {
-				fixed[idx] = 1; // should the variable not change
-				inital[idx] =  1.0; // the initial guess for solver
-				nonzero[idx] = 1; // should the variable not be zero
-			}
+			
 		}
 		log("sending first-shot equations to solver...");
-		double[] meanSolves = Arrays.copyOf(inital, inital.length);
-		int batches = (int) Math.ceil(equalities.getLeft().size()/batchsize);
-		ProgSetMax(ProgGetMax()+batches * 2);
-		for(int i=1; i < batches; i++) {
-			log("working on batch "
-				+ ((i-1) * batchsize)
-				+ " to "
-				+ (i * batchsize));
-			double[] solvedvalues = Solver.solve(
-					equalities.getLeft().subList((i-1) * batchsize, i * batchsize), 
+		double[] solvedvalues = Solver.solve(
+					equalities.getLeft(), 
 					equalities.getRight().size(),
 					fixed, nonzero, inital);
-			for(int j=0; j < meanSolves.length; j++) {
-				meanSolves[j] += (solvedvalues[j] - inital[j])/batches;
-			}
-			ProgIncr();
-		}
-		log("finished batches");
-		log("prepping for second-shot equations to solver...");
-		for(int i = 0; i < equalities.getRight().size(); i++) {
-			Function func = equalities.getRight().get(i);
-			SLPNEDVarType type= null;
-			int idx = -1;
-			String name = null;
-			if (func instanceof SLPNEDVariablePower) {
-				type = ((SLPNEDVariablePower) func).getType();
-				idx = ((SLPNEDVariablePower) func).getIndex();
-				name = ((SLPNEDVariablePower) func).toString();
-			} else if (func instanceof SLPNEDVariable) {
-				type = ((SLPNEDVariable) func).getType();
-				idx = ((SLPNEDVariable) func).getIndex();
-				name = ((SLPNEDVariable) func).toString();
-			} 
 			
-			if (type == null) {
-				fixed[i] = 0; // should the variable not change
-				inital[i] =  meanSolves[i]; // the initial guess for solver
-				nonzero[i] = 1; // should the variable not be zero
-			} else if (type == SLPNEDVarType.BASE){
-				fixed[idx] = 1; // should the variable not change
-				inital[idx] =  meanSolves[idx]; // the initial guess for solver
-				nonzero[idx] = 1; // should the variable not be zero
-			} else {
-				fixed[idx] = 0; // should the variable not change
-				inital[idx] =  meanSolves[idx]; // the initial guess for solver
-				nonzero[idx] = 1; // should the variable not be zero
-			}
-		}
-		log("sending second-shot equations to solver...");
-		meanSolves = Arrays.copyOf(inital, inital.length);
-		for(int i=1; i < batches; i++) {
-			log("working on batch "
-				+ ((i-1) * batchsize)
-				+ " to "
-				+ (i * batchsize));
-			double[] solvedvalues = Solver.solve(
-					equalities.getLeft().subList((i-1) * batchsize, i * batchsize), 
-					equalities.getRight().size(),
-					fixed, nonzero, inital);
-			for(int j=0; j < meanSolves.length; j++) {
-				meanSolves[j] += (solvedvalues[j] - inital[j])/batches;
-			}
-			ProgIncr();
-		}
-		log("finished solving equations...");
+		log("finished one-shot solution to equations");
 		Map<Function, Double> solvedVariables = new HashMap();
 		for (int i =0; i < equalities.getRight().size(); i++) {
 			log("Solved variable : "
 					+ equalities.getRight().get(i) 
-					+ " as : "+meanSolves[i]
+					+ " as : "+solvedvalues[i]
 			);
-			solvedVariables.put(equalities.getRight().get(i), meanSolves[i]);
+			solvedVariables.put(equalities.getRight().get(i), solvedvalues[i]);
 		}
 		return solvedVariables;
 	}
@@ -406,7 +320,7 @@ public class SLPNEDDiscovery {
 //	helper functions to handle progress to UI or logging
 	
 	protected void log(String message) {
-		System.out.println("[SLPNED-Discovery] "+message);
+		System.out.println("[SLPNED-discovery-one-shot] "+message);
 	}
 	
 	protected void ProgSetVal(int val) {

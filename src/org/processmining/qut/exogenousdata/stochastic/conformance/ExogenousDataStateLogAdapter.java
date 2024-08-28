@@ -27,6 +27,7 @@ public class ExogenousDataStateLogAdapter implements DataStateLogAdapter {
 		for(ExogenousDataset data : datasets) {
 			try {
 				state.putDouble(varIdx, ccp.computeEventTheta(event, traceAttrs, data));
+//				state.putDouble(varIdx, 1);
 			} catch (Throwable e) {
 				// TODO Auto-generated catch block
 				state.putDouble(varIdx, -1);
