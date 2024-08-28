@@ -35,7 +35,7 @@ import org.processmining.framework.providedobjects.ProvidedObjectManager;
 import org.processmining.framework.util.Pair;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.qut.exogenousdata.stochastic.conformance.eduEMSC;
-import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscovery;
+import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryOneShot;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 
 import lombok.Builder;
@@ -257,7 +257,7 @@ public class BPM2024BEval {
 			);
 		}
 //		set out location
-		SLPNEDDiscovery disc = new SLPNEDDiscovery();
+		SLPNEDDiscoveryOneShot disc = new SLPNEDDiscoveryOneShot();
 		disc.setDumpLoc(outLoc);
 //		run the discovery
 		StochasticLabelledPetriNetWithExogenousData slpned = 

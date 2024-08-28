@@ -66,7 +66,7 @@ public class eduEMSC extends duEMSC {
 			work.add(new Tuple(itAs.key(), itAs.value()));
 		}
 
-		sum = work.stream().parallel().map(t -> {
+		sum = work.stream().parallel().sequential().map(t -> {
 			try {
 				return getProbDifference(t.getLeft(), t.getRight(), logSize, mc, semantics, canceller, dataSequences,
 						activityDataSequences);
@@ -181,6 +181,7 @@ public class eduEMSC extends duEMSC {
 //				.max(BigDecimal.ZERO);
 
 		if (eduEMSC.debug) {
+			System.out.println("for given trace: "+ Arrays.toString(activitySequence));
 			System.out.println("(concurrent) log, sum of probs over D given A: " + sum);
 		}
 
@@ -219,6 +220,42 @@ public class eduEMSC extends duEMSC {
 
 	public static TObjectIntMap<DataState[]> getDataSequences(XLog log, DataStateLogAdapter logAdapter,
 			int maxTraceLength) {
+		int processed = 0;
+////		build a list of states
+//		Map<String, Integer> counts = new HashMap<>();
+//		List<DataState[]> states = log.stream()
+//			.parallel()
+//			.map(trace -> TraceProbablility.getDataSequence(trace, logAdapter, maxTraceLength))
+//			.collect(Collectors.toList());
+////		build binned versions of values
+//		Map<String, Double> maxs = new HashMap();
+//		Map<String, Double> mins = new HashMap();
+//		states.stream()
+//			.forEach(ds -> {
+//				for(DataState d: ds) {
+//					if (d instanceof ExogenousDataState) {
+//						ExogenousDataState e = (ExogenousDataState) d;
+//						for(Factor f :e.getState().values()){
+//							if (f.isKnown() == 0) {
+//								continue;
+//							}
+//							String name =  f.toString();
+//							if (maxs.containsKey(name)) {
+//								if (maxs.get(name) < f.getValue()) {
+//									maxs.put(name, f.getValue());
+//								}
+//							} else {
+//								maxs.put(name, f.getValue());
+//							}
+//						}
+//						
+//					}
+//				}
+//		});
+//		System.out.println(maxs.toString());
+////		add mean of each bin to map with value
+		
+//		hash based on the binned values
 		TObjectIntMap<DataState[]> dataSequences = new TObjectIntCustomHashMap<>(new HashingStrategy<DataState[]>() {
 			private static final long serialVersionUID = 1L;
 
@@ -230,7 +267,6 @@ public class eduEMSC extends duEMSC {
 				return Arrays.equals(o1, o2);
 			}
 		});
-		int processed = 0;
 		System.out.println("processing data sequences...");
 		log.stream().parallel().map(trace -> TraceProbablility.getDataSequence(trace, logAdapter, maxTraceLength))
 				.sequential().forEach(dataTrace -> dataSequences.adjustOrPutValue(dataTrace, 1, 1));

@@ -9,11 +9,11 @@ import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.qut.exogenousdata.ab.jobs.Tuple;
 import org.processmining.qut.exogenousdata.stochastic.solver.Solver;
 
-public class SLPNEDDiscoveryWithContext extends SLPNEDDiscovery {
+public class SLPNEDDiscoveryTwoShotWithContext extends SLPNEDDiscoveryTwoShot {
 	
 	protected UIPluginContext context = null;
 	
-	public SLPNEDDiscoveryWithContext() {
+	public SLPNEDDiscoveryTwoShotWithContext() {
 		super();
 	}
 	
@@ -34,7 +34,7 @@ public class SLPNEDDiscoveryWithContext extends SLPNEDDiscovery {
 
 
 
-	public SLPNEDDiscoveryWithContext(UIPluginContext context) {
+	public SLPNEDDiscoveryTwoShotWithContext(UIPluginContext context) {
 		super();
 		this.context = context;
 	}
