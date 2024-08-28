@@ -27,11 +27,11 @@ public interface RMMTesting<T,J> {
 		}
 	}
 	
-	public default void recordMemoryUsage(Runnable runnable, int runTimeSecs) {
+	public default J recordMemoryUsage(Runnable runnable, int runTimeSecs) {
 	    try {
 	    	
-	        CompletableFuture<Void> futureRun = CompletableFuture.runAsync(runnable);
-	        futureRun.
+	        CompletableFuture<J> futureRun = (CompletableFuture<J>) 
+	        		CompletableFuture.runAsync(runnable);
 	        long mem = 0;
 	        while( !futureRun.isDone()) {
 		            for (int cnt = 0; cnt < runTimeSecs; cnt++) {
@@ -46,9 +46,11 @@ public interface RMMTesting<T,J> {
 		            ;
 		            System.out.println("Max memory used (gb): " + mem/1000000000D);
 	        }
+	        return futureRun.get();
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
+	    return null;
 	}
 	
 	public abstract J _run(Configuration<T,J,Long,Double> config);
