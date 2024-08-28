@@ -33,9 +33,16 @@ public interface RMMTesting<T,J> {
 	        CompletableFuture<J> futureRun = (CompletableFuture<J>) 
 	        		CompletableFuture.runAsync(runnable);
 	        long mem = 0;
+	        long startMem = Runtime.getRuntime().totalMemory() 
+	        		- Runtime.getRuntime().freeMemory();
+	        StopWatch watch = new StopWatch();
+	        watch.start();
 	        while( !futureRun.isDone()) {
+	        	long time = watch.getTime();
+	        	if (time > 10000) {
 		            for (int cnt = 0; cnt < runTimeSecs; cnt++) {
-		                long memUsed = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+		                long memUsed = Runtime.getRuntime().totalMemory() 
+		                		- Runtime.getRuntime().freeMemory();
 		                mem = memUsed > mem ? memUsed : mem;
 		                try {
 		                    TimeUnit.SECONDS.sleep(1);
@@ -45,6 +52,10 @@ public interface RMMTesting<T,J> {
 		            }
 		            ;
 		            System.out.println("Max memory used (gb): " + mem/1000000000D);
+		            watch.reset();
+		            watch.start();
+	        	}
+		            
 	        }
 	        return futureRun.get();
 	    } catch (Exception e) {
