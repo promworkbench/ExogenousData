@@ -14,7 +14,7 @@ public interface Configuration<T,J,K,L> {
 	public abstract void addOther(String name, Object other);
 	
 	public abstract TestingResult<K, L> makeTesting();
-	public abstract void setResult(TestingResult<K, L> result);
-	public abstract TestingResult<K, L> getResult();
+	public abstract void setTestingResult(TestingResult<K, L> tester);
+	public abstract TestingResult<K, L> getTestingResult();
 
 }
