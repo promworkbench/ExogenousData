@@ -221,17 +221,17 @@ public class ChoiceCollector {
 		for(SyncReplayResult alignment : alignedTraces) {
 			for(int traceIdx : alignment.getTraceIndex()) {
 				XTrace currTrace = xlog.get(traceIdx);
-				System.out.println("looking at an alignment for a trace...");
-				System.out.println("trace ::  " + currTrace
-						.stream()
-						.map( (x) -> {return classifer.getClassIdentity(x);})
-						.reduce("", (ls,nx) -> {return ls + nx;})
-				);
-				System.out.println("moves :: "+alignment.getStepTypes());
+//				System.out.println("looking at an alignment for a trace...");
+//				System.out.println("trace ::  " + currTrace
+//						.stream()
+//						.map( (x) -> {return classifer.getClassIdentity(x);})
+//						.reduce("", (ls,nx) -> {return ls + nx;})
+//				);
+//				System.out.println("moves :: "+alignment.getStepTypes());
 				sojournStats.processAlignment(currTrace, alignment);
 			}
 		}
-		System.out.println("collected sojourn times...");
+		System.out.println("[Choice-Collector] collected sojourn times...");
 		int maxProcess = xlog.size();
 //		traverse each alignment and collect choice data in a lazy manner
 		return new Iterator<ChoiceDataPoint>() {
@@ -280,7 +280,7 @@ public class ChoiceCollector {
 				// print some progress out
 				curr += 1;
 				if (curr % predictInterval == 0) {
-					System.out.println("processed traces into choice data :: "+curr+"/"+maxProcess);
+					System.out.println("[Choice-Collector] processed traces into choice data :: "+curr+"/"+maxProcess);
 					if (timebetween < 0) {
 						timebetween = System.currentTimeMillis();
 					} else {
@@ -290,7 +290,7 @@ public class ChoiceCollector {
 						intervals = intervals / predictInterval;
 						intervals = (ms * intervals) /(1000.0* 60.0);
 						System.out.println(
-							String.format("likely time left itering choice data :: %.3f minutes", intervals)
+							String.format("[Choice-Collector] likely time left itering choice data :: %.3f minutes", intervals)
 						);
 						
 					}
@@ -367,9 +367,9 @@ public class ChoiceCollector {
 				else {
 					if (step == StepTypes.LMGOOD) {
 						if (lastsync >= 0) {
-							System.out.println("found pair at ("+lasttrans+","+(transitionIdx+1)+")");
+//							System.out.println("found pair at ("+lasttrans+","+(transitionIdx+1)+")");
 							Object trans = alignment.getNodeInstance().get(transitionIdx+1);
-							System.out.println(trans.getClass());
+//							System.out.println(trans.getClass());
 							if (trans instanceof Transition) {
 								Double sojourn = 
 									Double.longBitsToDouble(
@@ -399,7 +399,7 @@ public class ChoiceCollector {
 		}
 		
 		public void addTime(Transition trans, double time) {
-			System.out.println(trans.toString() + " added time of "+ time);
+//			System.out.println(trans.toString() + " added time of "+ time);
 			if (transitions.contains(trans)) {
 				this.times.get(trans).add(time);
 			}
@@ -459,7 +459,7 @@ public class ChoiceCollector {
 			if (ret.length() > 2) {
 				ret = ret.substring(0, ret.length()-2);
 			}
-			System.out.println("theta operations :: "+ ret);
+			System.out.println("[Choice-Collector] theta operations :: "+ ret);
 		}
 		
 		public ChoiceDataPoint[] generateChoiceData(
@@ -487,8 +487,8 @@ public class ChoiceCollector {
 			for( ChoiceExogenousPoint[] them : thetas) {
 				for( ChoiceExogenousPoint one : them) {
 					if (Double.isNaN(one.getValue()) || Double.isInfinite(one.getValue())){
-						System.out.println("handling power messed up");
-						System.out.println(one.toString());
+//						System.out.println("handling power messed up");
+//						System.out.println(one.toString());
 					}
 				}
 			}
@@ -516,14 +516,14 @@ public class ChoiceCollector {
 		
 		public PowerHandler determineHanlder(
 				List<StepTypes> left_rem, StepTypes curr, List<StepTypes> right_rem) {
-			System.out.println("left_rem : "+ left_rem);
-			System.out.println("curr :"+curr);
-			System.out.println("right_rem :"+ right_rem);
+//			System.out.println("left_rem : "+ left_rem);
+//			System.out.println("curr :"+curr);
+//			System.out.println("right_rem :"+ right_rem);
 			if (curr == StepTypes.L) {
-				System.out.println("determined log power");
+//				System.out.println("determined log power");
 				return new LogPower();
 			} else if (curr == StepTypes.MINVI) {
-				System.out.println("determined silent power");
+//				System.out.println("determined silent power");
 				int nexterVis = nextVis(right_rem);
 				if (nexterVis < 0) {
 					return new SilientModelPower(-1, false);
@@ -531,19 +531,19 @@ public class ChoiceCollector {
 					return new SilientModelPower(left_rem.size()+ 1+ nexterVis, true);
 				}
 			} else if (curr == StepTypes.LMGOOD) {
-				System.out.println("determined sync power");
+//				System.out.println("determined sync power");
 				return new PowerSynchronistation(findEventIndex(left_rem.size()+1));
 			} else {
 				if (left_rem.contains(StepTypes.LMGOOD)) {
 					if (right_rem.contains(StepTypes.LMGOOD)) {
-						System.out.println("determined betweensync power");
+						System.out.println("[Choice-Collector] determined betweensync power");
 						return new PowerBetweenSynchronisation(
 							(Transition) alignment.getNodeInstance().get(left_rem.size()),
 							findEventIndex(lastSync(left_rem)+1), 
 							findEventIndex(left_rem.size()+1+nextSync(right_rem))								
 						);
 					} else {
-						System.out.println("determined preceding power");
+						System.out.println("[Choice-Collector] determined preceding power");
 						int leftIndex = lastSync(left_rem);
 						return new PowerPrecedingSynchronisation(
 								findEventIndex(leftIndex),
@@ -551,14 +551,14 @@ public class ChoiceCollector {
 						);
 					}
 				} else if (right_rem.contains(StepTypes.LMGOOD)) {
-					System.out.println("determined proceding power");
+					System.out.println("[Choice-Collector] determined proceding power");
 					int rightIndex = left_rem.size() + nextSync(right_rem);
 					return new PowerProceedingSynchronisation(
 							findEventIndex(rightIndex),
 							(Transition) alignment.getNodeInstance().get(rightIndex)
 					);
 				} else {
-					System.out.println("determined no power");
+//					System.out.println("determined no power");
 					return new NoPower();
 				}
 			}
@@ -575,14 +575,14 @@ public class ChoiceCollector {
 		}
 		
 		public int findEventIndex(int stepIndex) {
-			System.out.println("asked to find event as of step number : "+ stepIndex);
+//			System.out.println("asked to find event as of step number : "+ stepIndex);
 			int eventIndex = -1;
 			for(StepTypes step : alignment.getStepTypes().subList(0, stepIndex)) {
 				if (step == StepTypes.L || step == StepTypes.LMGOOD) {
 					eventIndex++;
 				}
 			}
-			System.out.println("Returning :: " + eventIndex);
+//			System.out.println("Returning :: " + eventIndex);
 			return eventIndex;
 		}
 		
@@ -848,7 +848,7 @@ public class ChoiceCollector {
 				// check for link with dataset
 				if (dataset.checkLink(trace) && targetTimes.length > 0) {					
 					// handle processing in parallel
-					System.out.println("starting between syn with sojourn size of :: " + targetTimes.length);
+					System.out.println("[Choice-Collector] starting between syn with sojourn size of :: " + targetTimes.length);
 					double avgTheta = Arrays.stream(targetTimes)
 							.parallel()
 							.map(
@@ -899,7 +899,7 @@ public class ChoiceCollector {
 		private Transition target;
 		
 		public PowerProceedingSynchronisation(int eventRight, Transition target) {
-			System.out.println("proceeding made targetting :: " + eventRight);
+			System.out.println("[Choice-Collector] proceeding made targetting :: " + eventRight);
 			this.eventRight = eventRight;
 			this.target = target;
 		}
@@ -989,7 +989,7 @@ public class ChoiceCollector {
 //				check for linkage
 				if (dataset.checkLink(trace) && times.length > 0) {
 //					compute an average of the sojourns
-					System.out.println("starting preceeding syn with sojourn size of :: " + times.length);
+					System.out.println("[Choice-Collector] starting preceeding syn with sojourn size of :: " + times.length);
 					double avgTheta = Arrays.stream(times)
 							.parallel()
 							.map(

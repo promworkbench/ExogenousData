@@ -34,7 +34,7 @@ public class EqualitiesFactory {
 		VariableCounter vcounter = new VariableCounter();
 //		initialise all equality variables
 		prepareVariables(variables, varlookup, vcounter, datasets, transitions);
-		System.out.println("prepared variables...");
+//		System.out.println("prepared variables...");
 //		for each competition space, construct an equality between outcomes
 		for(ChoiceDataPoint comp : frequencies.keySet()) {
 //			if this space is about an enablement with only one option then skip
@@ -43,7 +43,7 @@ public class EqualitiesFactory {
 			}
 			Map<String, Integer> points = frequencies.get(comp);
 			int totalPoints = points.values().stream().reduce(0,Integer::sum);
-			System.out.println("working on "+ comp.toString() + " with size of "+ totalPoints);
+//			System.out.println("working on "+ comp.toString() + " with size of "+ totalPoints);
 			if (totalPoints < 1) {
 				continue;
 			}
@@ -61,7 +61,7 @@ public class EqualitiesFactory {
 							(subpoints * 1.0) / (totalPoints * 1.0), 
 							subpoints, op, comp, varlookup, variables, vcounter
 					);
-					System.out.println("(skipped term) constructed :: "+eq.toString());
+//					System.out.println("(skipped term) constructed :: "+eq.toString());
 					equations.add(eq);
 					point += 1;
 					if (point >= comp.getEnabled().size()) {
@@ -82,7 +82,7 @@ public class EqualitiesFactory {
 							(subpoints * 1.0) / (totalPoints * 1.0), 
 							subpoints, op, comp, varlookup, variables, vcounter
 					);
-					System.out.println("(zero removed) constructed :: "+eq.toString());
+//					System.out.println("(zero removed) constructed :: "+eq.toString());
 					equations.add(eq);
 				}
 			}
@@ -131,7 +131,7 @@ public class EqualitiesFactory {
 		}
 //		debug out variables
 		for(Function var : variables) {
-			System.out.println("created variable :: "+var.toString());
+//			System.out.println("created variable :: "+var.toString());
 		}
 		assert( variables.size() == transitions.size() * datasets.size() * 2 + transitions.size());
 		

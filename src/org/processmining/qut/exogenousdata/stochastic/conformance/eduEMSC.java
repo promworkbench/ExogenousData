@@ -134,7 +134,7 @@ public class eduEMSC extends duEMSC {
 		for (TObjectIntIterator<Pair<String[], DataState[]>> itAs = result.iterator(); itAs.hasNext();) {
 			itAs.advance();
 			Pair<String[], DataState[]> pair = itAs.key();
-			System.out.println("show act seq of "+ Arrays.toString(pair.getA()) 
+			System.out.println("[eduEMSC] show act seq of "+ Arrays.toString(pair.getA()) 
 			+ " with data "+ Arrays.toString(pair.getB()) 
 			+ " with freq of " + itAs.value());
 		}
@@ -181,8 +181,8 @@ public class eduEMSC extends duEMSC {
 //				.max(BigDecimal.ZERO);
 
 		if (eduEMSC.debug) {
-			System.out.println("for given trace: "+ Arrays.toString(activitySequence));
-			System.out.println("(concurrent) log, sum of probs over D given A: " + sum);
+			System.out.println("[eduEMSC] for given trace: "+ Arrays.toString(activitySequence));
+			System.out.println("[eduEMSC] (concurrent) log, sum of probs over D given A: " + sum);
 		}
 
 		return sum;
@@ -201,10 +201,10 @@ public class eduEMSC extends duEMSC {
 			}
 		});
 		int processed = 0;
-		System.out.println("processing activity sequences...");
+		System.out.println("[eduEMSC] processing activity sequences...");
 		log.stream().parallel().map(trace -> TraceProbablility.getActivitySequence(trace, classifier)).sequential()
 				.forEach(activityTrace -> activitySequences.adjustOrPutValue(activityTrace, 1, 1));
-		System.out.println("finished...");
+		System.out.println("[eduEMSC] finished activity sequences...");
 		//		for (XTrace trace : log) {
 		//			String[] activityTrace = TraceProbablility.getActivitySequence(trace, classifier);
 		//			activitySequences.adjustOrPutValue(activityTrace, 1, 1);
@@ -267,10 +267,10 @@ public class eduEMSC extends duEMSC {
 				return Arrays.equals(o1, o2);
 			}
 		});
-		System.out.println("processing data sequences...");
+		System.out.println("[eduEMSC] processing data sequences...");
 		log.stream().parallel().map(trace -> TraceProbablility.getDataSequence(trace, logAdapter, maxTraceLength))
 				.sequential().forEach(dataTrace -> dataSequences.adjustOrPutValue(dataTrace, 1, 1));
-		System.out.println("finished...");
+		System.out.println("[eduEMSC] finished data sequences...");
 		//		for (XTrace trace : log) {
 		//			DataState[] dataTrace = TraceProbablility.getDataSequence(trace, logAdapter, maxTraceLength);
 		//			dataSequences.adjustOrPutValue(dataTrace, 1, 1);
