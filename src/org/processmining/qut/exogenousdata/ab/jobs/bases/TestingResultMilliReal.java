@@ -39,18 +39,18 @@ public class TestingResultMilliReal implements TestingResult<Long, Double> {
 		String ret = "";
 		ret += "[Measures] { ";
 		for(Entry<String, Double> e : this.measures.entrySet()) {
-			ret += e.getKey()
-				+"="
+			ret += "'"+e.getKey()
+				+"':"
 				+e.getValue()
 				+", ";
 		}
 		ret += "} ";
 		ret += "[Timing] { ";
 		for(Entry<String, Long> e : this.timings.entrySet()) {
-			ret += e.getKey()
-				+"="
+			ret += "'"+e.getKey()
+				+"':"
 				+e.getValue()
-				+" ms, ";
+				+", ";
 		}
 		ret += "}";
 		return ret;
