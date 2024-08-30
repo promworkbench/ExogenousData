@@ -67,7 +67,7 @@ public interface RMMTesting<T,J> {
 	        long memUsed = Runtime.getRuntime().totalMemory() 
 	        		- Runtime.getRuntime().freeMemory();
 		    mem = memUsed > mem ? memUsed : mem;
-		    config.getTestingResult().addMeasurement("disc-mem", (double) (mem/(1024.0 * 1024.0)));
+		    config.getTestingResult().addMeasurement("disc-mem", (double) ((mem-startMem)/(1024.0 * 1024.0)));
 	        return futureRun.get();
 	    } catch (Exception e) {
 	        e.printStackTrace();
@@ -115,7 +115,7 @@ public interface RMMTesting<T,J> {
 	        		- Runtime.getRuntime().freeMemory();
 	        mem = memUsed > mem ? memUsed : mem;
 		    config.getTestingResult().addMeasurement("conf-mem", 
-		    		(double) (mem/(1024.0 * 1024.0)));
+		    		(double) ((mem-startMem)/(1024.0 * 1024.0)));
 	        return futureRun.get();
 	    } catch (Exception e) {
 	        e.printStackTrace();
