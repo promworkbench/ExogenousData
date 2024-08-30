@@ -37,13 +37,13 @@ public class BPM2024BStrats implements RMMTesting<AcceptingPetriNet,
 			"F:\\OneDrive - Queensland University of Technology\\phd\\mypapers\\2023\\B\\data\\roadfines"
 			); 
 	private List<Path> logs = new ArrayList() {{
-		add(Paths.get(dataDir.toString(), "roadfines_big_sampled.xes"));
+		add(Paths.get(dataDir.toString(), "roadfines.xes"));
 	}};
 	private List<Path> controlflows = new ArrayList() {{
 		add(Paths.get(dataDir.toString(), "models", "imf_default.apnml"));
 	}};
 	private List<Integer> sampleSizes = new ArrayList() {{
-		for(int i = 100; i < 3001; i+=100) {
+		for(int i = 500; i < 25001; i+=500) {
 			add(i);
 		}
 	}};
@@ -233,9 +233,9 @@ public class BPM2024BStrats implements RMMTesting<AcceptingPetriNet,
 		}
 
 		public String toString() {
-			return "[Config] { samples="
+			return "[Config] { 'samples':"
 					+ samples
-					+ ", type='"
+					+ ", 'type':'"
 					+ others.get("miner").getClass().toString()
 					+ "' }";
 		}		
