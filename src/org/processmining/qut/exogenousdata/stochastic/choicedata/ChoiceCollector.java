@@ -97,6 +97,7 @@ public class ChoiceCollector {
 				)
 				.build();
 		@Default boolean useDefaultAggerator = true;
+		@Default double rounding = 0.01;
 		
 		public void adjustAggeratorForPanel(ExogenousDataset dataset) throws Throwable {
 			if (useDefaultAggerator) {
@@ -474,13 +475,33 @@ public class ChoiceCollector {
 				if (transformers[i] instanceof SilientModelPower) {
 					continue;
 				} else {
-					thetas[i] = transformers[i].handle(thetas, datasets, xtrace, this.params, sojourns);
+					ChoiceExogenousPoint[] vals = transformers[i].handle(thetas, datasets, xtrace, this.params, sojourns);
+					for(int j=0; j < vals.length; j++) {
+						ChoiceExogenousPoint cop = vals[j].copy();
+						vals[j] = ChoiceExogenousPoint.builder()
+								.name(cop.getName())
+								.known(cop.isKnown())
+								.skipped(cop.isSkipped())
+								.value(cop.getValue() - (cop.getValue() % params.rounding))
+								.build();
+					}
+					thetas[i] = vals;
 				}
 			}
 //			second pass (for silent moves)
 			for( int i =0; i < transformers.length; i++) {
 				if (transformers[i] instanceof SilientModelPower) {
-					thetas[i] = transformers[i].handle(thetas, datasets, xtrace, this.params, sojourns);
+					ChoiceExogenousPoint[] vals = transformers[i].handle(thetas, datasets, xtrace, this.params, sojourns);
+					for(int j=0; j < vals.length; j++) {
+						ChoiceExogenousPoint cop = vals[j].copy();
+						vals[j] = ChoiceExogenousPoint.builder()
+								.name(cop.getName())
+								.known(cop.isKnown())
+								.skipped(cop.isSkipped())
+								.value(cop.getValue() - (cop.getValue() % params.rounding))
+								.build();
+					}
+					thetas[i] = vals;
 				}
 			}
 //			check for nans 
