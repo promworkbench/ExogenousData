@@ -13,22 +13,14 @@ public class ExogenousDataStateLogAdapter implements DataStateLogAdapter {
 	
 	private SLPNEDSemantics semantics;
 	private ExogenousDataset[] datasets;
-	private int precision;
+	private double rounding = 0.25;
 	private XAttributeMap traceAttrs;
 	
 	public ExogenousDataStateLogAdapter(
 			SLPNEDSemantics semantics, 
 			ExogenousDataset[] datasets) {
-		this(semantics, datasets, 1);
-	}
-	
-	public ExogenousDataStateLogAdapter(
-			SLPNEDSemantics semantics, 
-			ExogenousDataset[] datasets,
-			int precision) {
 		this.semantics = semantics;
 		this.datasets = datasets;
-		this.precision = precision;
 	}
 
 	public DataState fromEvent(XEvent event) {
@@ -38,7 +30,7 @@ public class ExogenousDataStateLogAdapter implements DataStateLogAdapter {
 		for(ExogenousDataset data : datasets) {
 			try {
 				double theta = ccp.computeEventTheta(event, traceAttrs, data);
-				theta = Double.parseDouble(String.format("%."+precision+"f", theta));
+				theta = theta - (theta % rounding);
 				state.putDouble(varIdx, theta);
 //				state.putDouble(varIdx, 1);
 			} catch (Throwable e) {

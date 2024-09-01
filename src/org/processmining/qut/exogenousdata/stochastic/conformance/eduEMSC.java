@@ -29,6 +29,7 @@ import lpsolve.LpSolveException;
 public class eduEMSC extends duEMSC {
 
 	public static boolean debug;
+	public static boolean parallel = false;
 
 	public static double measureLogModel(XLog log, ExogenousDataset[] datasets, XEventClassifier classifier,
 			StochasticLabelledPetriNetWithExogenousData model, boolean debug, ProMCanceller canceller)

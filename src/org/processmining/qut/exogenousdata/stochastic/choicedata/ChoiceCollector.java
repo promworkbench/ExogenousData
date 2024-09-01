@@ -97,7 +97,7 @@ public class ChoiceCollector {
 				)
 				.build();
 		@Default boolean useDefaultAggerator = true;
-		@Default double rounding = 0.01;
+		@Default double rounding = 0.25;
 		
 		public void adjustAggeratorForPanel(ExogenousDataset dataset) throws Throwable {
 			if (useDefaultAggerator) {
