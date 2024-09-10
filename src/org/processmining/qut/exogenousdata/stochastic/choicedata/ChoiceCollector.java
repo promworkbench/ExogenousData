@@ -41,6 +41,7 @@ import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.qut.exogenousdata.data.ExogenousUtils;
 import org.processmining.qut.exogenousdata.steps.slicing.PastOutcomeSlicer;
 import org.processmining.qut.exogenousdata.steps.slicing.Slicer;
+import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries;
 import org.processmining.qut.exogenousdata.steps.transform.type.Transformer;
 import org.processmining.qut.exogenousdata.steps.transform.type.agg.AbsoluteVarianceTransformer;
 import org.processmining.qut.exogenousdata.steps.transform.type.agg.TailingWeightedSubsequencesTransform;
@@ -124,14 +125,20 @@ public class ChoiceCollector {
 			return theta;
 		}
 		
-		public double computeEventTheta(XEvent event, XAttributeMap traceAttrs, ExogenousDataset dataset) throws Throwable {
+		public double computeEventTheta(XEvent event, XAttributeMap traceAttrs, ExogenousDataset dataset) 
+				throws Throwable {
 			adjustAggeratorForPanel(dataset);
-			XTrace simplierTrace = new XTraceImpl(traceAttrs);
-			simplierTrace.add(event);
+			XTrace simplierTrace = new XTraceImpl((XAttributeMap) traceAttrs.clone());
+			XEvent simplierEvent = (XEvent) event.clone();
+			int idx = simplierTrace.insertOrdered(simplierEvent);
 			XTrace linkage = dataset.findLinkage(simplierTrace).get(0);
+			Map<XEvent, SubSeries> map = eventSlicer.slice(simplierTrace, linkage, dataset);
+			SubSeries slice = map.get(simplierTrace.get(idx));
+			if (slice.size() < 1) {
+				return -1.0;
+			}
 			double theta = thetaAggerator.transform(
-						eventSlicer.slice(simplierTrace, linkage, dataset)
-						.get(event)
+						slice
 				).getRealValue();
 //			System.out.println("Computed event Theta :: "+ theta);
 			return theta;
@@ -482,7 +489,7 @@ public class ChoiceCollector {
 								.name(cop.getName())
 								.known(cop.isKnown())
 								.skipped(cop.isSkipped())
-								.value(cop.getValue() - (cop.getValue() % params.rounding))
+								.value(cop.getValue() - (cop.getValue() % params.rounding) + params.rounding)
 								.build();
 					}
 					thetas[i] = vals;
@@ -498,7 +505,7 @@ public class ChoiceCollector {
 								.name(cop.getName())
 								.known(cop.isKnown())
 								.skipped(cop.isSkipped())
-								.value(cop.getValue() - (cop.getValue() % params.rounding))
+								.value(cop.getValue() - (cop.getValue() % params.rounding) + params.rounding)
 								.build();
 					}
 					thetas[i] = vals;

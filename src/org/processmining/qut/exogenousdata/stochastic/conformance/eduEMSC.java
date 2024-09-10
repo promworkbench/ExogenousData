@@ -5,7 +5,9 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.model.XLog;
@@ -66,17 +68,40 @@ public class eduEMSC extends duEMSC {
 			itAs.advance();
 			work.add(new Tuple(itAs.key(), itAs.value()));
 		}
-
-		sum = work.stream().parallel().sequential().map(t -> {
-			try {
-				return getProbDifference(t.getLeft(), t.getRight(), logSize, mc, semantics, canceller, dataSequences,
-						activityDataSequences);
-			} catch (LpSolveException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return BigDecimal.ZERO;
-		}).reduce(sum, BigDecimal::add);
+		if (parallel) {
+			sum = work.parallelStream()
+					.map(t -> {
+						try {
+							return getProbDifference(
+									t.getLeft(), 
+									t.getRight(), 
+									logSize, mc, semantics, canceller, dataSequences,
+									activityDataSequences);
+						} catch (LpSolveException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						return BigDecimal.ZERO;
+					})
+					.reduce(sum, BigDecimal::add);
+		} else {
+			sum = work.stream()
+					.map(t -> {
+						try {
+							return getProbDifference(
+									t.getLeft(), 
+									t.getRight(), 
+									logSize, mc, semantics, canceller, dataSequences,
+									activityDataSequences);
+						} catch (LpSolveException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						return BigDecimal.ZERO;
+					})
+					.reduce(sum, BigDecimal::add);
+		}
+		
 
 		//		for (TObjectIntIterator<String[]> itAs = activitySequences.iterator(); itAs.hasNext();) {
 		//			itAs.advance();
@@ -143,9 +168,11 @@ public class eduEMSC extends duEMSC {
 		return result;
 	}
 
-	public static BigDecimal getProbDifference(String[] activitySequence, int activitySequenceWeight, int logSize,
+	public static BigDecimal getProbDifference(
+			String[] activitySequence, int activitySequenceWeight, int logSize,
 			MathContext mc, SLPNEDSemantics semantics, ProMCanceller canceller,
-			TObjectIntMap<DataState[]> dataSequences, TObjectIntMap<Pair<String[], DataState[]>> activityDataSequences)
+			TObjectIntMap<DataState[]> dataSequences, 
+			TObjectIntMap<Pair<String[], DataState[]>> activityDataSequences)
 			throws LpSolveException {
 
 		BigDecimal sum = BigDecimal.ZERO;
@@ -268,10 +295,35 @@ public class eduEMSC extends duEMSC {
 				return Arrays.equals(o1, o2);
 			}
 		});
-		System.out.println("[eduEMSC] processing data sequences...");
-		log.stream().parallel().map(trace -> TraceProbablility.getDataSequence(trace, logAdapter, maxTraceLength))
-				.sequential().forEach(dataTrace -> dataSequences.adjustOrPutValue(dataTrace, 1, 1));
-		System.out.println("[eduEMSC] finished data sequences...");
+		System.out.println("[eduEMSC] processing ("
+				+log.size()
+				+") for data sequences..."
+		);
+		Stream<DataState[]> stream;
+		if (parallel) {
+			stream = log.stream()
+					.parallel()
+					.map(trace -> TraceProbablility.getDataSequence(
+							trace, 
+							((ExogenousDataStateLogAdapter)logAdapter).clone(), 
+							maxTraceLength)
+					);
+		} else {
+			stream = log.stream()
+					.map(trace -> TraceProbablility.getDataSequence(
+							trace, 
+							((ExogenousDataStateLogAdapter)logAdapter).clone(), 
+							maxTraceLength)
+					);
+		}
+			
+		Iterator<DataState[]> iter = stream.iterator();
+		if (iter.hasNext()) {
+			for(DataState[] dataTrace = iter.next();iter.hasNext();dataTrace = iter.next()) {
+				dataSequences.adjustOrPutValue(dataTrace, 1, 1);
+			}
+		}
+		System.out.println("[eduEMSC] finished collecting data ("+ dataSequences.size() +") sequences...");
 		//		for (XTrace trace : log) {
 		//			DataState[] dataTrace = TraceProbablility.getDataSequence(trace, logAdapter, maxTraceLength);
 		//			dataSequences.adjustOrPutValue(dataTrace, 1, 1);
