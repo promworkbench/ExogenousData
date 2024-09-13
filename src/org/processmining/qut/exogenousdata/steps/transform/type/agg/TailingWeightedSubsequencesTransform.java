@@ -68,8 +68,14 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 	}
 
 	public TransformedAttribute transform(SubSeries subtimeseries) {
+		if (subtimeseries == null) {
+			System.out.println("subseries was null?");
+		} else if (subtimeseries.size() < 1) {
+			System.out.println("subseries was empty?");
+		}
 //		double agg = 1;
-//		System.out.println("starting tailing weight ("+ subtimeseries.size()+").");
+//		System.out.println("[TailingWeightedSubsequencesTransform] "
+//				+ "starting tailing weight ("+ subtimeseries.size()+").");
 		List<Double> relativeTimes = new ArrayList<Double>() {{
 			for (long rel : subtimeseries.getXSeries(true, Scaling.hour)) {
 				add((double)rel);
@@ -94,6 +100,9 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 					relativeTimes.stream()
 						.mapToDouble(t -> 1.0/ (1.0 + Math.abs(t)))
 						.reduce(0.0, Double::sum);
+			if (relativeTimes.size() > 0) {
+				norm = Math.max(norm, 0.001);
+			}
 			if (norm == 0.0) {
 				System.out.println("[TailingWeightedSubsequencesTransform] "
 						+ "Computed norm is zero, transform is unlikely to work");
@@ -101,8 +110,9 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 			agg = 
 				IntStream.range(0, values.size()-1)
 					.mapToDouble(i -> 
-					( 1.0 / ( 1+Math.abs(relativeTimes.get(i))) 
-							  * Math.abs((values.get(i) - mean)/ std))
+					( 1.0 / ( 1+Math.abs(relativeTimes.get(i)))) 
+				    * 
+				    (Math.abs((values.get(i) - mean)/ std))
 					)
 					.reduce(0.0, Double::sum);
 			agg = agg / norm;

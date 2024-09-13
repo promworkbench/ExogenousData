@@ -4,6 +4,7 @@ import org.deckfour.xes.model.XAttributeMap;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
+import org.processmining.qut.exogenousdata.exceptions.LinkNotFoundException;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceCollector.ChoiceCollectorParameters;
 import org.processmining.qut.exogenousdata.stochastic.model.SLPNEDSemantics;
 import org.processmining.stochasticlabelleddatapetrinet.datastate.DataState;
@@ -32,20 +33,31 @@ public class ExogenousDataStateLogAdapter implements DataStateLogAdapter {
 		this.rounding = rounding;
 	
 	}
+	protected ExogenousDataStateLogAdapter clone() {
+		return new ExogenousDataStateLogAdapter(
+				this.semantics.clone(),
+				this.datasets
+		);
+	}
+
+
 
 	public DataState fromEvent(XEvent event) {
 		ExogenousDataState state = new ExogenousDataState(datasets);
 		ChoiceCollectorParameters ccp = ChoiceCollectorParameters.builder().build();
 		int varIdx = 0;
 		for(ExogenousDataset data : datasets) {
+			state.putDouble(varIdx, -1);
 			try {
 				double theta = ccp.computeEventTheta(event, traceAttrs, data);
-				theta = theta - (theta % rounding);
+				theta = theta - (theta % rounding) + rounding;
 				state.putDouble(varIdx, theta);
 //				state.putDouble(varIdx, 1);
-			} catch (Throwable e) {
-				// TODO Auto-generated catch block
+			} catch (LinkNotFoundException e) {
+				// expected outcome
 				state.putDouble(varIdx, -1);
+			} catch (Throwable e) {
+				e.printStackTrace();
 			}
 			varIdx++;
 		}
@@ -59,7 +71,7 @@ public class ExogenousDataStateLogAdapter implements DataStateLogAdapter {
 
 	public DataState fromTrace(XTrace trace) {
 		traceAttrs = trace.getAttributes();
-		return fromEvent(trace.get(0));
+		return new ExogenousDataState(datasets);
 	}
 
 	public DataState fromTrace(XTrace trace, DataState ds) {
