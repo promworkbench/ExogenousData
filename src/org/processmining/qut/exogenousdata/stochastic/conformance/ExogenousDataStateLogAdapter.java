@@ -22,6 +22,16 @@ public class ExogenousDataStateLogAdapter implements DataStateLogAdapter {
 		this.semantics = semantics;
 		this.datasets = datasets;
 	}
+	
+	public ExogenousDataStateLogAdapter(
+			SLPNEDSemantics semantics, 
+			ExogenousDataset[] datasets,
+			double rounding) {
+		this.semantics = semantics;
+		this.datasets = datasets;
+		this.rounding = rounding;
+	
+	}
 
 	public DataState fromEvent(XEvent event) {
 		ExogenousDataState state = new ExogenousDataState(datasets);

@@ -142,7 +142,7 @@ public class SLPNEDDiscoveryOneShot implements SLPNEDDiscoverer{
 		double[] inital = new double[equalities.getRight().size()];
 		for(int i = 0; i < equalities.getRight().size(); i++) {
 				fixed[i] = 0; // should the variable not change
-				inital[i] =  1.0; // the initial guess for solver
+				inital[i] =  4.0; // the initial guess for solver
 				nonzero[i] = 1; // should the variable not be zero
 			
 		}

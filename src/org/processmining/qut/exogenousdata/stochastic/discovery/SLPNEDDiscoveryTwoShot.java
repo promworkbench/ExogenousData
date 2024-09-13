@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.stream.IntStream;
 
 import org.deckfour.xes.model.XLog;
@@ -161,15 +160,15 @@ public class SLPNEDDiscoveryTwoShot implements SLPNEDDiscoverer{
 			
 			if (type == null) {
 				fixed[i] = 0; // should the variable not change
-				inital[i] =  1.0; // the initial guess for solver
+				inital[i] =  4.0; // the initial guess for solver
 				nonzero[i] = 1; // should the variable not be zero
 			} else if (type == SLPNEDVarType.BASE){
 				fixed[idx] = 0; // should the variable not change
-				inital[idx] =  new Random().nextInt(9) + 1.0; // the initial guess for solver
+				inital[idx] =  4.0; // the initial guess for solver
 				nonzero[idx] = 1; // should the variable not be zero
 			} else {
 				fixed[idx] = 1; // should the variable not change
-				inital[idx] =  1.0; // the initial guess for solver
+				inital[idx] =  4.0; // the initial guess for solver
 				nonzero[idx] = 1; // should the variable not be zero
 			}
 		}

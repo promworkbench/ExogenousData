@@ -20,9 +20,6 @@ import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.qut.exogenousdata.exceptions.CannotConvertException;
 import org.processmining.qut.exogenousdata.stochastic.conformance.eduEMSC;
 import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoverer;
-import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryBatchedOneShot;
-import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryBatchedTwoShot;
-import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryOneShot;
 import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryTwoShot;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.qut.exogenousdata.utils.LoadyUtils;
@@ -43,7 +40,7 @@ public class BPM2024BStrats implements RMMTesting<AcceptingPetriNet,
 		add(Paths.get(dataDir.toString(), "models", "imf_default.apnml"));
 	}};
 	private List<Integer> sampleSizes = new ArrayList() {{
-		for(int i = 500; i < 25001; i+=500) {
+		for(int i = 1000; i < 25001; i+=1000) {
 			add(i);
 		}
 	}};
@@ -52,10 +49,10 @@ public class BPM2024BStrats implements RMMTesting<AcceptingPetriNet,
 		add(Paths.get(dataDir.toString(), "exogenous_dataset_unresolved_fines.xes"));
 	}};
 	private List<SLPNEDDiscoverer> miners = new ArrayList() {{
-		add(new SLPNEDDiscoveryOneShot());
+//		add(new SLPNEDDiscoveryOneShot());
 		add(new SLPNEDDiscoveryTwoShot());
-		add(new SLPNEDDiscoveryBatchedOneShot());
-		add(new SLPNEDDiscoveryBatchedTwoShot());
+//		add(new SLPNEDDiscoveryBatchedOneShot());
+//		add(new SLPNEDDiscoveryBatchedTwoShot());
 	}};
 	
 	public List<
