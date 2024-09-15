@@ -25,6 +25,7 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 	@Default private String name = "twsub";
 	@Default private double espilion = 0.01;
 	@Default private List<CachedVariance> cache = new ArrayList();
+	@Default private Scaling timeScaler = Scaling.day;
 	
 	private class CachedVariance {
 		
@@ -77,7 +78,7 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 //		System.out.println("[TailingWeightedSubsequencesTransform] "
 //				+ "starting tailing weight ("+ subtimeseries.size()+").");
 		List<Double> relativeTimes = new ArrayList<Double>() {{
-			for (long rel : subtimeseries.getXSeries(true, Scaling.hour)) {
+			for (long rel : subtimeseries.getXSeries(true, timeScaler)) {
 				add((double)rel);
 			}
 		}};

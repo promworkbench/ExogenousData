@@ -42,6 +42,7 @@ import org.processmining.qut.exogenousdata.data.ExogenousUtils;
 import org.processmining.qut.exogenousdata.steps.slicing.PastOutcomeSlicer;
 import org.processmining.qut.exogenousdata.steps.slicing.Slicer;
 import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries;
+import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries.Scaling;
 import org.processmining.qut.exogenousdata.steps.transform.type.Transformer;
 import org.processmining.qut.exogenousdata.steps.transform.type.agg.AbsoluteVarianceTransformer;
 import org.processmining.qut.exogenousdata.steps.transform.type.agg.TailingWeightedSubsequencesTransform;
@@ -98,7 +99,8 @@ public class ChoiceCollector {
 				)
 				.build();
 		@Default boolean useDefaultAggerator = true;
-		@Default double rounding = 0.05;
+		@Default double rounding = 1e-5;
+		@Default Scaling timeScaling = Scaling.monthly;
 		
 		public void adjustAggeratorForPanel(ExogenousDataset dataset) throws Throwable {
 			if (useDefaultAggerator) {
@@ -109,70 +111,53 @@ public class ChoiceCollector {
 								AbsoluteVarianceTransformer.builder()
 								.mean(mean).std(std).build()	
 						)
+						.timeScaler(timeScaling)
 						.build();
 			}
 		}
 		
-		public double computeTheta(XTrace trace, int eventIndex, ExogenousDataset dataset) throws Throwable {
-			adjustAggeratorForPanel(dataset);
-			XTrace simplierTrace = new XTraceImpl(trace.getAttributes());
-			simplierTrace.add(trace.get(eventIndex));
-			XTrace linkage = dataset.findLinkage(simplierTrace).get(0);
-			double theta = thetaAggerator.transform(
-						eventSlicer.slice(simplierTrace, linkage, dataset).get(trace.get(eventIndex))
-				).getRealValue();
-//			System.out.println("Computed Theta :: "+ theta);
-			return theta;
+		public double computeTheta(XTrace trace, int eventIndex, 
+				ExogenousDataset dataset) throws Throwable {
+			return computeEventTheta(trace.get(eventIndex), trace.getAttributes(), dataset);
 		}
 		
-		public double computeEventTheta(XEvent event, XAttributeMap traceAttrs, ExogenousDataset dataset) 
-				throws Throwable {
-			adjustAggeratorForPanel(dataset);
-			XTrace simplierTrace = new XTraceImpl((XAttributeMap) traceAttrs.clone());
-			XEvent simplierEvent = (XEvent) event.clone();
-			int idx = simplierTrace.insertOrdered(simplierEvent);
-			XTrace linkage = dataset.findLinkage(simplierTrace).get(0);
-			Map<XEvent, SubSeries> map = eventSlicer.slice(simplierTrace, linkage, dataset);
-			SubSeries slice = map.get(simplierTrace.get(idx));
-			if (slice.size() < 1) {
-				return -1.0;
-			}
-			double theta = thetaAggerator.transform(
-						slice
-				).getRealValue();
-//			System.out.println("Computed event Theta :: "+ theta);
-			return theta;
+		public double computeProceedingTheta(XTrace trace, XEvent posEvent, 
+				ExogenousDataset dataset) throws Throwable {
+			return computeEventTheta(posEvent, trace.getAttributes(), dataset);
 		}
 		
-		public double computeProceedingTheta(XTrace trace, XEvent posEvent, ExogenousDataset dataset) throws Throwable {
-			adjustAggeratorForPanel(dataset);
-			XTrace simplierTrace = new XTraceImpl(trace.getAttributes());
-			simplierTrace.add(posEvent);
-			XTrace linkage = dataset.findLinkage(simplierTrace).get(0);
-			double theta = thetaAggerator.transform(
-						eventSlicer.slice(simplierTrace, linkage, dataset).get(posEvent)
-				).getRealValue();
-//			System.out.println("Computed Theta :: "+ theta);
-			return theta;
-		}
-		
-		public double computeTheta(XTrace trace, int leftIndex, int rightIndex, ExogenousDataset dataset, Double sojourn) throws Throwable {
-			adjustAggeratorForPanel(dataset);
-			XTrace simplierTrace = new XTraceImpl(trace.getAttributes());
+		public double computeTheta(XTrace trace, int leftIndex, int rightIndex, 
+				ExogenousDataset dataset, Double sojourn) throws Throwable {
+			assert sojourn > -0.01;
 			Date newDate = new Date(
 					ExogenousUtils.getEventTimeMillis(trace.get(leftIndex))
 					+Double.doubleToLongBits(sojourn)
 			);
 			XEvent newEvent = (XEvent) trace.get(rightIndex).clone();
-			((XAttributeTimestamp) newEvent.getAttributes().get("time:timestamp")).setValue(newDate);
-			simplierTrace.add(newEvent);
-			XTrace linkage = dataset.findLinkage(simplierTrace).get(0);
-			double theta = thetaAggerator.transform(
-						eventSlicer.slice(simplierTrace, linkage, dataset).get(newEvent)
-				).getRealValue();
-//			System.out.println("Computed Theta :: "+ theta);
-			return theta;
-				
+			((XAttributeTimestamp) newEvent.getAttributes()
+					.get("time:timestamp")).setValue(newDate);
+			return computeEventTheta(newEvent, trace.getAttributes(), dataset);
+		}
+		
+		public double computeEventTheta(XEvent event, XAttributeMap traceAttrs, ExogenousDataset dataset) 
+				throws Throwable {
+			synchronized (this) {
+				adjustAggeratorForPanel(dataset);
+				XTrace simplierTrace = new XTraceImpl((XAttributeMap) traceAttrs.clone());
+				XEvent simplierEvent = (XEvent) event.clone();
+				int idx = simplierTrace.insertOrdered(simplierEvent);
+				XTrace linkage = dataset.findLinkage(simplierTrace).get(0);
+				Map<XEvent, SubSeries> map = eventSlicer.slice(simplierTrace, linkage, dataset);
+				SubSeries slice = map.get(simplierTrace.get(idx));
+				if (slice.size() < 1) {
+					return -1.0;
+				}
+				double theta = thetaAggerator.transform(
+							slice
+					).getRealValue();
+//				System.out.println("Computed event Theta :: "+ theta);
+				return theta;
+			}
 		}
 		
 	}
@@ -212,7 +197,7 @@ public class ChoiceCollector {
 		parameters.setCreateConn(false);
 		parameters.setInitialMarking(net.getInitialMarking());
 		parameters.setFinalMarkings((Marking[]) net.getFinalMarkings().toArray(new Marking[1]));
-//		parameters.setNumThreads(this.maxConcurrentThreads); ILP problem with an array index when threaded : LPProblemProvider:24
+		parameters.setNumThreads(22); // ILP problem with an array index when threaded : LPProblemProvider:24
 		parameters.setMaxNumOfStates(200000);
 		
 //		collect alignments for traces in log 
@@ -580,7 +565,7 @@ public class ChoiceCollector {
 					}
 				} else if (right_rem.contains(StepTypes.LMGOOD)) {
 					System.out.println("[Choice-Collector] determined proceding power");
-					int rightIndex = left_rem.size() + nextSync(right_rem);
+					int rightIndex = left_rem.size()+ 1 + nextSync(right_rem);
 					return new PowerProceedingSynchronisation(
 							findEventIndex(rightIndex),
 							(Transition) alignment.getNodeInstance().get(rightIndex)

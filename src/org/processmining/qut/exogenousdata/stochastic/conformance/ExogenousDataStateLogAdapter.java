@@ -5,6 +5,7 @@ import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XTrace;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.qut.exogenousdata.exceptions.LinkNotFoundException;
+import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries.Scaling;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceCollector.ChoiceCollectorParameters;
 import org.processmining.qut.exogenousdata.stochastic.model.SLPNEDSemantics;
 import org.processmining.stochasticlabelleddatapetrinet.datastate.DataState;
@@ -14,7 +15,8 @@ public class ExogenousDataStateLogAdapter implements DataStateLogAdapter {
 	
 	private SLPNEDSemantics semantics;
 	private ExogenousDataset[] datasets;
-	private double rounding = 0.25;
+	private double rounding = 0.05;
+	private Scaling timeScaler = Scaling.day;
 	private XAttributeMap traceAttrs;
 	
 	public ExogenousDataStateLogAdapter(
@@ -31,12 +33,25 @@ public class ExogenousDataStateLogAdapter implements DataStateLogAdapter {
 		this.semantics = semantics;
 		this.datasets = datasets;
 		this.rounding = rounding;
-	
 	}
+	
+	
+	public ExogenousDataStateLogAdapter(SLPNEDSemantics semantics, 
+			ExogenousDataset[] datasets, double rounding,
+			Scaling timeScaler) {
+		super();
+		this.semantics = semantics;
+		this.datasets = datasets;
+		this.rounding = rounding;
+		this.timeScaler = timeScaler;
+	}
+
 	protected ExogenousDataStateLogAdapter clone() {
 		return new ExogenousDataStateLogAdapter(
 				this.semantics.clone(),
-				this.datasets
+				this.datasets,
+				this.rounding,
+				this.timeScaler
 		);
 	}
 
@@ -44,7 +59,9 @@ public class ExogenousDataStateLogAdapter implements DataStateLogAdapter {
 
 	public DataState fromEvent(XEvent event) {
 		ExogenousDataState state = new ExogenousDataState(datasets);
-		ChoiceCollectorParameters ccp = ChoiceCollectorParameters.builder().build();
+		ChoiceCollectorParameters ccp = ChoiceCollectorParameters.builder()
+				.timeScaling(timeScaler)
+				.build();
 		int varIdx = 0;
 		for(ExogenousDataset data : datasets) {
 			state.putDouble(varIdx, -1);

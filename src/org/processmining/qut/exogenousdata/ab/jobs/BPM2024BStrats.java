@@ -25,8 +25,6 @@ import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPe
 import org.processmining.qut.exogenousdata.utils.LoadyUtils;
 import org.processmining.qut.exogenousdata.utils.LoggyUtils;
 
-import lpsolve.LpSolveException;
-
 public class BPM2024BStrats implements RMMTesting<AcceptingPetriNet, 
 	StochasticLabelledPetriNetWithExogenousData> {
 
@@ -141,16 +139,10 @@ public class BPM2024BStrats implements RMMTesting<AcceptingPetriNet,
 				return false;
 			}
 		};
-		try {
-			return eduEMSC.measureLogModel(
-					log, datasets.toArray(new ExogenousDataset[0]), 
-					new XEventNameClassifier(), config.result(), true, canceller
-			);
-		} catch (LpSolveException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return -1;
+		return eduEMSC.measureLogModel(
+				log, datasets.toArray(new ExogenousDataset[0]), 
+				new XEventNameClassifier(), config.result(), true, canceller
+		);
 	}
 	
 	class BPM2024BStratConfig implements Configuration<

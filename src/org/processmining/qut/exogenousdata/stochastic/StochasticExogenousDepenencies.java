@@ -138,17 +138,30 @@ public class StochasticExogenousDepenencies {
 			final XLog xlog, 
 			final StochasticLabelledPetriNetWithExogenousData model, 
 			final ExogenousDataset[] datasets) 
-	throws Exception {
+	{
 		ProMCanceller canceller = new ProMCanceller() {
 			public boolean isCancelled() {
 				return context.getProgress().isCancelled();
 			}
 		};
+		eduEMSC.setContext(context);
 		double measure = eduEMSC.measureLogModel(xlog, datasets, new XEventNameClassifier(), model, true, canceller);
+		
+		String name;
+		try {
+			name = model.getName();
+		} catch (Exception e) {
+			System.out.println("[eduEMSC] unable to get net's name.");
+			name = "exo-slpn";
+		}
+		final String outName = name;
 		return new HTMLToString() {
 
 			public String toHTMLString(boolean includeHTMLTags) {
-				return "Data-aware Earth Movers' Stochastic Conformance: " + measure;
+				return "(for model '"
+						+ outName
+						+"')<br/>"
+						+ "Data-aware Earth Movers' Stochastic Conformance: " + measure;
 			}
 		};
 	}
