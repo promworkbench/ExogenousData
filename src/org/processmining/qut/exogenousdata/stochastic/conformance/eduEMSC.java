@@ -181,7 +181,9 @@ public class eduEMSC extends duEMSC {
 		//			sum = sum.add(difference);
 		//		}
 		progIncr();
-		return BigDecimal.ONE.subtract(sum).doubleValue();
+		double ret = BigDecimal.ONE.subtract(sum).doubleValue();
+		progMessage("computed eduEMSC was ::" + ret);
+		return ret;
 	}
 	
 	private static Object[] processLogForSequences(XLog log,
