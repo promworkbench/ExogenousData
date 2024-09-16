@@ -3,9 +3,9 @@ package org.processmining.qut.exogenousdata.data;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.deckfour.xes.model.XAttributeTimestamp;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
+import org.processmining.log.utils.XUtils;
 import org.processmining.qut.exogenousdata.exceptions.ExogenousAttributeNotFoundException;
 import org.processmining.qut.exogenousdata.steps.linking.AttributeLinker;
 import org.processmining.qut.exogenousdata.steps.linking.ChainAttributeLinker;
@@ -29,7 +29,7 @@ public class ExogenousUtils {
 	 */
 	public static long getEventTimeMillis(XEvent ev) throws NoSuchElementException {
 		if (ev.getAttributes().containsKey("time:timestamp")) {
-			return ( (XAttributeTimestamp) ev.getAttributes().get("time:timestamp")).getValueMillis();
+			return XUtils.getTimestamp(ev).getTime();
 		} else {
 			throw new NoSuchElementException("Unable to find suitable attribute for event to describe time.");
 		}
