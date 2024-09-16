@@ -38,6 +38,7 @@ public class SLPNEDDiscoveryTwoShot implements SLPNEDDiscoverer{
 	protected String dumpLoc = "";
 	protected boolean shouldDump = false;
 	protected int batchsize = 1000;
+	protected double defaultValue = 4.0;
 	
 	public void setDumpLoc(String loc) {
 		dumpLoc = loc;
@@ -160,15 +161,15 @@ public class SLPNEDDiscoveryTwoShot implements SLPNEDDiscoverer{
 			
 			if (type == null) {
 				fixed[i] = 0; // should the variable not change
-				inital[i] =  4.0; // the initial guess for solver
+				inital[i] =  defaultValue; // the initial guess for solver
 				nonzero[i] = 1; // should the variable not be zero
 			} else if (type == SLPNEDVarType.BASE){
 				fixed[idx] = 0; // should the variable not change
-				inital[idx] =  4.0; // the initial guess for solver
+				inital[idx] =  defaultValue; // the initial guess for solver
 				nonzero[idx] = 1; // should the variable not be zero
 			} else {
 				fixed[idx] = 1; // should the variable not change
-				inital[idx] =  4.0; // the initial guess for solver
+				inital[idx] =  defaultValue; // the initial guess for solver
 				nonzero[idx] = 1; // should the variable not be zero
 			}
 		}
@@ -223,7 +224,11 @@ public class SLPNEDDiscoveryTwoShot implements SLPNEDDiscoverer{
 					+ equalities.getRight().get(i) 
 					+ " as : "+solvedvalues[i]
 			);
-			solvedVariables.put(equalities.getRight().get(i), solvedvalues[i]);
+			if (Math.abs(solvedvalues[i] - defaultValue) < 1e-4) {
+				solvedVariables.put(equalities.getRight().get(i), 1.0);
+			} else {
+				solvedVariables.put(equalities.getRight().get(i), solvedvalues[i]);
+			}
 		}
 		return solvedVariables;
 	}

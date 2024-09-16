@@ -35,6 +35,7 @@ public class SLPNEDDiscoveryOneShot implements SLPNEDDiscoverer{
 	protected String dumpLoc = "";
 	protected boolean shouldDump = false;
 	protected int batchsize = 1000;
+	protected double defaultSolveValue = 4.0;
 	
 	public void setDumpLoc(String loc) {
 		dumpLoc = loc;
@@ -142,7 +143,7 @@ public class SLPNEDDiscoveryOneShot implements SLPNEDDiscoverer{
 		double[] inital = new double[equalities.getRight().size()];
 		for(int i = 0; i < equalities.getRight().size(); i++) {
 				fixed[i] = 0; // should the variable not change
-				inital[i] =  4.0; // the initial guess for solver
+				inital[i] =  defaultSolveValue; // the initial guess for solver
 				nonzero[i] = 1; // should the variable not be zero
 			
 		}
@@ -159,7 +160,12 @@ public class SLPNEDDiscoveryOneShot implements SLPNEDDiscoverer{
 					+ equalities.getRight().get(i) 
 					+ " as : "+solvedvalues[i]
 			);
-			solvedVariables.put(equalities.getRight().get(i), solvedvalues[i]);
+			if (Math.abs(solvedvalues[i] - defaultSolveValue) < 1e-4) {
+				solvedVariables.put(equalities.getRight().get(i), 1.0);
+			} else {
+				solvedVariables.put(equalities.getRight().get(i), solvedvalues[i]);
+			}
+			
 		}
 		return solvedVariables;
 	}
