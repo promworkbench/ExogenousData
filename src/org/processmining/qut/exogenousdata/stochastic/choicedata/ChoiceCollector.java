@@ -1,5 +1,8 @@
 package org.processmining.qut.exogenousdata.stochastic.choicedata;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.deckfour.xes.classification.XEventClassifier;
@@ -24,6 +28,7 @@ import org.deckfour.xes.model.XTrace;
 import org.deckfour.xes.model.impl.XTraceImpl;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.framework.util.ui.widgets.helper.UserCancelledException;
+import org.processmining.log.utils.XUtils;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.models.semantics.IllegalTransitionException;
 import org.processmining.models.semantics.petrinet.Marking;
@@ -38,6 +43,7 @@ import org.processmining.plugins.petrinet.replayresult.StepTypes;
 import org.processmining.plugins.replayer.replayresult.SyncReplayResult;
 import org.processmining.pnetreplayer.utils.TransEvClassMappingUtils;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
+import org.processmining.qut.exogenousdata.data.ExogenousDatasetAttributes;
 import org.processmining.qut.exogenousdata.data.ExogenousUtils;
 import org.processmining.qut.exogenousdata.steps.slicing.PastOutcomeSlicer;
 import org.processmining.qut.exogenousdata.steps.slicing.Slicer;
@@ -364,12 +370,14 @@ public class ChoiceCollector {
 							Object trans = alignment.getNodeInstance().get(transitionIdx+1);
 //							System.out.println(trans.getClass());
 							if (trans instanceof Transition) {
+								Date ldate = XUtils.getTimestamp(trace.get(currIdx+1));
+								Date rdate = XUtils.getTimestamp(trace.get(lastsync));
 								Double sojourn = 
-									Double.longBitsToDouble(
-											ExogenousUtils.getEventTimeMillis(trace.get(currIdx+1)) 
-											- 
-											ExogenousUtils.getEventTimeMillis(trace.get(lastsync))
-									);
+								(   (double) 
+									ldate.getTime()
+									-
+									rdate.getTime()	
+								);
 								addTime((Transition) trans, sojourn);
 							}
 						}
@@ -853,6 +861,85 @@ public class ChoiceCollector {
 				Object ...args) {
 //			work out upper limit for sojourns
 			double duration = findDuration(trace);
+			if (false) { // target.getLabel() =="Send for Credit Collection") {
+				String dir = "C:\\Users\\n7176546\\OneDrive - Queensland University of Technology\\phd\\thesis\\extensions\\stochastic\\roadfines between sync\\";
+				try {
+					FileWriter writer = new FileWriter(new File(dir+"syncBetween.datadum"));
+					writer.write(target.getLabel()+"\n");
+					writer.write(XUtils.getConceptName(trace)+"\n");
+					writer.write(leftEventIndex+","+XUtils.getConceptName(trace.get(leftEventIndex))+",");
+					Date ldate = XUtils.getTimestamp(trace.get(leftEventIndex));
+					writer.write(ldate.toString()+",0\n");
+					writer.write(rightEventIndex+","+XUtils.getConceptName(trace.get(rightEventIndex))+",");
+					Date rdate = XUtils.getTimestamp(trace.get(rightEventIndex));
+					writer.write(rdate.toString()+","
+						+TimeUnit.MILLISECONDS.toDays((long) duration)+"\n"
+					);
+					writer.write("####\n");
+					writer.flush();
+					for(double sojourn: sojourns.getSojourns(target)) {
+						Double sday = (double) TimeUnit.MILLISECONDS.toDays((long) sojourn);
+						if (sojourn <= duration) {
+							writer.write(""
+									+ sojourn
+									+","
+									+ sday
+									+",green\n");
+						} else {
+							writer.write(""
+									+ sojourn
+									+","
+									+ sday
+									+",gray\n");
+						}
+						writer.flush();
+					}
+					writer.write("####\n");
+					ExogenousDataset dataset = datasets.get(0);
+					writer.write(dataset.getName()+"\n");
+					writer.write("####\n");
+					writer.flush();
+					for(XEvent ev : dataset.getSource().get(0)) {
+						Date xDate = XUtils.getTimestamp(ev);
+						Double xDays;
+						if (xDate.before(ldate)) {
+							xDays = -1.0 * (TimeUnit.MILLISECONDS.toDays(
+									ldate.getTime()
+									- 
+									xDate.getTime()
+							));
+						} else {
+							xDays = (double) (TimeUnit.MILLISECONDS.toDays(
+									xDate.getTime()
+									-
+									ldate.getTime()
+							));
+						}
+						if (xDate.before(rdate)) {
+							Object val = ExogenousDatasetAttributes
+									.extractExogenousValue(ev);
+							writer.write(""
+									+ xDate.toString()
+									+","
+									+ xDays
+									+","
+									+ val.toString()
+									+ "\n"
+							);
+							writer.flush();
+						} else {
+							break;
+						}
+						
+					}
+					writer.flush();
+					writer.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+			}
 			Double[] targetTimes = sojourns.getSojournsLessThan(target, duration);
 //			loop through powers and build ceps 
 			ChoiceExogenousPoint[] powers = new ChoiceExogenousPoint[datasets.size()];
@@ -861,20 +948,25 @@ public class ChoiceCollector {
 				// check for link with dataset
 				if (dataset.checkLink(trace) && targetTimes.length > 0) {					
 					// handle processing in parallel
-					System.out.println("[Choice-Collector] starting between syn with sojourn size of :: " + targetTimes.length);
+					System.out.println("[Choice-Collector] starting between syn "
+							+ "with sojourn size of :: " + targetTimes.length);
 					double avgTheta = Arrays.stream(targetTimes)
 							.parallel()
 							.map(
 							 time -> {
 									try {
-										return new Double(params.computeTheta(trace, leftEventIndex, rightEventIndex, dataset, time));
+										return new Double(params.computeTheta(
+												trace, leftEventIndex, 
+												rightEventIndex, dataset, time));
 									} catch (Throwable e) {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
-									return 0.0;
+									return -1.0;
 							 }
-							).reduce(0.0, Double::sum);
+							)
+							.filter(d -> d >= 0)
+							.reduce(0.0, Double::sum);
 					avgTheta = avgTheta / targetTimes.length;
 					powers[cepIndex] = ChoiceExogenousPoint.builder()
 							.known(true)
@@ -899,9 +991,18 @@ public class ChoiceCollector {
 		private double findDuration(XTrace trace) {
 			XEvent left = trace.get(leftEventIndex);
 			XEvent right = trace.get(rightEventIndex);
-			return Double.longBitsToDouble( 
-					ExogenousUtils.getEventTimeMillis(right) - ExogenousUtils.getEventTimeMillis(left)
+			Double ret = 0.0;
+			ret = (
+				(double)
+					XUtils.getTimestamp(right).getTime()
+					-
+					XUtils.getTimestamp(left).getTime()
 			);
+//			return Double.longBitsToDouble( 
+//					ExogenousUtils.getEventTimeMillis(right) - ExogenousUtils.getEventTimeMillis(left)
+//			);
+			
+			return ret;
 		}
 		
 	}
