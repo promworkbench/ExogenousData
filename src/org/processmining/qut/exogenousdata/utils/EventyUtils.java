@@ -1,5 +1,6 @@
 package org.processmining.qut.exogenousdata.utils;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,10 +16,20 @@ public class EventyUtils {
 	/**
 	 * Returns the concept:name of the given event.
 	 * @param event
-	 * @return concept:name as a String.
+	 * @return null or concept:name as a String.
 	 */
 	public static String getConcept(XEvent event) {
 		return XUtils.getConceptName(event);
+	}
+	
+	/**
+	 * Returns the date that can be extracted from the event.
+	 * Requires that the event has a "time:timestamp" Attribute.
+	 * @param event
+	 * @return null or Date for time:timestamp
+	 */
+	public static Date getTimestamp(XEvent event) {
+		return XUtils.getTimestamp(event);
 	}
 	
 	public static Map<String,Object> extractDataState(XEvent event){
