@@ -145,7 +145,8 @@ public class StochasticExogenousDepenencies {
 			}
 		};
 		eduEMSC.setContext(context);
-		double measure = eduEMSC.measureLogModel(xlog, datasets, new XEventNameClassifier(), model, true, canceller);
+		double measure = eduEMSC.measureLogModel(xlog, datasets, 
+				new XEventNameClassifier(), model, true, canceller);
 		
 		String name;
 		try {

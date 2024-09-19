@@ -16,7 +16,7 @@ public class ExogenousDataStateLogAdapter implements DataStateLogAdapter {
 	private SLPNEDSemantics semantics;
 	private ExogenousDataset[] datasets;
 	private double rounding = 0.05;
-	private Scaling timeScaler = Scaling.day;
+	private Scaling timeScaler = Scaling.monthly;
 	private XAttributeMap traceAttrs;
 	
 	public ExogenousDataStateLogAdapter(
@@ -61,6 +61,7 @@ public class ExogenousDataStateLogAdapter implements DataStateLogAdapter {
 		ExogenousDataState state = new ExogenousDataState(datasets);
 		ChoiceCollectorParameters ccp = ChoiceCollectorParameters.builder()
 				.timeScaling(timeScaler)
+				.rounding(rounding)
 				.build();
 		int varIdx = 0;
 		for(ExogenousDataset data : datasets) {
