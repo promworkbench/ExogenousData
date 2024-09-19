@@ -78,8 +78,8 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 //		System.out.println("[TailingWeightedSubsequencesTransform] "
 //				+ "starting tailing weight ("+ subtimeseries.size()+").");
 		List<Double> relativeTimes = new ArrayList<Double>() {{
-			for (long rel : subtimeseries.getXSeries(true, timeScaler)) {
-				add((double)rel);
+			for (long rel : subtimeseries.getXSeries(true)) {
+				add(timeScaler.scale(rel));
 			}
 		}};
 		List<Double> values = subtimeseries.getYSeries();
@@ -101,9 +101,6 @@ public class TailingWeightedSubsequencesTransform implements Transformer {
 					relativeTimes.stream()
 						.mapToDouble(t -> 1.0/ (1.0 + Math.abs(t)))
 						.reduce(0.0, Double::sum);
-			if (relativeTimes.size() > 0) {
-				norm = Math.max(norm, 0.001);
-			}
 			if (norm == 0.0) {
 				System.out.println("[TailingWeightedSubsequencesTransform] "
 						+ "Computed norm is zero, transform is unlikely to work");
