@@ -105,7 +105,7 @@ public class ChoiceCollector {
 				)
 				.build();
 		@Default boolean useDefaultAggerator = true;
-		@Default double rounding = 1e-5;
+		@Default double rounding = 0.05;
 		@Default Scaling timeScaling = Scaling.monthly;
 		
 		public void adjustAggeratorForPanel(ExogenousDataset dataset) throws Throwable {
@@ -508,8 +508,8 @@ public class ChoiceCollector {
 			for( ChoiceExogenousPoint[] them : thetas) {
 				for( ChoiceExogenousPoint one : them) {
 					if (Double.isNaN(one.getValue()) || Double.isInfinite(one.getValue())){
-//						System.out.println("handling power messed up");
-//						System.out.println(one.toString());
+						System.out.println("[Choice-Collector] handling power messed up");
+						System.out.println(one.toString());
 					}
 				}
 			}
@@ -884,15 +884,37 @@ public class ChoiceCollector {
 									+ sojourn
 									+","
 									+ sday
-									+",green\n");
+									+",green,target\n");
 						} else {
 							writer.write(""
 									+ sojourn
 									+","
 									+ sday
-									+",gray\n");
+									+",gray,target\n");
 						}
 						writer.flush();
+					}
+					for(Transition right : sojourns.transitions) {
+						if (right.getLabel().equals(
+								XUtils.getConceptName(trace.get(rightEventIndex)))) {
+							for(double sojourn: sojourns.getSojourns(right)) {
+								Double sday = (double) TimeUnit.MILLISECONDS.toDays((long) sojourn);
+								if (sojourn <= duration) {
+									writer.write(""
+											+ sojourn
+											+","
+											+ sday
+											+",blue,right\n");
+								} else {
+									writer.write(""
+											+ sojourn
+											+","
+											+ sday
+											+",gray,right\n");
+								}
+								writer.flush();
+							}
+						}
 					}
 					writer.write("####\n");
 					ExogenousDataset dataset = datasets.get(0);
@@ -930,9 +952,9 @@ public class ChoiceCollector {
 						} else {
 							break;
 						}
-						
 					}
 					writer.flush();
+					
 					writer.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
