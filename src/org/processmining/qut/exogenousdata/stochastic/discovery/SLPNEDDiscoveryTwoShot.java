@@ -38,7 +38,7 @@ public class SLPNEDDiscoveryTwoShot implements SLPNEDDiscoverer{
 	protected String dumpLoc = "";
 	protected boolean shouldDump = false;
 	protected int batchsize = 1000;
-	protected double defaultValue = 4.0;
+	protected double defaultValue = 2.0;
 	
 	public void setDumpLoc(String loc) {
 		dumpLoc = loc;
