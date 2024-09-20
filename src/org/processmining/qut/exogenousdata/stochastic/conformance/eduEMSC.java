@@ -16,7 +16,6 @@ import org.processmining.framework.plugin.Progress;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.qut.exogenousdata.ab.jobs.Tuple;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
-import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries.Scaling;
 import org.processmining.qut.exogenousdata.stochastic.model.SLPNEDSemantics;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.stochasticlabelleddatapetrinet.datastate.DataState;
@@ -67,9 +66,9 @@ public class eduEMSC extends duEMSC {
 		SLPNEDSemantics semantics = model.getDefaultSemantics();
 		double ret = compute(log, classifier, 
 				new ExogenousDataStateLogAdapter(
-						semantics, datasets, 1e-5, Scaling.monthly), 
+						semantics, datasets), 
 				semantics, canceller);
-		CONTEXT = null;
+		clearContext();
 		return ret;
 	}
 
@@ -233,7 +232,10 @@ public class eduEMSC extends duEMSC {
 //					extract activity
 					process[0]  = TraceProbablility.getActivitySequence(t, classifier);
 //					extract data
-					process[1]  = TraceProbablility.getDataSequence(t, logAdapter, maximumTraceLength);
+					process[1]  = TraceProbablility.getDataSequence(
+							t, ((ExogenousDataStateLogAdapter) logAdapter).clone(), 
+							maximumTraceLength
+					);
 					progIncr();
 					return process;
 				})

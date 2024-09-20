@@ -6,6 +6,7 @@ import java.util.List;
 import org.deckfour.xes.model.XAttributeTimestamp;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XTrace;
+import org.processmining.log.utils.XUtils;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.qut.exogenousdata.data.ExogenousDatasetType;
 import org.processmining.qut.exogenousdata.ds.timeseries.data.RealTimePoint;
@@ -62,7 +63,7 @@ public class SubSeries {
 			this.scale = scale;
 		}
 		
-		public Double scale(double value) {
+		public Double scale(long value) {
 			return value / scale;
 		}
 	}
@@ -110,20 +111,24 @@ public class SubSeries {
 	 */
 	public List<Long> getXSeries(Boolean relative){
 		List<Long> x = new ArrayList<Long>();
-		long start = relative ? ( (XAttributeTimestamp) this.endogenous.getAttributes().get("time:timestamp")).getValueMillis() : 0;
+		long start = relative ? 
+				XUtils.getTimestamp(this.endogenous).getTime() : 0;
 		for(XEvent ev : this.subEvents) {
-			XAttributeTimestamp ts = (XAttributeTimestamp) ev.getAttributes().get("time:timestamp");
-			x.add(ts.getValueMillis()- start);
+			long ts = XUtils.getTimestamp(ev).getTime();
+			x.add(ts - start);
 		}
 		return x;
 	}
 	
 	public List<Long> getXSeries(Boolean relative, Scaling scale){
 		List<Long> x = new ArrayList<Long>();
-		long start = relative ? ( (XAttributeTimestamp) this.endogenous.getAttributes().get("time:timestamp")).getValueMillis() : 0;
+		long start = relative ? 
+				XUtils.getTimestamp(this.endogenous).getTime() : 0;
 		for(XEvent ev : this.subEvents) {
-			XAttributeTimestamp ts = (XAttributeTimestamp) ev.getAttributes().get("time:timestamp");
-			x.add(ts.getValueMillis()- start);
+			long ts = XUtils.getTimestamp(ev).getTime();
+			x.add(
+					ts - start
+			);
 		}
 		return x;
 	}
