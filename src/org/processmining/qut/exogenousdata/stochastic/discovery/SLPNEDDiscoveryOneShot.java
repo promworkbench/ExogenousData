@@ -37,7 +37,7 @@ public class SLPNEDDiscoveryOneShot implements SLPNEDDiscoverer {
 	protected boolean shouldDump = false;
 	protected int batchsize = 1000;
 	protected double defaultSolveValue = 2.0;
-	protected double rounding = 1e-6;
+	protected double rounding = 1e-2;
 	protected Scaling timeScaling = Scaling.hour;
 	
 	public void configure(double rounding, int batchsize, 

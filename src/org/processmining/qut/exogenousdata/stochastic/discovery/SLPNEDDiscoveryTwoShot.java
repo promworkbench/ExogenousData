@@ -20,6 +20,7 @@ import org.processmining.models.graphbased.directed.petrinet.elements.Transition
 import org.processmining.qut.exogenousdata.ab.jobs.Tuple;
 import org.processmining.qut.exogenousdata.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
+import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries.Scaling;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceCollector;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceDataPoint;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceExogenousPoint;
@@ -39,7 +40,18 @@ public class SLPNEDDiscoveryTwoShot implements SLPNEDDiscoverer{
 	protected boolean shouldDump = false;
 	protected int batchsize = 1000;
 	protected double defaultValue = 2.0;
+	protected Scaling timeScaling = Scaling.hour;
+	protected double rounding = 1e-2;
 	
+	
+	
+	public void configure(double rounding, int batchsize, 
+			Scaling timeScaling, double defaultParameterValue) {
+		this.rounding = rounding;
+		this.timeScaling = timeScaling;
+		this.defaultValue = defaultParameterValue;
+	}
+
 	public void setDumpLoc(String loc) {
 		dumpLoc = loc;
 		shouldDump = true;
@@ -103,7 +115,10 @@ public class SLPNEDDiscoveryTwoShot implements SLPNEDDiscoverer{
 		log("building choice data...");
 		Iterator<ChoiceDataPoint> choiceData = ChoiceCollector.collect(
 				xlog, datasets, net, 
-				ChoiceCollector.ChoiceCollectorParameters.builder().build());
+				ChoiceCollector.ChoiceCollectorParameters.builder()
+				.rounding(rounding)
+				.timeScaling(timeScaling)
+				.build());
 		Map<ChoiceDataPoint, Map<String,Integer>> ret = new HashMap();
 		log("built lazy iterator for choice data...");
 		while( choiceData.hasNext()) {

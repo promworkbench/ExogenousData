@@ -16,6 +16,7 @@ import org.processmining.framework.plugin.Progress;
 import org.processmining.plugins.InductiveMiner.Pair;
 import org.processmining.qut.exogenousdata.ab.jobs.Tuple;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
+import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries.Scaling;
 import org.processmining.qut.exogenousdata.stochastic.model.SLPNEDSemantics;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.stochasticlabelleddatapetrinet.datastate.DataState;
@@ -33,6 +34,9 @@ public class eduEMSC extends duEMSC {
 
 	public static boolean debug;
 	public static boolean parallel = true;
+	
+	public static double defaultRoudning = 1e-2;
+	public static Scaling timeScaling = Scaling.hour;
 	
 	private static UIPluginContext CONTEXT = null;
 	private static Progress progressor = null;
@@ -52,7 +56,19 @@ public class eduEMSC extends duEMSC {
 			StochasticLabelledPetriNetWithExogenousData model, 
 			boolean debug, ProMCanceller canceller)
 	{
-		
+		return measureLogModel(
+				log, datasets, classifier,
+				model, 
+				debug, canceller,
+				defaultRoudning, timeScaling);
+	}
+	
+	public static double measureLogModel(
+			XLog log, ExogenousDataset[] datasets, XEventClassifier classifier,
+			StochasticLabelledPetriNetWithExogenousData model, 
+			boolean debug, ProMCanceller canceller,
+			double rounding, Scaling timeScaler)
+	{
 		if (CONTEXT != null) {
 			progressor = CONTEXT.getProgress();
 			progressor.setCaption("Computing eduEMSC");
@@ -66,11 +82,15 @@ public class eduEMSC extends duEMSC {
 		SLPNEDSemantics semantics = model.getDefaultSemantics();
 		double ret = compute(log, classifier, 
 				new ExogenousDataStateLogAdapter(
-						semantics, datasets), 
+						semantics, datasets,
+						rounding, timeScaler), 
 				semantics, canceller);
 		clearContext();
 		return ret;
+		
 	}
+	
+	
 
 	public static double compute(XLog log, XEventClassifier classifier, DataStateLogAdapter logAdapter,
 			SLPNEDSemantics semantics, ProMCanceller canceller) {
