@@ -7,7 +7,7 @@ import java.io.PrintStream;
 
 public class BPM2024BStratsTesting {
 
-	public static String outFile = "C:\\Users\\adam\\Desktop\\testing\\BPM2024B-E.stdout";
+	public static String outFile = "C:\\Users\\adam\\Desktop\\testing\\BPM2024B-2-A-Mimic.stdout";
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		System.setOut(new PrintStream(
