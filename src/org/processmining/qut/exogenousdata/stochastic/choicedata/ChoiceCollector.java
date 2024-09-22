@@ -203,8 +203,8 @@ public class ChoiceCollector {
 		parameters.setCreateConn(false);
 		parameters.setInitialMarking(net.getInitialMarking());
 		parameters.setFinalMarkings((Marking[]) net.getFinalMarkings().toArray(new Marking[1]));
-		parameters.setNumThreads(22); // ILP problem with an array index when threaded : LPProblemProvider:24
-		parameters.setMaxNumOfStates(200000);
+		parameters.setNumThreads(Math.min(1, Runtime.getRuntime().availableProcessors()/2)); // ILP problem with an array index when threaded : LPProblemProvider:24
+		parameters.setMaxNumOfStates(1000);
 		
 //		collect alignments for traces in log 
 		PNRepResult alignedTraces = new PNLogReplayer().replayLog(
