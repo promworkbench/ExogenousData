@@ -29,8 +29,8 @@ public class Solver {
 	
 //	Controls for the parameter values
 //	having a wider range is better than a small range for solver
-	public static double MIN = 0.001;
-	public static double MAX = 100.0;
+	public static double MIN = 0.0001;
+	public static double MAX = 1000.0;
 	public static double GAP = (MAX - MIN) * 0.1;
 	
 //	how long do you want to optimise for
@@ -42,7 +42,7 @@ public class Solver {
 //	how carefully should the solver move
 //	too big and the solution will default all factors to 1
 //	too small and it will move impractically slow
-	public static double LEARNING_RATE = 1e-10;
+	public static double LEARNING_RATE = 1e-12;
 	
 //	for feedback back to prom UI if set
 	public static Progress PROG = null;

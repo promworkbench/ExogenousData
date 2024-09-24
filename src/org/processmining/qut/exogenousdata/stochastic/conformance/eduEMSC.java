@@ -75,6 +75,16 @@ public class eduEMSC extends duEMSC {
 			progressor.setValue(0);
 			progressor.setMaximum(4);
 		}
+		//		precompute means and std of datasets
+		for(ExogenousDataset ds: datasets) {
+			try {
+				ds.getMean();
+				ds.getStd();
+			} catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		//		handle log so we have appropriate transformed values
 		eduEMSC.debug = debug;
@@ -246,8 +256,9 @@ public class eduEMSC extends duEMSC {
 			}
 		});
 //		expand on log to find components in ONE pass
-		for(Object[] processed : log.parallelStream()
-				.map(t -> {
+		for(Object[] processed : log.stream()
+					.parallel()
+					.map(t -> {
 					Object[] process = new Object[2];
 //					extract activity
 					process[0]  = TraceProbablility.getActivitySequence(t, classifier);
