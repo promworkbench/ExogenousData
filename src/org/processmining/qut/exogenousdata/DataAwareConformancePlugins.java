@@ -268,7 +268,7 @@ public class DataAwareConformancePlugins {
 
 			public String toHTMLString(boolean includeHTMLTags) {
 				return "<p>"
-						+ "<b>Guard-recall:</b> " 
+						+ "<b>Guard-precision:</b> " 
 						+ gprec
 						+ "</p>"; 
 			}

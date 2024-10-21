@@ -66,7 +66,7 @@ public class TraversalBookkeepingEngine implements
 			}
 //			update bottom of equation
 			for(int i=0; i <pathsForTrace; i++) {
-				retBottom += (1/pathsForTrace) * trace.size();
+				retBottom += (1.0/pathsForTrace) * trace.size();
 			}
 			incProgress();
 		}
