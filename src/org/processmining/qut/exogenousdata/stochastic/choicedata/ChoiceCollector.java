@@ -568,12 +568,12 @@ public class ChoiceCollector {
 						int leftIndex = lastSync(left_rem);
 						return new PowerPrecedingSynchronisation(
 								findEventIndex(leftIndex),
-								(Transition) alignment.getNodeInstance().get(left_rem.size())
+								(Transition) alignment.getNodeInstance().get(leftIndex)
 						);
 					}
 				} else if (right_rem.contains(StepTypes.LMGOOD)) {
 					System.out.println("[Choice-Collector] determined proceding power");
-					int rightIndex = left_rem.size()+ 1 + nextSync(right_rem);
+					int rightIndex = left_rem.size()+ nextSync(right_rem);
 					return new PowerProceedingSynchronisation(
 							findEventIndex(rightIndex),
 							(Transition) alignment.getNodeInstance().get(rightIndex)
