@@ -45,6 +45,14 @@ public class LoggyUtils {
 		return ret;
 	}
 	
+	/**
+	 * Samples the given log by randomly selecting traces up to given number of
+	 * samples or until no more samples can be drawn. Deterministic randomness is
+	 * used so repeated calls on the same log will draw the same samples.
+	 * @param log to draw samples from
+	 * @param samples number of samples to draw
+	 * @return The sampled log
+	 */
 	public static XLog sampleFromLog(XLog log, int samples) {
 		XLog slog = new XLogImpl((XAttributeMap) log.getAttributes().clone());
 		Set<Integer> seen = new HashSet();
@@ -54,7 +62,7 @@ public class LoggyUtils {
 			while(seen.contains(next)) {
 				next = rand.nextInt(log.size());
 			}
-			slog.add(log.get(next));
+			slog.add((XTrace)log.get(next).clone());
 			seen.add(next);
 			if (seen.size() == log.size()) {
 				break;
