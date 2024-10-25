@@ -23,7 +23,7 @@ import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceCollector;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceDataPoint;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceExogenousPoint;
-import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory;
+import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesProdFactory;
 import org.processmining.qut.exogenousdata.stochastic.model.SLPNEDSemantics;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.qut.exogenousdata.stochastic.solver.Solver;
@@ -127,7 +127,7 @@ public class SLPNEDDiscoveryBatchedOneShot implements SLPNEDDiscoverer{
 			Map<ChoiceDataPoint, Map<String,Integer>> frequencies,
 			List<ExogenousDataset> datasets,
 			AcceptingPetriNet net) {
-		return EqualitiesFactory.construct( 
+		return EqualitiesProdFactory.construct( 
 				frequencies, 
 				datasets,
 				net.getNet().getTransitions()

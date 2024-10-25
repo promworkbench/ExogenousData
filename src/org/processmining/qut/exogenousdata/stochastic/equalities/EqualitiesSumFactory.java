@@ -6,22 +6,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.processmining.basicstochasticminer.solver.Constant;
 import org.processmining.basicstochasticminer.solver.Division;
 import org.processmining.basicstochasticminer.solver.Equation;
 import org.processmining.basicstochasticminer.solver.Function;
 import org.processmining.basicstochasticminer.solver.Product;
 import org.processmining.basicstochasticminer.solver.Sum;
-import org.processmining.basicstochasticminer.solver.Variable;
-import org.processmining.basicstochasticminer.solver.VariablePower;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.qut.exogenousdata.ab.jobs.Tuple;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceDataPoint;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceExogenousPoint;
+import org.processmining.qut.exogenousdata.stochastic.equalities.Variables.SLPNEDVariable;
+import org.processmining.qut.exogenousdata.stochastic.equalities.Variables.SLPNEDVariablePower;
 
-public class EqualitiesFactory {
+public class EqualitiesSumFactory {
 	
-	private EqualitiesFactory() {};
+	private EqualitiesSumFactory() {};
 	
 	public static Tuple<List<Equation>,List<Function>> construct(
 			Map<ChoiceDataPoint, Map<String,Integer>> frequencies,
@@ -70,7 +71,7 @@ public class EqualitiesFactory {
 				}
 			}
 			else {
-//			(b) otherwise, we can drop all options that are not observation
+//			(b) otherwise, we can drop all options that are not observed
 //			(a + b) cannot be done, only one
 				for(Transition op : comp.getEnabled()) {
 					String label = op.getId().toString();
@@ -87,23 +88,14 @@ public class EqualitiesFactory {
 				}
 			}
 		}
+		for (Equation eq : equations) {
+			System.out.println("Created equation of ::");
+			System.out.println("\t"+eq.getFunction().toLatex());
+		}
 		return new Tuple(equations, variables);
 	}
 	
-	public static String getBaseWeightName(Transition trans) {
-		String transName = trans.getId().toString().replace(" ", "_");
-		return String.format(BASE_WEIGHT, transName);
-	}
 	
-	public static String getExogenousAdjust(Transition trans, ChoiceExogenousPoint point) {
-		String transName = trans.getId().toString().replace(" ", "_");
-		return String.format(EXO_WEIGHT, transName, point.getName().replace(" ", "_"));
-	}
-	
-	public static String getNotExogenousAdjust(Transition trans, ChoiceExogenousPoint point) {
-		String transName = trans.getId().toString().replace(" ", "_");
-		return String.format(NOT_EXO_WEIGHT, transName, point.getName().replace(" ", "_"));
-	}
 	
 	/*
 	 * Handles preparing all known variables for the given datasets and transitions before building
@@ -118,14 +110,14 @@ public class EqualitiesFactory {
 //		loop through transitions, creating for each one a base weight
 		for(Transition trans : transitions) {
 			String transName = trans.getId().toString().replace(" ", "_");
-			createVarIfNeeded(String.format(BASE_WEIGHT, transName), varlookup, variables, vcounter, trans, null);
+			createVarIfNeeded(String.format(Variables.BASE_WEIGHT, transName), varlookup, variables, vcounter, trans, null);
 //			then for each dataset, create two adjusters
 			for(ExogenousDataset dataset : datasets) {
 				createVarIfNeeded(
-						String.format(EXO_WEIGHT, transName, dataset.getName().replace(" ", "_")), 
+						String.format(Variables.EXO_WEIGHT, transName, dataset.getName().replace(" ", "_")), 
 						varlookup, variables, vcounter, trans, dataset.getName());
 				createVarIfNeeded(
-						String.format(NOT_EXO_WEIGHT, transName, dataset.getName().replace(" ", "_")),
+						String.format(Variables.NOT_EXO_WEIGHT, transName, dataset.getName().replace(" ", "_")),
 						varlookup, variables, vcounter, trans, dataset.getName());
 			}
 		}
@@ -149,58 +141,93 @@ public class EqualitiesFactory {
 //		build top (always the same)
 //		get functions for variables
 		Function b1 = createVarIfNeeded(
-				getBaseWeightName(fired),
+				Variables.getBaseWeightName(fired),
 				varlookup, variables, vcounter, fired, null);
 		Function x1 = null;
 		ChoiceExogenousPoint[] powers = point.getPowers();
 		for(int i=0 ; i < powers.length; i++) {
+			// for each xpower construct the following
+			// [check] . power . xadj + [not check] . nxadj
 //			cycle through adjustments
 			ChoiceExogenousPoint power = powers[i];
 			boolean knower = power.isKnown();
-			String ajname = knower ?
-				getExogenousAdjust(fired, power) :
-				getNotExogenousAdjust(fired, power);
-			double ajpower = knower ? power.getValue() : 1;
-			Function adjuster = createVarIfNeeded(ajname, varlookup, variables, vcounter, fired ,power.getName(), ajpower);
+			String xadj = Variables.getExogenousAdjust(fired, power);
+			String nxadj = Variables.getNotExogenousAdjust(fired, power);
+			double xadjcheck = knower ? 1.0 : 0.0;
+			double xadjpower = knower ? power.getValue() : 1.0;
+			double nxadjcheck = knower ? 0.0 : 1.0;
+			Function xadj_f = new Product(
+					new Constant(xadjcheck),
+					new Product(
+						new Constant(xadjpower),
+						createVarIfNeeded(xadj, varlookup, variables, vcounter, fired ,power.getName(), 1.0)
+					)
+			);
+			Function nxadj_f = new Product(
+					new Constant(nxadjcheck),
+					createVarIfNeeded(nxadj, varlookup, variables, vcounter, fired ,power.getName(), 1.0)
+			);
+			Function adjuster = new Sum(xadj_f, nxadj_f);
 			if (x1 == null) {
 //				first adjustment
 				x1 = adjuster;
 			} else {
 //				for every other make a chain of products
-				x1 = new Product(x1, adjuster);
+				x1 = new Sum(x1, adjuster);
 			}
 		}
-		Product top = new Product(b1 , x1);
+//		top equation should be badj + a large sum over 
+		Sum top = new Sum(b1 , x1);
 //		build bottom (different)
 		Sum bottom = null;
 		for (Transition trans : point.getEnabled()) {
-			String botBase = getBaseWeightName(trans);
+			String botBase = Variables.getBaseWeightName(trans);
 			Function adjusters = null;
 			for (int i=0; i < powers.length; i++) {
+				ChoiceExogenousPoint power = powers[i];
 				boolean knower = powers[i].isKnown();
-				String ajname = knower ? 
-					getExogenousAdjust(trans, powers[i]) :
-					getNotExogenousAdjust(trans, powers[i]);
-				double apower = knower ? powers[i].getValue() : 1;
-				Function  adjuster = createVarIfNeeded(ajname, varlookup, variables, vcounter, trans, powers[i].getName(), apower );
+				String xadj = Variables.getExogenousAdjust(fired, power);
+				String nxadj = Variables.getNotExogenousAdjust(fired, power);
+				double xadjcheck = knower ? 1.0 : 0.0;
+				double xadjpower = knower ? power.getValue() : 1.0;
+				double nxadjcheck = knower ? 0.0 : 1.0;
+				Function xadj_f = new Product(
+						new Constant(xadjcheck),
+						new Product(
+							new Constant(xadjpower),
+							createVarIfNeeded(xadj, varlookup, variables, vcounter, fired ,power.getName(), 1.0)
+						)
+				);
+				Function nxadj_f = new Product(
+						new Constant(nxadjcheck),
+						createVarIfNeeded(nxadj, varlookup, variables, vcounter, fired ,power.getName(), 1.0)
+				);
+				Function adjuster = new Sum(xadj_f, nxadj_f);
+//				String ajname = knower ? 
+//					getExogenousAdjust(trans, powers[i]) :
+//					getNotExogenousAdjust(trans, powers[i]);
+//				double apower = knower ? powers[i].getValue() : 1;
+//				Function  adjuster = createVarIfNeeded(ajname, varlookup, variables, vcounter, trans, powers[i].getName(), apower );
 				if (adjusters == null) {
 					adjusters = adjuster;
 				} else {
-					adjusters = new Product(adjusters, adjuster);
+					adjusters = new Sum(adjusters, adjuster);
 				}
 			}
 			if (bottom == null) {
-				bottom = new Sum(new Product( 
+				bottom = new Sum(
+					new Sum( 
 						createVarIfNeeded(botBase, varlookup, variables, vcounter, trans, null),
 						adjusters
-				));
+					)
+				);
 			} else {
 				bottom = new Sum(bottom,
-						new Product( 
-								createVarIfNeeded(botBase, varlookup, variables, vcounter, trans, null),
-								adjusters
-						)
-					);
+					new Sum( 
+							createVarIfNeeded(botBase, varlookup, variables, vcounter, trans, null),
+							adjusters
+					)
+				);
 			}
 			
 		}
@@ -297,111 +324,4 @@ public class EqualitiesFactory {
 		
 		return out;
 	}
-	
-	public static enum SLPNEDVarType {
-		BASE("BW_"),
-		EXOADJ("AX_"),
-		NOTEXOADJ("NAX_"),
-		UNKNOWN("");
-		
-		public String startsWith;
-		
-		private SLPNEDVarType(String startsWith) {
-			this.startsWith = startsWith;
-		}
-		
-		public static SLPNEDVarType findType(String varName) {
-			if (varName.startsWith(BASE.startsWith)) {
-				return BASE;
-			} else if (varName.startsWith(EXOADJ.startsWith)) {
-				return EXOADJ;
-			} else if (varName.startsWith(NOTEXOADJ.startsWith)) {
-				return NOTEXOADJ;
-			}
-			return UNKNOWN;
-		}
-	}
-	
-	/**
-	 * Minor wrapper to keep track of the transition that the variable relates to.
-	 * @author Adam Banham
-	 */
-	public static class SLPNEDVariablePower extends VariablePower {
-		
-		protected Transition trans;
-		protected SLPNEDVarType type;
-		protected String dataset;
-		protected int index;
-		
-		public SLPNEDVariablePower(int parameterIndex, String name, double power, Transition trans, String dname) {
-			super(parameterIndex, name, power);
-			this.index = parameterIndex;
-			this.trans = trans;
-			this.type = SLPNEDVarType.findType(name);
-			if (dname != null) {
-				this.dataset = dname;
-			} else {
-				this.dataset = "unsure";
-			}
-			
-		}
-		
-		public int getIndex() {
-			return index;
-		}
-		
-		public Transition getTransition() {
-			return this.trans;
-		}
-		
-		public SLPNEDVarType getType() {
-			return this.type;
-		}
-		
-		public String getDataset() {
-			return this.dataset;
-		}
-	}
-	
-	public static class SLPNEDVariable extends Variable {
-		
-		protected Transition trans;
-		protected SLPNEDVarType type;
-		protected String dataset;
-		protected int index;
-
-		public SLPNEDVariable(int parameterIndex, String name, Transition trans, String dname) {
-			super(parameterIndex, name);
-			this.index = parameterIndex;
-			this.trans = trans;
-			this.type = SLPNEDVarType.findType(name);
-			if (dname != null) {
-				this.dataset = dname;
-			} else {
-				this.dataset = "unsure";
-			}
-		}
-		
-		public int getIndex() {
-			return index;
-		}
-		
-		public Transition getTransition() {
-			return this.trans;
-		}
-		
-		public SLPNEDVarType getType() {
-			return this.type;
-		}
-		
-		public String getDataset() {
-			return this.dataset;
-		}
-	}
-	
-//	String templates
-	public static final String BASE_WEIGHT = "BW_%s";
-	public static final String EXO_WEIGHT = "AX_%s_%s";
-	public static final String NOT_EXO_WEIGHT = "NAX_%s_%s";
-
 }

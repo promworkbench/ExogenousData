@@ -24,10 +24,10 @@ import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries.Scaling;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceCollector;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceDataPoint;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceExogenousPoint;
-import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory;
-import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVarType;
-import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVariable;
-import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVariablePower;
+import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesSumFactory;
+import org.processmining.qut.exogenousdata.stochastic.equalities.Variables.SLPNEDVarType;
+import org.processmining.qut.exogenousdata.stochastic.equalities.Variables.SLPNEDVariable;
+import org.processmining.qut.exogenousdata.stochastic.equalities.Variables.SLPNEDVariablePower;
 import org.processmining.qut.exogenousdata.stochastic.model.SLPNEDSemantics;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.qut.exogenousdata.stochastic.solver.Solver;
@@ -146,7 +146,7 @@ public class SLPNEDDiscoveryTwoShot implements SLPNEDDiscoverer{
 			Map<ChoiceDataPoint, Map<String,Integer>> frequencies,
 			List<ExogenousDataset> datasets,
 			AcceptingPetriNet net) {
-		return EqualitiesFactory.construct( 
+		return EqualitiesSumFactory.construct( 
 				frequencies, 
 				datasets,
 				net.getNet().getTransitions()

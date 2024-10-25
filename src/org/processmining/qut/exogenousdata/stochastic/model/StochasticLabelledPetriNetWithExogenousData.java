@@ -21,9 +21,10 @@ import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 import org.processmining.models.graphbased.directed.petrinet.elements.Transition;
 import org.processmining.qut.exogenousdata.ab.jobs.Tuple;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
-import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVarType;
-import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVariable;
-import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesFactory.SLPNEDVariablePower;
+import org.processmining.qut.exogenousdata.stochastic.equalities.Variables;
+import org.processmining.qut.exogenousdata.stochastic.equalities.Variables.SLPNEDVarType;
+import org.processmining.qut.exogenousdata.stochastic.equalities.Variables.SLPNEDVariable;
+import org.processmining.qut.exogenousdata.stochastic.equalities.Variables.SLPNEDVariablePower;
 import org.processmining.stochasticlabelledpetrinets.StochasticLabelledPetriNet;
 
 public class StochasticLabelledPetriNetWithExogenousData implements StochasticLabelledPetriNet {
@@ -77,7 +78,7 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 		for(Function var: solvedVariables.keySet()) {
 			int varIndex =-1;
 			int adjIndex =-1;
-			SLPNEDVarType type;
+			Variables.SLPNEDVarType type;
 			if (var instanceof SLPNEDVariable) {
 				SLPNEDVariable slpnedVar = (SLPNEDVariable) var;
 				varIndex = this.transitions.get(slpnedVar.getTransition());
@@ -91,6 +92,7 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 				type = slpnedVar.getType();
 				adjIndex = this.datasets.get(slpnedVar.getDataset());
 			} else {
+				System.out.println(var.toString() + " | " + var.getClass().toGenericString());
 				throw new Exception("variable not of known type for constructing slpned.");
 			}
 			if (type == SLPNEDVarType.BASE) {
