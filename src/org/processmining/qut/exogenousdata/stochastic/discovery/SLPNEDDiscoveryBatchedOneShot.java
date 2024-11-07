@@ -23,23 +23,13 @@ import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceCollector;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceDataPoint;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceExogenousPoint;
-import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesProdFactory;
 import org.processmining.qut.exogenousdata.stochastic.model.SLPNEDSemantics;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
 import org.processmining.qut.exogenousdata.stochastic.solver.Solver;
 
 import nl.tue.astar.AStarException;
 
-public class SLPNEDDiscoveryBatchedOneShot implements SLPNEDDiscoverer{
-	
-	protected String dumpLoc = "";
-	protected boolean shouldDump = false;
-	protected int batchsize = 1000;
-	
-	public void setDumpLoc(String loc) {
-		dumpLoc = loc;
-		shouldDump = true;
-	}
+public class SLPNEDDiscoveryBatchedOneShot extends SLPNEDDiscoveryOneShot {
 	
 	public StochasticLabelledPetriNetWithExogenousData discoverFromLog(
 			ExogenousAnnotatedLog xlog, 
@@ -123,17 +113,6 @@ public class SLPNEDDiscoveryBatchedOneShot implements SLPNEDDiscoverer{
 		return ret;
 	}
 	
-	protected Tuple<List<Equation>,List<Function>> constructEquations(
-			Map<ChoiceDataPoint, Map<String,Integer>> frequencies,
-			List<ExogenousDataset> datasets,
-			AcceptingPetriNet net) {
-		return EqualitiesProdFactory.construct( 
-				frequencies, 
-				datasets,
-				net.getNet().getTransitions()
-		);
-	}
-	
 	protected Map<Function, Double> solveEquations(
 			Tuple<List<Equation>,List<Function>> equalities) {
 		log("setting up variable matrixes...");
@@ -176,12 +155,6 @@ public class SLPNEDDiscoveryBatchedOneShot implements SLPNEDDiscoverer{
 			solvedVariables.put(equalities.getRight().get(i), meanSolves[i]);
 		}
 		return solvedVariables;
-	}
-	
-	protected StochasticLabelledPetriNetWithExogenousData makeNet(
-			AcceptingPetriNet net, Map<Function, Double> solution,
-			List<ExogenousDataset> datasets) throws Exception {
-		return new StochasticLabelledPetriNetWithExogenousData(net, solution, datasets);
 	}
 	
 	protected void diagonsticDump(
@@ -351,6 +324,15 @@ public class SLPNEDDiscoveryBatchedOneShot implements SLPNEDDiscoverer{
 	
 	protected int ProgGetMax() {
 		return 0;
+	}
+	
+	public SLPNEDDiscoverer clone() {
+		SLPNEDDiscoveryBatchedTwoShot miner = new SLPNEDDiscoveryBatchedTwoShot();
+		miner.configure(rounding, batchsize,
+				timeScaling, defaultSolveValue,
+				form
+		);
+		return miner;
 	}
 
 }

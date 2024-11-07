@@ -8,6 +8,7 @@ import org.processmining.qut.exogenousdata.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries.Scaling;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
+import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData.WeightForm;
 
 public interface SLPNEDDiscoverer {
 	
@@ -24,9 +25,11 @@ public interface SLPNEDDiscoverer {
 		double rounding,
 		int batchsize,
 		Scaling timeScaling,
-		double defaultParameterValue
+		double defaultParameterValue,
+		WeightForm form
 	) {
 		
 	}
-
+	
+	abstract public SLPNEDDiscoverer clone();
 }

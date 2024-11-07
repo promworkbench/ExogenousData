@@ -33,6 +33,7 @@ import org.processmining.qut.exogenousdata.steps.transform.type.StochasticTransf
 import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryOneShot;
 import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryOneShotWithContext;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
+import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData.WeightForm;
 import org.processmining.qut.exogenousdata.stochastic.model.in.SLPNEDImporter;
 import org.processmining.qut.exogenousdata.stochastic.model.out.SLPNEDExporter;
 
@@ -430,47 +431,100 @@ public class SLPNEDDiscoveryTest {
 	
 	@Test
 	public void testExportAndImport() {
-		StochasticLabelledPetriNetWithExogenousData net = null;
+		for (WeightForm form : WeightForm.values()) {
+			StochasticLabelledPetriNetWithExogenousData net = null;
+			try {
+				xlog.getEndogenousLog().getClassifiers().add(
+						new XEventNameClassifier()
+				);
+				SLPNEDDiscoveryOneShot slpnedDiscovery = new SLPNEDDiscoveryOneShot();
+				slpnedDiscovery.configure(
+						SLPNEDDiscoveryOneShot.DEFAULT_ROUNDING, 
+						SLPNEDDiscoveryOneShot.DEFAULT_BATCH, 
+						SLPNEDDiscoveryOneShot.DEFAULT_TIME_SCALE, 
+						SLPNEDDiscoveryOneShot.DEFAULT_SOLVING_VALUE, 
+						form
+				);
+				net = slpnedDiscovery.discoverFromLog(xlog, buildNet());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				org.junit.Assert.fail();
+			}
+			Path temp = null;
+			try {
+				temp = Files.createTempDirectory("tempfiles");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				org.junit.Assert.fail("Unable to make temp dir");
+			}
+			File tempFile = null;
+			try {
+				tempFile = temp.toFile().createTempFile("test_slpned", ".pnml");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				org.junit.Assert.fail("Unable to make temp file");
+			}
+			try {
+				SLPNEDExporter.export(net, tempFile);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				org.junit.Assert.fail("Unable to export net");
+			}
+			try {
+				net =SLPNEDImporter.read(new FileInputStream(tempFile));
+			} catch (NumberFormatException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				org.junit.Assert.fail("Unable to import net");
+			}
+		}
+	}
+	
+	@Test
+	public void testIndividuallyAdditive() {
 		try {
 			xlog.getEndogenousLog().getClassifiers().add(
 					new XEventNameClassifier()
 			);
 			SLPNEDDiscoveryOneShot slpnedDiscovery = new SLPNEDDiscoveryOneShot();
-			net = slpnedDiscovery.discoverFromLog(xlog, buildNet());
+			slpnedDiscovery.configure( 
+					SLPNEDDiscoveryOneShot.DEFAULT_ROUNDING,
+					SLPNEDDiscoveryOneShot.DEFAULT_BATCH,
+					SLPNEDDiscoveryOneShot.DEFAULT_TIME_SCALE,
+					SLPNEDDiscoveryOneShot.DEFAULT_SOLVING_VALUE,
+					WeightForm.INDIVADD
+			);
+			slpnedDiscovery.discoverFromLog(xlog, buildNet());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			org.junit.Assert.fail();
 		}
-		Path temp = null;
+	}
+	
+	@Test
+	public void testGlobalAdditive() {
 		try {
-			temp = Files.createTempDirectory("tempfiles");
-		} catch (IOException e) {
+			xlog.getEndogenousLog().getClassifiers().add(
+					new XEventNameClassifier()
+			);
+			SLPNEDDiscoveryOneShot slpnedDiscovery = new SLPNEDDiscoveryOneShot();
+			slpnedDiscovery.configure( 
+					SLPNEDDiscoveryOneShot.DEFAULT_ROUNDING,
+					SLPNEDDiscoveryOneShot.DEFAULT_BATCH,
+					SLPNEDDiscoveryOneShot.DEFAULT_TIME_SCALE,
+					SLPNEDDiscoveryOneShot.DEFAULT_SOLVING_VALUE,
+					WeightForm.GLOBALADD
+			);
+			slpnedDiscovery.discoverFromLog(xlog, buildNet());
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			org.junit.Assert.fail("Unable to make temp dir");
-		}
-		File tempFile = null;
-		try {
-			tempFile = temp.toFile().createTempFile("test_slpned", ".pnml");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			org.junit.Assert.fail("Unable to make temp file");
-		}
-		try {
-			SLPNEDExporter.export(net, tempFile);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			org.junit.Assert.fail("Unable to export net");
-		}
-		try {
-			net =SLPNEDImporter.read(new FileInputStream(tempFile));
-		} catch (NumberFormatException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			org.junit.Assert.fail("Unable to import net");
+			org.junit.Assert.fail();
 		}
 	}
 	
@@ -481,7 +535,4 @@ public class SLPNEDDiscoveryTest {
 			
 			return new SLPNEDDiscoveryOneShot().discoverFromLog(xlog, buildNet());
 	}
-	
-	
-
 }

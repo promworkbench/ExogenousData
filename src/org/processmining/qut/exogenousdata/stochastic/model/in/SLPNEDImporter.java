@@ -40,6 +40,9 @@ public class SLPNEDImporter extends AbstractImportPlugin{
 		
 		BufferedReader r = new BufferedReader(new InputStreamReader(input));
 		
+		int orderedWeight = Integer.parseInt(getNextLine(r));
+		result.setWeightForm(orderedWeight);
+		
 		int numberOfAdjusters = Integer.parseInt(getNextLine(r));
 		for(int adj=0; adj < numberOfAdjusters; adj++) {
 			result.addExogenousFactor(getNextLine(r).replace("&#35;","#"));

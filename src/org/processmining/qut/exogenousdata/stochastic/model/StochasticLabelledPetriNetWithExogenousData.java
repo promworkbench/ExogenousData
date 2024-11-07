@@ -29,7 +29,14 @@ import org.processmining.stochasticlabelledpetrinets.StochasticLabelledPetriNet;
 
 public class StochasticLabelledPetriNetWithExogenousData implements StochasticLabelledPetriNet {
 	
+	public static enum WeightForm {
+		INDIVMUT,
+		INDIVADD,
+		GLOBALADD;
+	}
+	
 	private AcceptingPetriNet net;
+	private WeightForm form;
 	private Map<Transition, Integer> transitions;
 	private Map<Place, Integer> places;
 	private Map<String, Integer> datasets;
@@ -44,6 +51,7 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 	private List<String> adjustment_names;
 	
 	public StochasticLabelledPetriNetWithExogenousData() {
+		this.form = WeightForm.INDIVMUT;
 //		setup variables
 		prepareVars();
 	}
@@ -53,6 +61,17 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 			Map<Function, Double> solvedVariables,
 			Collection<ExogenousDataset> datasets
 	) throws Exception {
+		this(net, solvedVariables, datasets, WeightForm.INDIVMUT);
+	}
+	
+	public StochasticLabelledPetriNetWithExogenousData(
+			AcceptingPetriNet net,
+			Map<Function, Double> solvedVariables,
+			Collection<ExogenousDataset> datasets,
+			WeightForm form
+	) throws Exception {
+//		set the weight form
+		this.form = form;
 //		setup variables
 		prepareVars(net, solvedVariables, datasets);
 //		stardardise the ordering of datasets
@@ -147,8 +166,6 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 			this.input_transitions.put(tranid, inplaces);
 			this.output_transitions.put(tranid, outplaces);
 		}
-		
-//		set up initial places
 	}
 	
 	private void prepareVars() {
@@ -228,14 +245,31 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 	public double calcWeight(int transition, double[] powers, int[] known) {
 		double weight = calcBaseWeight(transition);
 		Map<String, Tuple<Double, Double>> adjusters = getAdjustments(transition);
-		for(String adjuster : adjustment_names) {
-			int x = datasets.get(adjuster);
-			Tuple<Double, Double> adjustments = adjusters.get(adjuster);
-			if (known[x] == 1) {
-				weight *= Math.pow(adjustments.getLeft(),powers[x]);
-			} else {
-				weight *= adjustments.getRight();
+		if (this.form.equals(WeightForm.INDIVMUT)) {
+			for(String adjuster : adjustment_names) {
+				int x = datasets.get(adjuster);
+				Tuple<Double, Double> adjustments = adjusters.get(adjuster);
+				if (known[x] == 1) {
+					weight *= Math.pow(adjustments.getLeft(),powers[x]);
+				} else {
+					weight *= adjustments.getRight();
+				}
 			}
+		}
+		else if (this.form.equals(WeightForm.INDIVADD)||
+				 this.form.equals(WeightForm.GLOBALADD)) {
+			for(String adjuster : adjustment_names) {
+				int x = datasets.get(adjuster);
+				Tuple<Double, Double> adjustments = adjusters.get(adjuster);
+				if (known[x] == 1) {
+					weight += powers[x] * adjustments.getLeft();
+				} else {
+					weight += adjustments.getRight();
+				}
+			}
+		} 
+		else {
+//			we shouldn't get here but hey when in rome...
 		}
 		return weight;
 	}
@@ -328,6 +362,9 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 			PrintWriter w = null;
 			try {
 				w = new PrintWriter(outstream);
+				
+				w.println("# Weight Form");
+				w.println(form.ordinal());
 				
 				w.println("# adjusters");
 				w.println(adjustment_names.size());
@@ -490,6 +527,14 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 				new_not_adjustments[old_not_adjustments.length] = 1.0;
 				this.adjustments.replace(trans, new_adjustments);
 				this.not_adjustments.replace(trans, new_not_adjustments);
+			}
+		}
+	}
+	
+	public void setWeightForm(int ordinalWeightForm) {
+		for(WeightForm form : WeightForm.values()) {
+			if (form.ordinal() == ordinalWeightForm) {
+				this.form = form;
 			}
 		}
 	}

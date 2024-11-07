@@ -20,11 +20,9 @@ import org.processmining.models.graphbased.directed.petrinet.elements.Transition
 import org.processmining.qut.exogenousdata.ab.jobs.Tuple;
 import org.processmining.qut.exogenousdata.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
-import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries.Scaling;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceCollector;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceDataPoint;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceExogenousPoint;
-import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesSumFactory;
 import org.processmining.qut.exogenousdata.stochastic.equalities.Variables.SLPNEDVarType;
 import org.processmining.qut.exogenousdata.stochastic.equalities.Variables.SLPNEDVariable;
 import org.processmining.qut.exogenousdata.stochastic.equalities.Variables.SLPNEDVariablePower;
@@ -34,28 +32,7 @@ import org.processmining.qut.exogenousdata.stochastic.solver.Solver;
 
 import nl.tue.astar.AStarException;
 
-public class SLPNEDDiscoveryTwoShot implements SLPNEDDiscoverer{
-	
-	protected String dumpLoc = "";
-	protected boolean shouldDump = false;
-	protected int batchsize = 1000;
-	protected double defaultValue = 2.0;
-	protected Scaling timeScaling = Scaling.hour;
-	protected double rounding = 1e-2;
-	
-	
-	
-	public void configure(double rounding, int batchsize, 
-			Scaling timeScaling, double defaultParameterValue) {
-		this.rounding = rounding;
-		this.timeScaling = timeScaling;
-		this.defaultValue = defaultParameterValue;
-	}
-
-	public void setDumpLoc(String loc) {
-		dumpLoc = loc;
-		shouldDump = true;
-	}
+public class SLPNEDDiscoveryTwoShot extends  SLPNEDDiscoveryOneShot {
 	
 	public StochasticLabelledPetriNetWithExogenousData discoverFromLog(
 			ExogenousAnnotatedLog xlog, 
@@ -142,17 +119,6 @@ public class SLPNEDDiscoveryTwoShot implements SLPNEDDiscoverer{
 		return ret;
 	}
 	
-	protected Tuple<List<Equation>,List<Function>> constructEquations(
-			Map<ChoiceDataPoint, Map<String,Integer>> frequencies,
-			List<ExogenousDataset> datasets,
-			AcceptingPetriNet net) {
-		return EqualitiesSumFactory.construct( 
-				frequencies, 
-				datasets,
-				net.getNet().getTransitions()
-		);
-	}
-	
 	protected Map<Function, Double> solveEquations(
 			Tuple<List<Equation>,List<Function>> equalities) {
 		log("setting up variable matrixes...");
@@ -176,15 +142,15 @@ public class SLPNEDDiscoveryTwoShot implements SLPNEDDiscoverer{
 			
 			if (type == null) {
 				fixed[i] = 0; // should the variable not change
-				inital[i] =  defaultValue; // the initial guess for solver
+				inital[i] =  defaultSolveValue; // the initial guess for solver
 				nonzero[i] = 1; // should the variable not be zero
 			} else if (type == SLPNEDVarType.BASE){
 				fixed[idx] = 0; // should the variable not change
-				inital[idx] =  defaultValue; // the initial guess for solver
+				inital[idx] =  defaultSolveValue; // the initial guess for solver
 				nonzero[idx] = 1; // should the variable not be zero
 			} else {
 				fixed[idx] = 1; // should the variable not change
-				inital[idx] =  defaultValue; // the initial guess for solver
+				inital[idx] =  defaultSolveValue; // the initial guess for solver
 				nonzero[idx] = 1; // should the variable not be zero
 			}
 		}
@@ -239,19 +205,13 @@ public class SLPNEDDiscoveryTwoShot implements SLPNEDDiscoverer{
 					+ equalities.getRight().get(i) 
 					+ " as : "+solvedvalues[i]
 			);
-			if (Math.abs(solvedvalues[i] - defaultValue) < 1e-4) {
+			if (Math.abs(solvedvalues[i] - defaultSolveValue) < 1e-4) {
 				solvedVariables.put(equalities.getRight().get(i), 1.0);
 			} else {
 				solvedVariables.put(equalities.getRight().get(i), solvedvalues[i]);
 			}
 		}
 		return solvedVariables;
-	}
-	
-	protected StochasticLabelledPetriNetWithExogenousData makeNet(
-			AcceptingPetriNet net, Map<Function, Double> solution,
-			List<ExogenousDataset> datasets) throws Exception {
-		return new StochasticLabelledPetriNetWithExogenousData(net, solution, datasets);
 	}
 	
 	protected void diagonsticDump(
@@ -421,6 +381,15 @@ public class SLPNEDDiscoveryTwoShot implements SLPNEDDiscoverer{
 	
 	protected int ProgGetMax() {
 		return 0;
+	}
+	
+	public SLPNEDDiscoverer clone() {
+		SLPNEDDiscoveryTwoShot miner = new SLPNEDDiscoveryTwoShot();
+		miner.configure(rounding, batchsize,
+				timeScaling, defaultSolveValue,
+				form
+		);
+		return miner;
 	}
 
 }
