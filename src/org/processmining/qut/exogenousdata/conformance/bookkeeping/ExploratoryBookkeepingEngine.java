@@ -140,7 +140,7 @@ public class ExploratoryBookkeepingEngine
 						);
 						TTNode src = step.getModel().get().src();
 						for(TTFlowWithGuard srcflow : src.getOutgoingFlows()) {
-							botSum += (1/paths) * ( 
+							botSum += (1.0/paths) * ( 
 									srcflow
 									.evaluateGuard(dataState) 
 									== GuardOutcomes.TRUE
