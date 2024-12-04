@@ -1,8 +1,10 @@
 package org.processmining.qut.exogenousdata.ab.jobs;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,13 +38,15 @@ import org.processmining.framework.util.Pair;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
 import org.processmining.qut.exogenousdata.stochastic.conformance.eduEMSC;
 import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryOneShot;
+import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryTwoShot;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
+import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData.WeightForm;
 
 import lombok.Builder;
 
 public class BPM2024BEval {
 	
-	final static String dataFolder = "C:\\Users\\nobody\\Desktop\\adam\\data\\";
+	final static String dataFolder = "F:\\OneDrive - Queensland University of Technology\\phd\\mypapers\\2023\\B\\data\\eval_data\\data\\";
 	
 	final static String mimicFolder = dataFolder + "mimic\\";
 	final static String smartFolder = dataFolder + "smart\\";
@@ -91,6 +95,7 @@ public class BPM2024BEval {
 	final static String imfNet = "imf_default.apnml";
 	final static String dfmNet = "dfm_default.apnml";
 	final static String poimNet = "poim_default.pnml";
+	final static String rfNorm = "normative_model.pnml";
 
 	@Builder
 	public static class Configuration {
@@ -105,39 +110,39 @@ public class BPM2024BEval {
 	}
 	
 	static List<Configuration> configs = new ArrayList() {{
-		add(
-			Configuration.builder()
-			.discLog(mimicDiscLog)
-			.confLog(mimicConfLog)
-			.datasets(mimicDatasets)
-			.model(imfNet)
-			.out(mimicOut)
-			.models(mimicModels)
-			.name("mimic_imf")
-			.build()
-		);
-		add(
-				Configuration.builder()
-				.discLog(mimicDiscLog)
-				.confLog(mimicConfLog)
-				.datasets(mimicDatasets)
-				.model(dfmNet)
-				.out(mimicOut)
-				.models(mimicModels)
-				.name("mimic_dfm")
-				.build()
-			);
-		add(
-				Configuration.builder()
-				.discLog(mimicDiscLog)
-				.confLog(mimicConfLog)
-				.datasets(mimicDatasets)
-				.model(poimNet)
-				.out(mimicOut)
-				.models(mimicModels)
-				.name("mimic_poim")
-				.build()
-			);
+//		add(
+//			Configuration.builder()
+//			.discLog(mimicDiscLog)
+//			.confLog(mimicConfLog)
+//			.datasets(mimicDatasets)
+//			.model(imfNet)
+//			.out(mimicOut)
+//			.models(mimicModels)
+//			.name("mimic_imf")
+//			.build()
+//		);
+//		add(
+//				Configuration.builder()
+//				.discLog(mimicDiscLog)
+//				.confLog(mimicConfLog)
+//				.datasets(mimicDatasets)
+//				.model(dfmNet)
+//				.out(mimicOut)
+//				.models(mimicModels)
+//				.name("mimic_dfm")
+//				.build()
+//			);
+//		add(
+//				Configuration.builder()
+//				.discLog(mimicDiscLog)
+//				.confLog(mimicConfLog)
+//				.datasets(mimicDatasets)
+//				.model(poimNet)
+//				.out(mimicOut)
+//				.models(mimicModels)
+//				.name("mimic_poim")
+//				.build()
+//			);
 		add(
 				Configuration.builder()
 				.discLog(smartDiscLog)
@@ -176,6 +181,17 @@ public class BPM2024BEval {
 				.discLog(roadDiscLog)
 				.confLog(roadConfLog)
 				.datasets(roadDatasets)
+				.model(rfNorm)
+				.out(roadOut)
+				.models(roadModels)
+				.name("roadfines_norm")
+				.build()
+			);
+		add(
+				Configuration.builder()
+				.discLog(roadDiscLog)
+				.confLog(roadConfLog)
+				.datasets(roadDatasets)
 				.model(imfNet)
 				.out(roadOut)
 				.models(roadModels)
@@ -206,19 +222,30 @@ public class BPM2024BEval {
 			);
 	}};
 	
-	public static void main(String[] args) {
+	public static String outFile = "C:\\Users\\adam\\Desktop\\testing\\BPM2024B-eval-invmut.stdout";
+	public static String outSuffix = "-two-shot-eq-1";
+	
+	
+	public static void main(String[] args) throws FileNotFoundException {
 		// TODO Auto-generated method stub
+		System.setOut(new PrintStream(
+				new BufferedOutputStream(
+						new FileOutputStream(outFile,true)), 
+				true));
 		for (Configuration config : configs) {
-			try {
-				run(
-					config.discLog, config.confLog, config.datasets,
-					config.model, config.out, config.models
-				);
-			} catch (Exception e) {
-				writeOutError(config, e);
-				e.printStackTrace();
-				break;
+			for( int r=0; r<5; r++) {
+				System.out.println("Starting run "+(r+1));
+				try {
+					run(
+						config.discLog, config.confLog, config.datasets,
+						config.model, config.out, config.models, r
+					);
+				} catch (Exception e) {
+					writeOutError(config, e);
+					e.printStackTrace();
+				}
 			}
+			
 		}
 	}
 	
@@ -240,7 +267,7 @@ public class BPM2024BEval {
 
 	public static void run(
 			String discLog, String confLog, List<String> sets, String net,
-			String outLoc, String modelLoc
+			String outLoc, String modelLoc, int run
 		) throws FileNotFoundException, Exception {
 //		load the log
 		XLog log = new XesXmlParser().parse(new FileInputStream(discLog)).get(0);
@@ -257,13 +284,37 @@ public class BPM2024BEval {
 			);
 		}
 //		set out location
-		SLPNEDDiscoveryOneShot disc = new SLPNEDDiscoveryOneShot();
+		SLPNEDDiscoveryOneShot disc = new SLPNEDDiscoveryTwoShot();
+//		configuration for multiplicative form (eq.3)
+		disc.configure(
+				disc.DEFAULT_ROUNDING,
+				disc.DEFAULT_BATCH,
+				disc.DEFAULT_TIME_SCALE,
+				disc.DEFAULT_SOLVING_VALUE,
+				WeightForm.INDIVMUT);
+//		configuration for additive form (eq.4)
+//		disc.configure(
+//				disc.DEFAULT_ROUNDING,
+//				disc.DEFAULT_BATCH,
+//				disc.DEFAULT_TIME_SCALE,
+//				disc.DEFAULT_SOLVING_VALUE,
+//				WeightForm.INDIVADD);
+//		configuration for global additive form (eq.5)
+//		disc.configure(
+//				disc.DEFAULT_ROUNDING,
+//				disc.DEFAULT_BATCH,
+//				disc.DEFAULT_TIME_SCALE,
+//				disc.DEFAULT_SOLVING_VALUE,
+//				WeightForm.GLOBALADD);
 		disc.setDumpLoc(outLoc);
 //		run the discovery
 		StochasticLabelledPetriNetWithExogenousData slpned = 
 				disc.discover(log, datasets, loadNet(modelLoc + net));
 //		save discovery
-		slpned.exportNet(new File(outLoc + net.split("[.]")[0] + ".slpned"));
+		slpned.exportNet(new File(outLoc + net.split("[.]")[0] 
+				+ String.format("-%02d", run+1)
+				+ outSuffix
+				+".slpned"));
 //		perform conformance
 		log = null;
 		System.out.println("loading in conformance log...");
@@ -279,7 +330,10 @@ public class BPM2024BEval {
 				new XEventNameClassifier(), slpned, true, canceller
 		);
 		System.out.println("eduEMSC finished...");
-		writeOutScore(outLoc + net.split("[.]")[0] + ".eduEMSC" , measure);
+		writeOutScore(outLoc + net.split("[.]")[0]
+				+ String.format("-%02d", run+1)
+				+ outSuffix
+				+ ".eduEMSC" , measure);
 //		finished run
 		System.out.println("computed conformance :: " + measure);
 	}

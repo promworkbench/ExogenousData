@@ -42,7 +42,7 @@ public class BPM2024BStrats implements RMMTesting<AcceptingPetriNet,
 	}};
 	private List<Path> controlflows = new ArrayList() {{
 //		add(Paths.get(dataDir.toString(), "models", "imf_default.apnml"));
-		add(Paths.get(dataDir.toString(), "models", "road_fines_normative_model_with_marking.pnml"));
+		add(Paths.get(dataDir.toString(), "models", "normative_model.pnml"));
 	}};
 	private List<Integer> sampleSizes = new ArrayList() {{
 		for(int i = 1000; i <= 25000; i+=1000) {
@@ -73,7 +73,7 @@ public class BPM2024BStrats implements RMMTesting<AcceptingPetriNet,
 	}};
 	
 	private List<WeightForm> forms = new ArrayList() {{
-		add(WeightForm.INDIVADD);
+		add(WeightForm.GLOBALADD);
 	}};
 	
 	public List<
