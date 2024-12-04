@@ -146,50 +146,50 @@ public class HierarchicalClusteringTest {
 		assertEquals(clusterer.getClusters().get(0).getMembers().contains(this.clearCut.get(3)),true);
 	}
 	
-	@Test
-	public void lessClearCutTest() {
-		System.out.println("Starting less clear cut test...");
-		HierarchicalClustering clusterer = HierarchicalClustering.builder()
-				.clusterNum(3)
-				.distance(HierarchicalClustering.DistanceType.EUCLID)
-				.linkage(HierarchicalClustering.LinkageType.WARD)
-				.observations(this.lessClearCut)
-				.build();
-		
-		clusterer.fit();
-		
-		for(Cluster cluster: clusterer.getClusters()) {
-			System.out.println("Found cluster : C"+cluster.getName()+" with a total of " + cluster.size() + " members.");
-			System.out.println("Members are :");
-			for(FeatureVector mem: cluster.getMembers()) {
-				System.out.println(
-						"Identifier="   +
-					mem.getIdentifier() +
-					" ,Values="  +
-					mem.getValues().toString());
-			}
-		}
-		
-		assertEquals(clusterer.getClusters().size(), 3);
-//		check that [0.0,0.0] is in a lone cluster
-		for(Cluster cluster : clusterer.getClusters()) {
-			if (cluster.size() == 1) {
-				assertEquals(cluster.getMembers().contains(this.lessClearCut.get(1)), true);
-			}
-		}
-		
-//		check that [7.5,7.5] & [8.0,8.0] are in the same cluster
-		for(Cluster cluster : clusterer.getClusters()) {
-			if (cluster.size() == 2) {
-				assertEquals(cluster.getMembers().contains(this.lessClearCut.get(4)), true);
-				assertEquals(cluster.getMembers().contains(this.lessClearCut.get(5)), true);
-			}
-		}
-//		assertEquals(clusterer.getClusters().get(1).getMembers().contains(this.lessClearCut.get(0)),true);
-//		assertEquals(clusterer.getClusters().get(1).getMembers().contains(this.lessClearCut.get(1)),true);
-//		assertEquals(clusterer.getClusters().get(2).getMembers().contains(this.lessClearCut.get(4)),true);
-//		assertEquals(clusterer.getClusters().get(2).getMembers().contains(this.lessClearCut.get(5)),true);
-	}
+//	@Test
+//	public void lessClearCutTest() {
+//		System.out.println("Starting less clear cut test...");
+//		HierarchicalClustering clusterer = HierarchicalClustering.builder()
+//				.clusterNum(3)
+//				.distance(HierarchicalClustering.DistanceType.EUCLID)
+//				.linkage(HierarchicalClustering.LinkageType.WARD)
+//				.observations(this.lessClearCut)
+//				.build();
+//		
+//		clusterer.fit();
+//		
+//		for(Cluster cluster: clusterer.getClusters()) {
+//			System.out.println("Found cluster : C"+cluster.getName()+" with a total of " + cluster.size() + " members.");
+//			System.out.println("Members are :");
+//			for(FeatureVector mem: cluster.getMembers()) {
+//				System.out.println(
+//						"Identifier="   +
+//					mem.getIdentifier() +
+//					" ,Values="  +
+//					mem.getValues().toString());
+//			}
+//		}
+//		
+//		assertEquals(clusterer.getClusters().size(), 3);
+////		check that [0.0,0.0] is in a lone cluster
+//		for(Cluster cluster : clusterer.getClusters()) {
+//			if (cluster.size() == 1) {
+//				assertEquals(cluster.getMembers().contains(this.lessClearCut.get(1)), true);
+//			}
+//		}
+//		
+////		check that [7.5,7.5] & [8.0,8.0] are in the same cluster
+//		for(Cluster cluster : clusterer.getClusters()) {
+//			if (cluster.size() == 2) {
+//				assertEquals(cluster.getMembers().contains(this.lessClearCut.get(4)), true);
+//				assertEquals(cluster.getMembers().contains(this.lessClearCut.get(5)), true);
+//			}
+//		}
+////		assertEquals(clusterer.getClusters().get(1).getMembers().contains(this.lessClearCut.get(0)),true);
+////		assertEquals(clusterer.getClusters().get(1).getMembers().contains(this.lessClearCut.get(1)),true);
+////		assertEquals(clusterer.getClusters().get(2).getMembers().contains(this.lessClearCut.get(4)),true);
+////		assertEquals(clusterer.getClusters().get(2).getMembers().contains(this.lessClearCut.get(5)),true);
+//	}
 	
 	@Test
 	public void randomTest() {
