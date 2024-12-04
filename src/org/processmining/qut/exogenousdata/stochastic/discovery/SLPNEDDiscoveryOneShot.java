@@ -24,6 +24,7 @@ import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries.Scaling;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceCollector;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceDataPoint;
 import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceExogenousPoint;
+import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesGobalSumFactory;
 import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesProdFactory;
 import org.processmining.qut.exogenousdata.stochastic.equalities.EqualitiesSumFactory;
 import org.processmining.qut.exogenousdata.stochastic.model.SLPNEDSemantics;
@@ -192,13 +193,15 @@ public class SLPNEDDiscoveryOneShot implements SLPNEDDiscoverer {
 					datasets,
 					net.getNet().getTransitions()
 			);
-		} else {
-//			TODO
-			return EqualitiesSumFactory.construct( 
+		} else if (this.form.equals(WeightForm.GLOBALADD)) {
+			return EqualitiesGobalSumFactory.construct( 
 					frequencies, 
 					datasets,
 					net.getNet().getTransitions()
 			);
+		} else {
+//			shouldn't get here
+			return null;
 		}
 		
 	}

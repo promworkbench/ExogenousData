@@ -94,36 +94,82 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 			indexer++;
 		}
 //		load in variables 
-		for(Function var: solvedVariables.keySet()) {
-			int varIndex =-1;
-			int adjIndex =-1;
-			Variables.SLPNEDVarType type;
-			if (var instanceof SLPNEDVariable) {
-				SLPNEDVariable slpnedVar = (SLPNEDVariable) var;
-				varIndex = this.transitions.get(slpnedVar.getTransition());
-				type = slpnedVar.getType();
-				if (type != SLPNEDVarType.BASE) {
+//		handle global version differently from other
+		if (form.equals(WeightForm.GLOBALADD)) {
+			for(Function var: solvedVariables.keySet()) {
+				int varIndex =-1;
+				int adjIndex =-1;
+				Variables.SLPNEDVarType type;
+				if (var instanceof SLPNEDVariable) {
+					SLPNEDVariable slpnedVar = (SLPNEDVariable) var;
+					type = slpnedVar.getType();
+					if (type != SLPNEDVarType.BASE) {
+						adjIndex = this.datasets.get(slpnedVar.getDataset());
+					}
+				} else if (var instanceof SLPNEDVariablePower) {
+					SLPNEDVariablePower slpnedVar = (SLPNEDVariablePower) var;
+					type = slpnedVar.getType();
 					adjIndex = this.datasets.get(slpnedVar.getDataset());
+				} else {
+					System.out.println(var.toString() + " | " + var.getClass().toGenericString());
+					throw new Exception("variable not of known type for constructing slpned.");
 				}
-			} else if (var instanceof SLPNEDVariablePower) {
-				SLPNEDVariablePower slpnedVar = (SLPNEDVariablePower) var;
-				varIndex = this.transitions.get(slpnedVar.getTransition());
-				type = slpnedVar.getType();
-				adjIndex = this.datasets.get(slpnedVar.getDataset());
-			} else {
-				System.out.println(var.toString() + " | " + var.getClass().toGenericString());
-				throw new Exception("variable not of known type for constructing slpned.");
+				if (type == SLPNEDVarType.BASE) {
+					this.base_weights.put(varIndex, solvedVariables.get(var));
+				} else if (type == SLPNEDVarType.EXOADJ) {
+					for (int index=0; 
+						 index < net.getNet().getTransitions().size(); 
+							index++) {
+						varIndex = index;
+						if (solvedVariables.get(var) != null) {
+							this.adjustments.get(varIndex)[adjIndex] = 
+									solvedVariables.get(var);
+						}
+					}
+					
+				} else if (type == SLPNEDVarType.NOTEXOADJ) {
+					for (int index=0; 
+							 index < net.getNet().getTransitions().size(); 
+							index++) {
+						varIndex = index;
+						this.not_adjustments.get(varIndex)[adjIndex] = solvedVariables.get(var);
+				
+					}
+				}
 			}
-			if (type == SLPNEDVarType.BASE) {
-				this.base_weights.put(varIndex, solvedVariables.get(var));
-			} else if (type == SLPNEDVarType.EXOADJ) {
-				if (solvedVariables.get(var) != null) {
-					this.adjustments.get(varIndex)[adjIndex] = solvedVariables.get(var);
+		} else {
+			for(Function var: solvedVariables.keySet()) {
+				int varIndex =-1;
+				int adjIndex =-1;
+				Variables.SLPNEDVarType type;
+				if (var instanceof SLPNEDVariable) {
+					SLPNEDVariable slpnedVar = (SLPNEDVariable) var;
+					varIndex = this.transitions.get(slpnedVar.getTransition());
+					type = slpnedVar.getType();
+					if (type != SLPNEDVarType.BASE) {
+						adjIndex = this.datasets.get(slpnedVar.getDataset());
+					}
+				} else if (var instanceof SLPNEDVariablePower) {
+					SLPNEDVariablePower slpnedVar = (SLPNEDVariablePower) var;
+					varIndex = this.transitions.get(slpnedVar.getTransition());
+					type = slpnedVar.getType();
+					adjIndex = this.datasets.get(slpnedVar.getDataset());
+				} else {
+					System.out.println(var.toString() + " | " + var.getClass().toGenericString());
+					throw new Exception("variable not of known type for constructing slpned.");
 				}
-			} else if (type == SLPNEDVarType.NOTEXOADJ) {
-				this.not_adjustments.get(varIndex)[adjIndex] = solvedVariables.get(var);
+				if (type == SLPNEDVarType.BASE) {
+					this.base_weights.put(varIndex, solvedVariables.get(var));
+				} else if (type == SLPNEDVarType.EXOADJ) {
+					if (solvedVariables.get(var) != null) {
+						this.adjustments.get(varIndex)[adjIndex] = solvedVariables.get(var);
+					}
+				} else if (type == SLPNEDVarType.NOTEXOADJ) {
+					this.not_adjustments.get(varIndex)[adjIndex] = solvedVariables.get(var);
+				}
 			}
 		}
+//		handle places
 		indexer = 0;
 		for(Place place : net.getNet().getPlaces()) {
 			this.places.put(place, indexer);
@@ -537,5 +583,9 @@ public class StochasticLabelledPetriNetWithExogenousData implements StochasticLa
 				this.form = form;
 			}
 		}
+	}
+	
+	public WeightForm getWeightForm() {
+		return form;
 	}
 }

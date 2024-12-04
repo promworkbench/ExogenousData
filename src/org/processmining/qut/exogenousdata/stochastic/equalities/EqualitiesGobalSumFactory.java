@@ -20,9 +20,11 @@ import org.processmining.qut.exogenousdata.stochastic.choicedata.ChoiceExogenous
 import org.processmining.qut.exogenousdata.stochastic.equalities.Variables.SLPNEDVariable;
 import org.processmining.qut.exogenousdata.stochastic.equalities.Variables.SLPNEDVariablePower;
 
-public class EqualitiesSumFactory {
+public class EqualitiesGobalSumFactory {
 	
-	private EqualitiesSumFactory() {};
+	private EqualitiesGobalSumFactory() {};
+	
+	static public Transition global = new Transition("global-t", null);
 	
 	public static Tuple<List<Equation>,List<Function>> construct(
 			Map<ChoiceDataPoint, Map<String,Integer>> frequencies,
@@ -114,18 +116,22 @@ public class EqualitiesSumFactory {
 //			then for each dataset, create two adjusters
 			for(ExogenousDataset dataset : datasets) {
 				createVarIfNeeded(
-						String.format(Variables.EXO_WEIGHT, transName, dataset.getName().replace(" ", "_")), 
-						varlookup, variables, vcounter, trans, dataset.getName());
+						String.format(Variables.EXO_WEIGHT, 
+								global.getId().toString().replace(" ",  "_"),
+								dataset.getName().replace(" ", "_")), 
+						varlookup, variables, vcounter, global, dataset.getName());
 				createVarIfNeeded(
-						String.format(Variables.NOT_EXO_WEIGHT, transName, dataset.getName().replace(" ", "_")),
-						varlookup, variables, vcounter, trans, dataset.getName());
+						String.format(Variables.NOT_EXO_WEIGHT, 
+								global.getId().toString().replace(" ",  "_"), 
+								dataset.getName().replace(" ", "_")),
+						varlookup, variables, vcounter, global, dataset.getName());
 			}
 		}
 //		debug out variables
 		for(Function var : variables) {
 //			System.out.println("created variable :: "+var.toString());
 		}
-		assert( variables.size() == transitions.size() * datasets.size() * 2 + transitions.size());
+		assert( variables.size() ==  datasets.size() * 2 + transitions.size());
 		
 	}
 	
@@ -151,8 +157,8 @@ public class EqualitiesSumFactory {
 //			cycle through adjustments
 			ChoiceExogenousPoint power = powers[i];
 			boolean knower = power.isKnown();
-			String xadj = Variables.getExogenousAdjust(fired, power);
-			String nxadj = Variables.getNotExogenousAdjust(fired, power);
+			String xadj = Variables.getExogenousAdjust(global, power);
+			String nxadj = Variables.getNotExogenousAdjust(global, power);
 			double xadjcheck = knower ? 1.0 : 0.0;
 			double xadjpower = knower ? power.getValue() : 1.0;
 			double nxadjcheck = knower ? 0.0 : 1.0;
@@ -160,12 +166,12 @@ public class EqualitiesSumFactory {
 					new Constant(xadjcheck),
 					new Product(
 						new Constant(xadjpower),
-						createVarIfNeeded(xadj, varlookup, variables, vcounter, fired ,power.getName(), 1.0)
+						createVarIfNeeded(xadj, varlookup, variables, vcounter, global ,power.getName(), 1.0)
 					)
 			);
 			Function nxadj_f = new Product(
 					new Constant(nxadjcheck),
-					createVarIfNeeded(nxadj, varlookup, variables, vcounter, fired ,power.getName(), 1.0)
+					createVarIfNeeded(nxadj, varlookup, variables, vcounter, global ,power.getName(), 1.0)
 			);
 			Function adjuster = new Sum(xadj_f, nxadj_f);
 			if (x1 == null) {
@@ -186,8 +192,8 @@ public class EqualitiesSumFactory {
 			for (int i=0; i < powers.length; i++) {
 				ChoiceExogenousPoint power = powers[i];
 				boolean knower = powers[i].isKnown();
-				String xadj = Variables.getExogenousAdjust(fired, power);
-				String nxadj = Variables.getNotExogenousAdjust(fired, power);
+				String xadj = Variables.getExogenousAdjust(global, power);
+				String nxadj = Variables.getNotExogenousAdjust(global, power);
 				double xadjcheck = knower ? 1.0 : 0.0;
 				double xadjpower = knower ? power.getValue() : 1.0;
 				double nxadjcheck = knower ? 0.0 : 1.0;
@@ -195,12 +201,12 @@ public class EqualitiesSumFactory {
 						new Constant(xadjcheck),
 						new Product(
 							new Constant(xadjpower),
-							createVarIfNeeded(xadj, varlookup, variables, vcounter, fired ,power.getName(), 1.0)
+							createVarIfNeeded(xadj, varlookup, variables, vcounter, global ,power.getName(), 1.0)
 						)
 				);
 				Function nxadj_f = new Product(
 						new Constant(nxadjcheck),
-						createVarIfNeeded(nxadj, varlookup, variables, vcounter, fired ,power.getName(), 1.0)
+						createVarIfNeeded(nxadj, varlookup, variables, vcounter, global ,power.getName(), 1.0)
 				);
 				Function adjuster = new Sum(xadj_f, nxadj_f);
 //				String ajname = knower ? 

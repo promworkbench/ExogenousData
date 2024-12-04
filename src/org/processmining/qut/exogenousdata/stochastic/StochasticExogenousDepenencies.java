@@ -21,13 +21,16 @@ import org.processmining.framework.util.ui.widgets.ProMPropertiesPanel;
 import org.processmining.qut.exogenousdata.ExogenousDataStatics;
 import org.processmining.qut.exogenousdata.data.ExogenousAnnotatedLog;
 import org.processmining.qut.exogenousdata.data.ExogenousDataset;
+import org.processmining.qut.exogenousdata.steps.slicing.data.SubSeries.Scaling;
 import org.processmining.qut.exogenousdata.stochastic.conformance.eduEMSC;
 import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoverer;
 import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryBatchedOneShotWithContext;
 import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryBatchedTwoShotWithContext;
+import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryOneShot;
 import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryOneShotWithContext;
 import org.processmining.qut.exogenousdata.stochastic.discovery.SLPNEDDiscoveryTwoShotWithContext;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
+import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData.WeightForm;
 
 public class StochasticExogenousDepenencies {
 	
@@ -91,14 +94,24 @@ public class StochasticExogenousDepenencies {
 //		ask for the type of approach to use
 		ProMPropertiesPanel wizard = new ProMPropertiesPanel("Parameters"
 				+ " for Exo-slpn discovery");
-		ProMComboBox<String> box = wizard.addComboBox("type of solving approach", 
+		ProMComboBox<String> sbox = wizard.addComboBox("type of solving approach", 
 				discoveryModes.keySet().toArray(new String[0])
 		);
-		box.setSelectedIndex(0);
+		sbox.setSelectedIndex(0);
+		ProMComboBox<WeightForm> ebox = wizard.addComboBox("type of equation", 
+				WeightForm.values()
+		);
+		ebox.setSelectedIndex(0);
+		ProMComboBox<Scaling> tbox = wizard.addComboBox("time scaling", 
+				Scaling.values()
+		);
+		tbox.setSelectedIndex(3);
 		InteractionResult result = context.showConfiguration(
 				"Configuration for generating playout tree",
 				wizard);
-		String mode = (String) box.getSelectedItem();
+		String mode = (String) sbox.getSelectedItem();
+		WeightForm form = (WeightForm) ebox.getSelectedItem();
+		Scaling scale = (Scaling) tbox.getSelectedItem();
 		if (result != InteractionResult.CANCEL) {
 	//		handle datasts
 			List<ExogenousDataset> temp = new ArrayList();
@@ -106,13 +119,20 @@ public class StochasticExogenousDepenencies {
 				temp.add(dataset);
 			}
 	//		call method to return net
+			SLPNEDDiscoverer disc = null;
 			for(Entry<String, Class<? extends SLPNEDDiscoverer>> e : discoveryModes.entrySet()) {
 				if (mode == e.getKey()) {
-					SLPNEDDiscoverer disc = e.getValue().getConstructor(context.getClass()).newInstance(context);
-					return disc.discover(xlog, temp, net);
+					disc = e.getValue().getConstructor(context.getClass()).newInstance(context);
 				}
 			}
-			throw new Exception("Unknown Discovery method selected.");
+			disc.configure(
+				SLPNEDDiscoveryOneShot.DEFAULT_ROUNDING,
+				SLPNEDDiscoveryOneShot.DEFAULT_BATCH, 
+				scale, 
+				SLPNEDDiscoveryOneShot.DEFAULT_SOLVING_VALUE, 
+				form
+			);
+			return disc.discover(xlog, temp, net);
 		}
 		return null;
 	}
