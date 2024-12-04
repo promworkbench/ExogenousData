@@ -18,6 +18,7 @@ import org.processmining.plugins.graphviz.dot.DotNode;
 import org.processmining.plugins.graphviz.visualisation.DotPanel;
 import org.processmining.qut.exogenousdata.ab.jobs.Tuple;
 import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData;
+import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPetriNetWithExogenousData.WeightForm;
 import org.processmining.stochasticlabelledpetrinets.plugins.StochasticLabelledPetriNetVisualisationPlugin;
 
 public class SLPNEDPrettierVisualizer extends StochasticLabelledPetriNetVisualisationPlugin<StochasticLabelledPetriNetWithExogenousData>{
@@ -97,7 +98,7 @@ public class SLPNEDPrettierVisualizer extends StochasticLabelledPetriNetVisualis
 					+ "<TABLE"
 					+ " BORDER=\"0\" "
 					+ "><TR>"
-					+ "<TD COLSPAN=\"3\">"
+					+ "<TD COLSPAN=\"4\">"
 					+ "<FONT POINT-SIZE=\"16\" >"
 					+ "&#120591;"
 					+ "</FONT>"
@@ -106,7 +107,7 @@ public class SLPNEDPrettierVisualizer extends StochasticLabelledPetriNetVisualis
 					+")</FONT></TD>"
 					+ "</TR>"
 					+ "<TR>"
-					+ "<TD ALIGN=\"LEFT\" COLSPAN=\"3\">"
+					+ "<TD ALIGN=\"LEFT\" COLSPAN=\"4\">"
 					+ "<FONT ALIGN=\"LEFT\" POINT-SIZE=\"10\" >"
 					+ "<I>Base (&Phi;):</I>"
 					+ "</FONT>"
@@ -115,7 +116,7 @@ public class SLPNEDPrettierVisualizer extends StochasticLabelledPetriNetVisualis
 					+ "<TR>"
 					+ "<TD BORDER=\"1\" BGCOLOR=\"#c0bbbb\" "
 					+ "STYLE=\"ROUNDED,DASHED\" "
-					+ "CELLPADDING=\"5\" COLSPAN=\"3\" "
+					+ "CELLPADDING=\"5\" COLSPAN=\"4\" "
 					+ ">"
 					+ df.format(base)
 					+ "</TD>"
@@ -126,12 +127,12 @@ public class SLPNEDPrettierVisualizer extends StochasticLabelledPetriNetVisualis
 					+ "<TABLE"
 					+ " BORDER=\"0\" "
 					+ "><TR>"
-					+ "<TD COLSPAN=\"3\">" 
+					+ "<TD COLSPAN=\"4\">" 
 					+  label
 					+"</TD>"
 					+ "</TR>"
 					+ "<TR>"
-					+ "<TD ALIGN=\"LEFT\" COLSPAN=\"3\">"
+					+ "<TD ALIGN=\"LEFT\" COLSPAN=\"4\">"
 					+ "<FONT ALIGN=\"LEFT\" POINT-SIZE=\"10\" >"
 					+ "<I>Base (&Phi;):</I>"
 					+ "</FONT>"
@@ -140,7 +141,7 @@ public class SLPNEDPrettierVisualizer extends StochasticLabelledPetriNetVisualis
 					+ "<TR>"
 					+ "<TD BORDER=\"1\" BGCOLOR=\"#c0bbbb\" "
 					+ "STYLE=\"ROUNDED,DASHED\" "
-					+ "CELLPADDING=\"5\" COLSPAN=\"3\" "
+					+ "CELLPADDING=\"5\" COLSPAN=\"4\" "
 					+ ">"
 					+ df.format(base)
 					+ "</TD>"
@@ -149,6 +150,9 @@ public class SLPNEDPrettierVisualizer extends StochasticLabelledPetriNetVisualis
 		StringBuilder parameters = new StringBuilder();
 		boolean addedprow = false;
 		parameters.append("<TR>"
+				+ "<TD>"
+				+ "op"
+				+ "</TD>"
 				+ "<TD>"
 				+ "var"
 				+ "</TD>"
@@ -162,49 +166,93 @@ public class SLPNEDPrettierVisualizer extends StochasticLabelledPetriNetVisualis
 //		add rows in pairs, one side for adjustment and other for not adjustment (lacking exogenous data)
 		for(String adjuster : adjusters.keySet()) {
 			StringBuilder prow = new StringBuilder();
+			prow.append("<TR>");
 			boolean keep = false;
-			prow.append("<TR>"
-					+ "<TD "
-					+ "CELLPADDING=\"2\" "
-					+ ">"
-					+ adjuster
-					+ "</TD>"
-			);
-			
 			Tuple<Double, Double> adjustments = adjusters.get(adjuster);
 			double adjusterValue = adjustments.getLeft();
 			double alterValue = adjustments.getRight();
-			if (adjusterValue < 1 || adjusterValue > 1) {
+			if (net.getWeightForm().equals(WeightForm.INDIVMUT)) {
 				prow.append("<TD "
-						+ "BORDER=\"1\" BGCOLOR=\"#c0bbbb\" " 
-						+ "STYLE=\"ROUNDED,DASHED\" " 
+						+ "BORDER=\"1\" BGCOLOR=\"lightblue\" "
+						+ "STYLE=\"ROUNDED\" "
 						+ "CELLPADDING=\"5\" "
 						+ ">"
-						+ " * "
-						+ df.format(adjusterValue)
-						+ "^(TTES) "
+						+ "*"
 						+ "</TD>");
-				keep = true;
+				prow.append(""
+						+ "<TD "
+						+ "CELLPADDING=\"2\" "
+						+ ">"
+						+ adjuster
+						+ "</TD>"
+				);
+				if (adjusterValue < 1 || adjusterValue > 1) {
+					prow.append("<TD "
+							+ "BORDER=\"1\" BGCOLOR=\"#c0bbbb\" " 
+							+ "STYLE=\"ROUNDED,DASHED\" " 
+							+ "CELLPADDING=\"5\" "
+							+ ">"
+							+ df.format(adjusterValue)
+							+ "^(TTES) "
+							+ "</TD>");
+					keep = true;
+				} else {
+					prow.append("<TD> </TD>");
+				}
+				if (alterValue < 1 || alterValue > 1) {
+					prow.append("<TD "
+							+ "BORDER=\"1\" BGCOLOR=\"#c0bbbb\" " 
+							+ "STYLE=\"ROUNDED,DASHED\" " 
+							+ "CELLPADDING=\"5\" "
+							+ ">"
+							+ " * "
+							+ df.format(alterValue)
+							+ "</TD>");
+					keep = true;
+				} else {
+					prow.append("<TD> </TD>");
+				}
+				prow.append("</TR>");
+				if (keep) {
+					parameters.append(prow.toString());
+					addedprow = true;
+				}
 			} else {
-				prow.append("<TD> </TD>");
-			}
-			if (alterValue < 1 || alterValue > 1) {
+//				for additive models
+				prow.append("<TD "
+						+ "BORDER=\"1\" BGCOLOR=\"lightgreen\" "
+						+ "CELLPADDING=\"5\" "
+						+ "STYLE=\"ROUNDED\" "
+						+ ">"
+						+ "+"
+						+ "</TD>");
+				prow.append(""
+						+ "<TD "
+						+ "CELLPADDING=\"2\" "
+						+ ">"
+						+ adjuster
+						+ "</TD>"
+				);
 				prow.append("<TD "
 						+ "BORDER=\"1\" BGCOLOR=\"#c0bbbb\" " 
 						+ "STYLE=\"ROUNDED,DASHED\" " 
 						+ "CELLPADDING=\"5\" "
 						+ ">"
-						+ " * "
+						+ "(TTES) * "
+						+ df.format(adjusterValue)
+						+ "</TD>");
+				prow.append("<TD "
+						+ "BORDER=\"1\" BGCOLOR=\"#c0bbbb\" " 
+						+ "STYLE=\"ROUNDED,DASHED\" " 
+						+ "CELLPADDING=\"5\" "
+						+ ">"
 						+ df.format(alterValue)
 						+ "</TD>");
-				keep = true;
-			} else {
-				prow.append("<TD> </TD>");
-			}
-			prow.append("</TR>");
-			if (keep) {
-				parameters.append(prow.toString());
-				addedprow = true;
+				prow.append("</TR>");
+				if (true) {
+					parameters.append(prow.toString());
+					addedprow = true;
+				}
 			}
 		}
 		dotLabel = headLabel;
