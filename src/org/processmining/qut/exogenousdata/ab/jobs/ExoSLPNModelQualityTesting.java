@@ -44,7 +44,7 @@ import org.processmining.qut.exogenousdata.stochastic.model.StochasticLabelledPe
 
 import lombok.Builder;
 
-public class BPM2024BEval {
+public class ExoSLPNModelQualityTesting {
 	
 	final static String dataFolder = "F:\\OneDrive - Queensland University of Technology\\phd\\mypapers\\2023\\B\\data\\eval_data\\data\\";
 	
@@ -110,39 +110,28 @@ public class BPM2024BEval {
 	}
 	
 	static List<Configuration> configs = new ArrayList() {{
-//		add(
-//			Configuration.builder()
-//			.discLog(mimicDiscLog)
-//			.confLog(mimicConfLog)
-//			.datasets(mimicDatasets)
-//			.model(imfNet)
-//			.out(mimicOut)
-//			.models(mimicModels)
-//			.name("mimic_imf")
-//			.build()
-//		);
-//		add(
-//				Configuration.builder()
-//				.discLog(mimicDiscLog)
-//				.confLog(mimicConfLog)
-//				.datasets(mimicDatasets)
-//				.model(dfmNet)
-//				.out(mimicOut)
-//				.models(mimicModels)
-//				.name("mimic_dfm")
-//				.build()
-//			);
-//		add(
-//				Configuration.builder()
-//				.discLog(mimicDiscLog)
-//				.confLog(mimicConfLog)
-//				.datasets(mimicDatasets)
-//				.model(poimNet)
-//				.out(mimicOut)
-//				.models(mimicModels)
-//				.name("mimic_poim")
-//				.build()
-//			);
+		add(
+			Configuration.builder()
+			.discLog(mimicDiscLog)
+			.confLog(mimicConfLog)
+			.datasets(mimicDatasets)
+			.model(imfNet)
+			.out(mimicOut)
+			.models(mimicModels)
+			.name("mimic_imf")
+			.build()
+		);
+		add(
+				Configuration.builder()
+				.discLog(mimicDiscLog)
+				.confLog(mimicConfLog)
+				.datasets(mimicDatasets)
+				.model(dfmNet)
+				.out(mimicOut)
+				.models(mimicModels)
+				.name("mimic_dfm")
+				.build()
+			);
 		add(
 				Configuration.builder()
 				.discLog(smartDiscLog)
@@ -220,10 +209,29 @@ public class BPM2024BEval {
 				.name("roadfines_poim")
 				.build()
 			);
+		add(
+				Configuration.builder()
+				.discLog(mimicDiscLog)
+				.confLog(mimicConfLog)
+				.datasets(mimicDatasets)
+				.model(poimNet)
+				.out(mimicOut)
+				.models(mimicModels)
+				.name("mimic_poim")
+				.build()
+			);
 	}};
 	
-	public static String outFile = "C:\\Users\\adam\\Desktop\\testing\\BPM2024B-eval-invmut.stdout";
+	public static String feedbackFolder = "C:\\Users\\adam\\Desktop\\testing\\";
+//	setup for eq 1
+	public static String outFile = feedbackFolder+"mq-eval-invmut.stdout";
 	public static String outSuffix = "-two-shot-eq-1";
+//	setup for eq 2
+//	public static String outFile = feedbackFolder+"mq-eval-invadd.stdout";
+//	public static String outSuffix = "-two-shot-eq-2";
+//	setup for eq 3
+//	public static String outFile = feedbackFolder+"mq-eval-globadd.stdout";
+//	public static String outSuffix = "-two-shot-eq-3";
 	
 	
 	public static void main(String[] args) throws FileNotFoundException {
@@ -233,7 +241,7 @@ public class BPM2024BEval {
 						new FileOutputStream(outFile,true)), 
 				true));
 		for (Configuration config : configs) {
-			for( int r=0; r<5; r++) {
+			for( int r=0; r<1; r++) {
 				System.out.println("Starting run "+(r+1));
 				try {
 					run(

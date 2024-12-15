@@ -14,7 +14,7 @@ import org.processmining.basicstochasticminer.solver.Sum;
 import org.processmining.basicstochasticminer.solver.Variable;
 import org.processmining.basicstochasticminer.solver.VariablePower;
 
-public class BPM2024B {
+public class StochasticEquationTesting {
 	
 	
 	private static int RUNS = 100;

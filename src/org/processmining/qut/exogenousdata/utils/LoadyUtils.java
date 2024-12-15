@@ -11,7 +11,7 @@ import org.processmining.datapetrinets.io.DPNIOException;
 import org.processmining.datapetrinets.io.DataPetriNetImporter;
 import org.processmining.log.utils.XUtils;
 import org.processmining.models.graphbased.directed.petrinetwithdata.newImpl.PetriNetWithData;
-import org.processmining.qut.exogenousdata.ab.jobs.BPM2024BEval.FakeContext;
+import org.processmining.qut.exogenousdata.ab.jobs.ExoSLPNModelQualityTesting.FakeContext;
 
 public class LoadyUtils {
 	
