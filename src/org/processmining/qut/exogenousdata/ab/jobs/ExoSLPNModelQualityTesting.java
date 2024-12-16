@@ -241,7 +241,7 @@ public class ExoSLPNModelQualityTesting {
 						new FileOutputStream(outFile,true)), 
 				true));
 		for (Configuration config : configs) {
-			for( int r=0; r<1; r++) {
+			for( int r=0; r<5; r++) {
 				System.out.println("Starting run "+(r+1));
 				try {
 					run(
