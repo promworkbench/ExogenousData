@@ -293,21 +293,21 @@ public class ExoSLPNModelQualityTesting {
 		}
 //		set out location
 		SLPNEDDiscoveryOneShot disc = new SLPNEDDiscoveryTwoShot();
-//		configuration for multiplicative form (eq.3)
+//		configuration for multiplicative form (eq.1)
 		disc.configure(
 				disc.DEFAULT_ROUNDING,
 				disc.DEFAULT_BATCH,
 				disc.DEFAULT_TIME_SCALE,
 				disc.DEFAULT_SOLVING_VALUE,
 				WeightForm.INDIVMUT);
-//		configuration for additive form (eq.4)
+//		configuration for additive form (eq.2)
 //		disc.configure(
 //				disc.DEFAULT_ROUNDING,
 //				disc.DEFAULT_BATCH,
 //				disc.DEFAULT_TIME_SCALE,
 //				disc.DEFAULT_SOLVING_VALUE,
 //				WeightForm.INDIVADD);
-//		configuration for global additive form (eq.5)
+//		configuration for global additive form (eq.3)
 //		disc.configure(
 //				disc.DEFAULT_ROUNDING,
 //				disc.DEFAULT_BATCH,
