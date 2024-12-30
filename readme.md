@@ -370,9 +370,9 @@ measure between 0.0 and 1.0. A score of 0.0 reports that the net's stochastic
 distribution does not capture the log's stochastic distribution, and 1.0 
 reports that it completely matches and captures the log's distribution.
 
-![Plugin for computing duEMSC](docs/screens/stoc_duEMSC.png)
+![Plugin for computing duEMSC](docs/screens/stoc_DUEMSC.png)
 <br> 
-![Scoring from duEMSC](docs/screens/stoc_duEMSC_score.png)
+![Scoring from duEMSC](docs/screens/stoc_DUEMSC_score.png)
 
 ## Issues
 
