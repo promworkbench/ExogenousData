@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.deckfour.xes.model.XLog;
 import org.processmining.acceptingpetrinet.models.AcceptingPetriNet;
 import org.processmining.contexts.uitopia.UIPluginContext;
@@ -258,6 +257,17 @@ public class ExogenousDataPlugins {
 		return edi;
 	}
 	
+	public static final String ExogenousAwareDiscoveryHelp = ""
+			+ "This plugin allows users to perform various process enhancement"
+			+ " and discovery "
+			+ "methods using an xlog and a control flow description. "
+			+ " Such as performing decision mining and then exploring "
+			+ "annotated transition guards using a visual format."
+			+ "<br> See "
+			+ " <a href=\"https://youtu.be/iSklEeNUJSc\" target=\"_blank\">"
+			+ "https://youtu.be/iSklEeNUJSc</a> for a walkthough of tooling."
+			+ version;
+	
 	@Plugin(
 			name = "Exogenous Aware Discovery (DPN)",
 			parameterLabels = {"Exogenous Annotated Log (xlog)","Control Flow (DPN)"},
@@ -266,14 +276,7 @@ public class ExogenousDataPlugins {
 			categories={PluginCategory.Analytics, PluginCategory.Enhancement,
 						PluginCategory.Discovery
 			},
-			help="This plugin allows users to perform various process discovery "
-					+ "methods using an xlog and a control flow description. "
-					+ " Such as performing decision mining and then exploring "
-					+ "annotated transition guards using a visual format."
-					+ "<br> See "
-					+ " <a href=\"https://youtu.be/iSklEeNUJSc\" target=\"_blank\">"
-					+ "https://youtu.be/iSklEeNUJSc</a> for a walkthough of tooling."
-					+ version,
+			help=ExogenousAwareDiscoveryHelp,
 			userAccessible = true
 	)
 	@UITopiaVariant(
@@ -305,14 +308,7 @@ public class ExogenousDataPlugins {
 			categories={PluginCategory.Analytics, PluginCategory.Enhancement,
 						PluginCategory.Discovery
 			},
-			help="This plugin allows users to perform various process discovery "
-					+ "methods using an xlog and a control flow description. "
-					+ " Such as performing decision mining and then exploring "
-					+ "annotated transition guards using a visual format."
-					+ "<br> See "
-					+ " <a href=\"https://youtu.be/iSklEeNUJSc\" target=\"_blank\">"
-					+ "https://youtu.be/iSklEeNUJSc</a> for a walkthough of tooling."
-					+ version,
+			help=ExogenousAwareDiscoveryHelp,
 			userAccessible = true
 	)
 	@UITopiaVariant(
@@ -348,14 +344,7 @@ public class ExogenousDataPlugins {
 			categories={PluginCategory.Analytics, PluginCategory.Enhancement,
 						PluginCategory.Discovery
 			},
-			help="This plugin allows users to perform various process discovery "
-					+ "methods using an xlog and a control flow description. "
-					+ " Such as performing decision mining and then exploring "
-					+ "annotated transition guards using a visual format."
-					+ "<br> See "
-					+ " <a href=\"https://youtu.be/iSklEeNUJSc\" target=\"_blank\">"
-					+ "https://youtu.be/iSklEeNUJSc</a> for a walkthough of tooling."
-					+ version,
+			help=ExogenousAwareDiscoveryHelp,
 			userAccessible = true
 	)
 	@UITopiaVariant(
@@ -398,14 +387,7 @@ public class ExogenousDataPlugins {
 			categories={PluginCategory.Analytics, PluginCategory.Enhancement,
 						PluginCategory.Discovery
 			},
-			help="This plugin allows users to perform various process discovery "
-					+ "methods using an xlog and a control flow description. "
-					+ " Such as performing decision mining and then exploring "
-					+ "annotated transition guards using a visual format."
-					+ "<br> See "
-					+ " <a href=\"https://youtu.be/iSklEeNUJSc\" target=\"_blank\">"
-					+ "https://youtu.be/iSklEeNUJSc</a> for a walkthough of tooling."
-					+ version,
+			help=ExogenousAwareDiscoveryHelp,
 			userAccessible = true
 	)
 	@UITopiaVariant(
@@ -457,26 +439,26 @@ public class ExogenousDataPlugins {
 		return edi;
 	}
 	
-	@Plugin(
-			name = "Exogenous Aware Enhancement",
-			parameterLabels = {"Exogenous Annotated Log", "xDPN",},
-			categories={PluginCategory.Analytics, PluginCategory.Enhancement},
-			help="This plugin allows users to build and extract EESA visualisations."
-					+ " This plugin is currently under construction, and as such"
-					+ " is not fully implemented for use via a GUI."
-					+ version,
-			returnLabels = {}, returnTypes = {}, userAccessible = true
-	)
-	@UITopiaVariant(
-			affiliation = authorAff,
-			author = authora,
-			email = authorEmail,
-			pack = packageName
-	)
-	public void exogenousEnhancement(final UIPluginContext context, 
-			final XLog exogenous, final PetriNetWithData model) throws Throwable {
-		throw new NotImplementedException("Still under construction...");
-	}
+//	@Plugin(
+//			name = "Exogenous Aware Enhancement",
+//			parameterLabels = {"Exogenous Annotated Log", "xDPN",},
+//			categories={PluginCategory.Analytics, PluginCategory.Enhancement},
+//			help="This plugin allows users to build and extract EESA visualisations."
+//					+ " This plugin is currently under construction, and as such"
+//					+ " is not fully implemented for use via a GUI."
+//					+ version,
+//			returnLabels = {}, returnTypes = {}, userAccessible = true
+//	)
+//	@UITopiaVariant(
+//			affiliation = authorAff,
+//			author = authora,
+//			email = authorEmail,
+//			pack = packageName
+//	)
+//	public void exogenousEnhancement(final UIPluginContext context, 
+//			final XLog exogenous, final PetriNetWithData model) throws Throwable {
+//		throw new NotImplementedException("Still under construction...");
+//	}
 	
 	@Plugin(
 			name = "Make Log into Exogenous Dataset",

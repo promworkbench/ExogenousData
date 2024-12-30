@@ -4,7 +4,7 @@
 
 This is a plugin for the ProM framework, which implements several tools 
 around xPM, a framework for process mining with exogenous data [5]. One 
-of the main features for this plugin is an interative interface for 
+of the main features for this plugin is an interactive interface for 
 several steps of the framework. i.e. viewing an xlog, performing decision 
 mining with exogenous data and generating Explorative Exogenous Signal 
 Anylsis (EESA) visualisations (and ranking a collection). While this plugin 
@@ -14,6 +14,32 @@ Furthermore, only a limited set of transformers and slicers are supported.
 Please get in contact if you require assistance with the creation of
  exo-panels or exo-descriptions, or non-trivial options for creating 
  determinations in a xPM instantiation.
+ 
+ ## List of GUI exposed techniques
+
+Below is a list of GUI exposed techniques if the plugin is installed into 
+a local ProM instance, i.e. using the PackageManager for ProM.
+ 
+| GUI name | Technique | Parameters | Description | Paper |
+|----------|-----------|-------------|-------| --- |
+|Exogenous Annotated Log Preparation (XLogs)| xPM - Log Processing | Endogenous Log, Many XES Logs (Exogenous Candidates) | Given an event log and several exo-panels, this plugin allows users to define determinations as identified by xPM [1] and apply them to create an ExogenousAnnotatedLog. This plugin will convert the given xes logs into ExogenousDataset Objects. | [6] |
+|Exogenous Annotated Log Preparation | xPM - Log Processing | Endogenous Log, Many ExogenousDatasets | same as above | [6] |
+|Exogenous Annotated Log Preparation (AIIM 2022) (XLogs)| xPM - Log Processing | Endogenous Log, Many XES Logs (Exogenous Candidates) | This plugin allows users to reproduce the xPM instantition used in [6,7] | [6,7] |
+|Exogenous Annotated Log Preparation (AIIM 2022)| xPM - Log Processing | Endogenous Log, Many ExogenousDatasets | same as above | [6,7] |
+|Exogenous Annotated Log Preparation (Exemplar) (XLogs) | xPM - Log Processing |  Endogenous Log, Many XES Logs (Exogenous Candidates) | Given an event log and several exo-panels, this plugin allows users to reproduce the exemplar configuration used in the repo [examplar](exemplar/readme.md) | [5] |
+|Exogenous Annotated Log Preparation (Exemplar)| xPM - Log Processing | Endogenous Log, Many ExogenousDatasets | same as above | [5] |
+|Make Log into Exogenous Dataset| xPM - Log Processing | XES Log | This plugin allows a user to create an ExogenousDataset from a parsed XES log, assuming that it was formatted appropriately [Appendix B.1.1, 5]. | [5] |
+|Describe Exogenous Dataset| xPM, Visualiser, | ExogenousDataset | This plugins creates a screen showing some basic information and statistics about a given ExogenousDataset | [5] |
+|Exogenous Annotated Log Explorer | xPM, Visualiser | ExogenousAnnotatedLog |  This plugin allows users to explore an ExogenousAnnotatedLog through a GUI, including several screens to dive down to the event log of each annotated trace | [6] |
+|Exogenous Aware Discovery (DPN)| xPM, Visualiser, Decision Mining| ExogenousAnnotatedLog, PetriNetWithData | This plugin allows users to perform various process enhancement and discovery methods using an ExogenousAnnotatedLog and a control flow description. | [5,6] |
+|Exogenous Aware Discovery (PN)| same as above | ExogenousAnnotatedLog, Petrinet| same as above, but will create a dummy PetriNetWithData from the Petrinet with naively true guards | [5,6] |
+|Exogenous Aware Discovery (PT)| same as above | ExogenousAnnotatedLog, ProcessTree| same as above, but will unfold the ProcessTree into a Petrinet, then create a dummy PetriNetWithData from the unfolded Petrinet| [5,6] |
+|Exogenous Aware Discovery (APN)| same as above |  ExogenousAnnotatedLog, AcceptingPetriNet| same as above, but will convert the AcceptingPetriNet into a dummy PetriNetWithData | [5,6] |
+|(Non) Exogenous Aware Discovery (DPN) | same as above | XLog, PetriNetWithData | same as above, but will convert the given XLog into an ExogenousAnnotatedLog with no exogenous data so that decision mining techniques can be used in the GUI form | [5,6] |
+
+
+
+## Development
 
 The development cycle for this plugin, is that only 
 [major releases](https://github.com/promworkbench/ExogenousData/releases) 
@@ -271,6 +297,14 @@ Furthermore, for each exo-panel and slicer, a popup can be used to showcase an I
 
 ![Exogenous Aware Enhancement - Popout](docs/screens/Exogenous_Aware_Enhancement_popout.png) 
 
+## Investigating exogenous influences using stochastic process mining
+
+TODO 
+- fill out section with
+- discovery for exo-slpn
+- conformance checking for exo-slpn
+- visualisation tools for exo-slpn
+
 ### Ranking a collection of EESA visualisation
 
 
@@ -315,3 +349,11 @@ approach", IEEE Access, vol. 12, pp. 60 276–60 298, 2024
 <br>
 [5] A. Banham, "Process mining with exogenous data", PhD Thesis, Queensland
 university of techonology, 2024.
+<br>
+[6] A. Banham, S. J. J. Leemans, M. T. Wynn, and R. Andrews, “xPM: A framework for
+process mining with exogenous data,” in ICPM Workshops, ser. Lecture Notes in Business
+Information Processing, vol. 433, Springer, 2021, pp. 85–97
+<br>
+[7] A. Banham, S. J. J. Leemans, M. T. Wynn, R. Andrews, K. B. Laupland, and L. Shinners,
+“xPM: Enhancing exogenous data visibility,” Artif. Intell. Medicine, vol. 133,
+p. 102 409, 2022
