@@ -1,61 +1,27 @@
+# Weight Form
+0
 # adjusters
 3
 # adjusters
 capacity
-iron
 copper
+iron
 # number of places
 10
 # initial marking
-0
-0
-0
-0
-0
-0
-0
-0
-0
 1
+0
+0
+0
+0
+0
+0
+0
+0
+0
 # number of transitions
 13
 # transition 0
-label B
-# base weight 
-1.0
-# adjustments for exogenous data
-1.0
-1.0
-1.0
-# adjustments without exogenous data
-1.0
-1.0
-1.0
-# number of input places
-1
-0
-# number of output places
-1
-4
-# transition 1
-label C
-# base weight 
-1.0
-# adjustments for exogenous data
-1.0
-1.0
-1.0
-# adjustments without exogenous data
-1.0
-1.0
-1.0
-# number of input places
-1
-4
-# number of output places
-1
-1
-# transition 2
 label A
 # base weight 
 1.0
@@ -69,18 +35,18 @@ label A
 1.0
 # number of input places
 1
-9
+0
 # number of output places
 1
-0
-# transition 3
-label F
+1
+# transition 1
+label B
 # base weight 
-0.0010597613585519197
+1.0
 # adjustments for exogenous data
-2.819723286427073E-4
-7.178743181054853E-4
-0.0012772156143287742
+1.0
+1.0
+1.0
 # adjustments without exogenous data
 1.0
 1.0
@@ -91,14 +57,32 @@ label F
 # number of output places
 1
 2
-# transition 4
-label K
+# transition 2
+label C
 # base weight 
-5.019600160297491E-4
+1.0
 # adjustments for exogenous data
-0.45930238837763276
-1.8049262488184379
-0.0010312150707955264
+1.0
+1.0
+1.0
+# adjustments without exogenous data
+1.0
+1.0
+1.0
+# number of input places
+1
+2
+# number of output places
+1
+3
+# transition 3
+label D
+# base weight 
+9.441695130458047
+# adjustments for exogenous data
+1.0000000000934191E-4
+34.31868846736239
+4.770359474132557E-4
 # adjustments without exogenous data
 1.0
 1.0
@@ -108,62 +92,44 @@ label K
 3
 # number of output places
 1
-6
-# transition 5
-label H
-# base weight 
-0.5813802142015301
-# adjustments for exogenous data
-9.061574829618234E-4
-9.1171577662975
-1.2374919173658205
-# adjustments without exogenous data
-1.0
-1.0
-1.0
-# number of input places
-1
-5
-# number of output places
-1
-8
-# transition 6
-label M
-# base weight 
-1.0
-# adjustments for exogenous data
-1.0
-1.0
-1.0
-# adjustments without exogenous data
-1.0
-1.0
-1.0
-# number of input places
-1
-6
-# number of output places
-1
-0
-# transition 7
+4
+# transition 4
 label E
 # base weight 
-1.0000000074519906E-4
+0.0010589443426512295
 # adjustments for exogenous data
-4.4318551515797175E-4
-3.920811968340929E-4
-4.7360001046398284E-4
+19.13867833775524
+0.001091394479673486
+14.7287082475064
 # adjustments without exogenous data
 1.0
 1.0
 1.0
 # number of input places
 1
-1
+3
 # number of output places
 1
-2
-# transition 8
+4
+# transition 5
+label F
+# base weight 
+6.541259230931815
+# adjustments for exogenous data
+3.223109749388877
+0.0032972705499487243
+2.2342996375185877
+# adjustments without exogenous data
+1.0
+1.0
+1.0
+# number of input places
+1
+3
+# number of output places
+1
+4
+# transition 6
 label G
 # base weight 
 1.0
@@ -177,10 +143,46 @@ label G
 1.0
 # number of input places
 1
-2
+4
 # number of output places
 1
 5
+# transition 7
+label H
+# base weight 
+0.27960241012884124
+# adjustments for exogenous data
+2.8186229475138536
+3.0345614947152124
+0.07108622675973775
+# adjustments without exogenous data
+1.0
+1.0
+1.0
+# number of input places
+1
+5
+# number of output places
+1
+9
+# transition 8
+label I
+# base weight 
+2.466395237420933
+# adjustments for exogenous data
+3.5472761614406823
+0.6921042491774211
+0.011036852973400285
+# adjustments without exogenous data
+1.0
+1.0
+1.0
+# number of input places
+1
+5
+# number of output places
+1
+6
 # transition 9
 label J
 # base weight 
@@ -195,61 +197,61 @@ label J
 1.0
 # number of input places
 1
-7
+6
 # number of output places
 1
-3
+7
 # transition 10
-label I
+label K
 # base weight 
-2.597105470822107
+2.0818230134351983
 # adjustments for exogenous data
-8.508014691076837E-4
-2.10397576676288
-0.38976065752616307
+1.553295856900562
+0.7337856200168932
+2.6805281168872326
 # adjustments without exogenous data
 1.0
 1.0
 1.0
 # number of input places
-1
-5
-# number of output places
 1
 7
-# transition 11
-label D
-# base weight 
-2.8631361370764564E-4
-# adjustments for exogenous data
-4.3578863461058885E-4
-4.038838884126061E-4
-4.1881441881173637E-4
-# adjustments without exogenous data
-1.0
-1.0
-1.0
-# number of input places
-1
-1
 # number of output places
 1
-2
-# transition 12
+8
+# transition 11
 label L
 # base weight 
-4.980361671953573E-4
+2.112784570608007
 # adjustments for exogenous data
-0.8053221619493506
-0.8220256842473
-0.0015086798834788113
+2.448359543027099
+1.05263981834059
+1.3178467139603198
 # adjustments without exogenous data
 1.0
 1.0
 1.0
 # number of input places
 1
-3
+7
 # number of output places
 1
-6
+8
+# transition 12
+label M
+# base weight 
+1.0
+# adjustments for exogenous data
+1.0
+1.0
+1.0
+# adjustments without exogenous data
+1.0
+1.0
+1.0
+# number of input places
+1
+8
+# number of output places
+1
+1

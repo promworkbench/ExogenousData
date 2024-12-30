@@ -1,7 +1,8 @@
 [![Java Build](https://github.com/promworkbench/ExogenousData/actions/workflows/test_build.yml/badge.svg)](https://github.com/promworkbench/ExogenousData/actions/workflows/test_build.yml) [![Java Release](https://github.com/promworkbench/ExogenousData/actions/workflows/release_build.yml/badge.svg)](https://github.com/promworkbench/ExogenousData/actions/workflows/release_build.yml) [![Java Tests](https://github.com/promworkbench/ExogenousData/actions/workflows/java_tests.yml/badge.svg)](https://github.com/promworkbench/ExogenousData/actions/workflows/java_tests.yml)
 
 # Exogenous Data ProM Plugin
-
+***Developed by Adam P. Banham, orcid: 0000-0001-9912-8220***
+<br>
 This is a plugin for the ProM framework, which implements several tools 
 around xPM, a framework for process mining with exogenous data [5]. One 
 of the main features for this plugin is an interactive interface for 
@@ -45,6 +46,7 @@ a local ProM instance, i.e. using the PackageManager for ProM.
 |Discover Stochastic Exogenous Dependencies in a Petri Net (Exo-SLPN)(xLog)| process enhancement, stochastic process mining | ExogenousAnnotatedLog, AcceptingPetriNet | This plugin allows users to enhance a AcceptingPetriNet into a StochasticLabelledPetriNetWithExogenousData (Exo-SLPN), by deriving parameterised weight functions for each transition in the net. The user can select several options for the form of these weight functions. | [?] |
 |Discover Stochastic Exogenous Dependencies in a Petri Net (Exo-SLPN)(Datasets)| process enhancement, stochastic process mining | XLog (Endogenous Log), AcceptingPetriNet, Many ExogenousDataset | same as above, but only the supplied ExogenousDatasets are used to form weight functions | [?] |
 |Compute duEMSC for Exo-SLPN (Datasets)| conformance checking, stochastic process mining | XLog (Endogenous Log), StochasticLabelledPetriNetWithExogenousData, Many ExogenousDataset | This plugin allows users to quantify the quality of a discovered Exo-SLPN by using the data-aware Unit Earth Mover's conformance measure. | [?] |
+|Compute duEMSC for Exo-SLPN (XLog)| conformance checking, stochastic process mining | ExogenousAnnotatedLog, StochasticLabelledPetriNetWithExogenousData | same as above, but will use all annotated datasets. | [?] |
 |(Prettier) Stochastic labelled Petri net with Exogenous Data visualisation| visualiser | StochasticLabelledPetriNetWithExogenousData | Visualises an Exo-SLPN using dot (Graphviz). | [?] |
 |Stochastic labelled Petri net with Exogenous Data visualisation | visualiser | StochasticLabelledPetriNetWithExogenousData | Visualises an Exo-SLPN, in a simple form, using dot (Graphviz) (Graphviz). | [?] |
 |StochasticLabelledPetriNetWithExogenousData Importer| parser | InputStream | Reads a file to create an Exo-SLPN | [?] |
@@ -76,7 +78,7 @@ with  much less. lpsolve is required for many of the techniques, as
 alignments are used. For development purposes, the binaries are included in
 `\lib`.
 
-```
+```bash
 -ea -Xmx8G -XX:MaxPermSize=256m -Djava.library.path=. 
 -Djava.util.Arrays.useLegacyMergeSort=true  -Djava.library.path=.\lib\
 ```
@@ -291,65 +293,110 @@ proportionally less for anthing else.
 While, the inner semi-circle will be used to show how each individual 
 decision point contributed towards the overall metric.
 
-
 ## Investigating a process model with exogenous data
 ***Currently undergoing work to improve implementation of interfaces***
 
-To explore an outcome in more detail, the user can click the button labelled "Open Enhancement".
-After doing so, the user will be able to explore each transition in greater detail and view an EESAs for a transition (Overlapping variants at this stage are hard coded). 
+To explore an outcome in more detail, the user can click the button labelled 
+"Open Enhancement". After doing so, the user will be able to explore each 
+transition in greater detail and view an EESAs for a transition (Overlapping 
+variants at this stage are hard coded). 
 
 ![Exogenous Aware Enhancement - Landing Page](docs/screens/Exogenous_Aware_Enhancement_Plugin.png) 
 
-To do so, a user needs to click on a transition in the process model visualisation (top) and the transition will be highlighted.
+To do so, a user needs to click on a transition in the process model 
+visualisation (top) and the transition will be highlighted.
 
 ![Exogenous Aware Enhancement - Click](docs/screens/Exogenous_Aware_Enhancement_click.png) 
 
-Furthermore, for each exo-panel and slicer, a popup can be used to showcase an Individual EESA (median with STD/IQR) or raw slice plot (not recommended when viewing large numbers of slices).
+Furthermore, for each exo-panel and slicer, a popup can be used to showcase 
+an Individual EESA (median with STD/IQR) or raw slice plot (not recommended 
+when viewing large numbers of slices).
 
 ![Exogenous Aware Enhancement - Popout](docs/screens/Exogenous_Aware_Enhancement_popout.png) 
 
-## Investigating exogenous influences using stochastic process mining
-
-TODO 
-- fill out section with
-- discovery for exo-slpn
-- conformance checking for exo-slpn
-- visualisation tools for exo-slpn
-
 ### Ranking a collection of EESA visualisation
-
-
-A user can generate a ranking for overlapping EESA visualisations by clicking the button lablled "search". Then all transitions that have been visited will be pooled and used for the collection of EESAs.
-Ranking may take some time depending on the number of EESAs present in the collection.
+A user can generate a ranking for overlapping EESA visualisations by clicking 
+the button lablled "search". Then all transitions that have been visited will 
+be pooled and used for the collection of EESAs. Ranking may take some time 
+depending on the number of EESAs present in the collection.
 
 ![Exogenous Aware Enhancement - ESSA Ranking](docs/screens/EESA_Ranking_Searching.png) 
 
-After the ranking is completed, the ranking list (bottom-right) will be populated from rank 1 to rank n, to show where overlapping EESA were found. Then rank n+1 (bottom of the list with common= -1) show where non-overlapping EESAs exist.
-Clicking on a ranking item in the will highlight the transition it came from in the process model (top) and the EESA in question will be shown (bottom-left).
+After the ranking is completed, the ranking list (bottom-right) will be 
+populated from rank 1 to rank n, to show where overlapping EESA were found. 
+Then rank n+1 (bottom of the list with common= -1) show where non-overlapping 
+EESAs exist. Clicking on a ranking item in the will highlight the transition it 
+came from in the process model (top) and the EESA in question will be shown 
+(bottom-left).
 
 ![Exogenous Aware Enhancement - Ranking Outcome](docs/screens/EESA_Ranking_outcome.png) 
 
+## Investigating exogenous influences using stochastic process mining
+
+In many cases, behaviour in processes can be influenced by exogenous data as 
+actors interpret contextual factors surrounding an execution. One approach to 
+describe this phenomenon is to consider how the likelihood of actions changes 
+based on the context of a given process execution. This approach allows one 
+to consider if a noticeable change occurs with the introduction of exogenous 
+data. One such operationalisation of this approach is to use stochastic process 
+mining to derive weight functions which include exogenous data as an external 
+factor.
+
+This package implements a process discovery/enhancement technique to discover 
+a stochastic labelled Petri net with exogenous dependencies or an Exo-SLPN. 
+The details for this modelling formalism based on stochastic labelled Petri 
+nets will be available in an upcoming publication [?]. The general idea of 
+the approach is to derive a parameterised weight function for each transition 
+to quantify the likelihood of firing given the context of a (maybe partial) 
+process execution. Importantly, these weight functions can consider the 
+temporal nature of exogenous data.
+
+In order to discover an Exo-SLPN, users will need an exogenous annotated log. 
+Then the plugin "Discover Stochastic Exogenous Dependencies in 
+a Petri Net (Exo-SLPN)(XLog)" can be used to discover an Exo-SLPN, as seen 
+below.
+
+![Discovering an Exo-SLPN](docs/screens/stoc_discover.png)
+
+Also implemented is a visualisation for Exo-SLPNs, as shown below:
+
+![Visualising an Exo-SLPN](docs/screens/stoc_visualise.png)
+
+We have also implemented a conformance checking measure for our formalism to 
+determine whether the discovered Exo-SLPN is suitable for further analysis. 
+Using the same inputs used for discovery and the discovered net, the plugin 
+called "Compute duEMSC for Exo-SLPN (Datasets)", shown below, computes a 
+measure between 0.0 and 1.0. A score of 0.0 reports that the net's stochastic 
+distribution does not capture the log's stochastic distribution, and 1.0 
+reports that it completely matches and captures the log's distribution.
+
+![Plugin for computing duEMSC](docs/screens/stoc_duEMSC.png)
+<br> 
+![Scoring from duEMSC](docs/screens/stoc_duEMSC_score.png)
 
 ## Issues
 
-To request assistance in using this plugin or for clarification on a feature, create an issue with the label "help-requested".
+To request assistance in using this plugin or for clarification on a feature, 
+create an issue with the label "help-requested".
 
 ## Feature Requests
 
-To request new features to be implemented or where hard coding exists and should be removed, create an issue with the label "feature-request".
+To request new features to be implemented or where hard coding exists and 
+should be removed, create an issue with the label "feature-request".
 
 
 ## Contact
 
-To get in contact, see https://www.adambanham.io/contact for my current email addresses and socials.
+To get in contact, see https://www.adambanham.io/contact for my current 
+email addresses and socials.
 
 # References
 
-[1] F. Mannhardt, M. de Leoni, H. A. Reijers, andW. M. P. van der Aalst, "Decision mining
+[1] F. Mannhardt, M. de Leoni, H. A. Reijers, and W.M.P. van der Aalst, "Decision mining
 revisited - discovering overlapping rules", in CAiSE, ser. Lecture Notes in Computer
 Science, vol. 9694, Springer, 2016, pp. 377–392 .
 <br>
-[2] M. de Leoni and W. M. P. van der Aalst, "Data-aware process mining: Discovering
+[2] M. de Leoni and W.M.P. van der Aalst, "Data-aware process mining: Discovering
 decisions in processes using alignments", in SAC, ACM, 2013, pp. 1454–1461.
 <br>
 [3] J.R. Quinlan, "C4.5: programs for machine learning", Morgan Kaufmann, 1993.
