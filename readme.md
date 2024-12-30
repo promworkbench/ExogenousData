@@ -22,22 +22,33 @@ a local ProM instance, i.e. using the PackageManager for ProM.
  
 | GUI name | Technique | Parameters | Description | Paper |
 |----------|-----------|-------------|-------| --- |
-|Exogenous Annotated Log Preparation (XLogs)| xPM - Log Processing | Endogenous Log, Many XES Logs (Exogenous Candidates) | Given an event log and several exo-panels, this plugin allows users to define determinations as identified by xPM [1] and apply them to create an ExogenousAnnotatedLog. This plugin will convert the given xes logs into ExogenousDataset Objects. | [6] |
-|Exogenous Annotated Log Preparation | xPM - Log Processing | Endogenous Log, Many ExogenousDatasets | same as above | [6] |
-|Exogenous Annotated Log Preparation (AIIM 2022) (XLogs)| xPM - Log Processing | Endogenous Log, Many XES Logs (Exogenous Candidates) | This plugin allows users to reproduce the xPM instantition used in [6,7] | [6,7] |
-|Exogenous Annotated Log Preparation (AIIM 2022)| xPM - Log Processing | Endogenous Log, Many ExogenousDatasets | same as above | [6,7] |
-|Exogenous Annotated Log Preparation (Exemplar) (XLogs) | xPM - Log Processing |  Endogenous Log, Many XES Logs (Exogenous Candidates) | Given an event log and several exo-panels, this plugin allows users to reproduce the exemplar configuration used in the repo [examplar](exemplar/readme.md) | [5] |
-|Exogenous Annotated Log Preparation (Exemplar)| xPM - Log Processing | Endogenous Log, Many ExogenousDatasets | same as above | [5] |
-|Make Log into Exogenous Dataset| xPM - Log Processing | XES Log | This plugin allows a user to create an ExogenousDataset from a parsed XES log, assuming that it was formatted appropriately [Appendix B.1.1, 5]. | [5] |
-|Describe Exogenous Dataset| xPM, Visualiser, | ExogenousDataset | This plugins creates a screen showing some basic information and statistics about a given ExogenousDataset | [5] |
-|Exogenous Annotated Log Explorer | xPM, Visualiser | ExogenousAnnotatedLog |  This plugin allows users to explore an ExogenousAnnotatedLog through a GUI, including several screens to dive down to the event log of each annotated trace | [6] |
-|Exogenous Aware Discovery (DPN)| xPM, Visualiser, Decision Mining| ExogenousAnnotatedLog, PetriNetWithData | This plugin allows users to perform various process enhancement and discovery methods using an ExogenousAnnotatedLog and a control flow description. | [5,6] |
+|Exogenous Annotated Log Preparation (XLogs)| xPM - log processing | Endogenous Log, Many XES Logs (Exogenous Candidates) | Given an event log and several exo-panels, this plugin allows users to define determinations as identified by xPM [1] and apply them to create an ExogenousAnnotatedLog. This plugin will convert the given xes logs into ExogenousDataset Objects. | [6] |
+|Exogenous Annotated Log Preparation | xPM - log processing | Endogenous Log, Many ExogenousDatasets | same as above | [6] |
+|Exogenous Annotated Log Preparation (AIIM 2022) (XLogs)| xPM - log processing | Endogenous Log, Many XES Logs (Exogenous Candidates) | This plugin allows users to reproduce the xPM instantition used in [6,7] | [6,7] |
+|Exogenous Annotated Log Preparation (AIIM 2022)| xPM - log processing | Endogenous Log, Many ExogenousDatasets | same as above | [6,7] |
+|Exogenous Annotated Log Preparation (Exemplar) (XLogs) | xPM - log processing |  Endogenous Log, Many XES Logs (Exogenous Candidates) | Given an event log and several exo-panels, this plugin allows users to reproduce the exemplar configuration used in the repo [examplar](exemplar/readme.md) | [5] |
+|Exogenous Annotated Log Preparation (Exemplar)| xPM - log processing | Endogenous Log, Many ExogenousDatasets | same as above | [5] |
+|Make Log into Exogenous Dataset| xPM - log processing | XES Log | This plugin allows a user to create an ExogenousDataset from a parsed XES log, assuming that it was formatted appropriately [Appendix B.1.1, 5]. | [5] |
+|Describe Exogenous Dataset| xPM, visualiser | ExogenousDataset | This plugins creates a screen showing some basic information and statistics about a given ExogenousDataset | [5] |
+|Exogenous Annotated Log Explorer | xPM, visualiser | ExogenousAnnotatedLog |  This plugin allows users to explore an ExogenousAnnotatedLog through a GUI, including several screens to dive down to the event log of each annotated trace | [6] |
+|Exogenous Aware Discovery (DPN)| xPM, visualiser, decision mining, process enhancement | ExogenousAnnotatedLog, PetriNetWithData | This plugin allows users to perform various process enhancement and discovery methods using an ExogenousAnnotatedLog and a control flow description. | [5,6] |
 |Exogenous Aware Discovery (PN)| same as above | ExogenousAnnotatedLog, Petrinet| same as above, but will create a dummy PetriNetWithData from the Petrinet with naively true guards | [5,6] |
 |Exogenous Aware Discovery (PT)| same as above | ExogenousAnnotatedLog, ProcessTree| same as above, but will unfold the ProcessTree into a Petrinet, then create a dummy PetriNetWithData from the unfolded Petrinet| [5,6] |
 |Exogenous Aware Discovery (APN)| same as above |  ExogenousAnnotatedLog, AcceptingPetriNet| same as above, but will convert the AcceptingPetriNet into a dummy PetriNetWithData | [5,6] |
 |(Non) Exogenous Aware Discovery (DPN) | same as above | XLog, PetriNetWithData | same as above, but will convert the given XLog into an ExogenousAnnotatedLog with no exogenous data so that decision mining techniques can be used in the GUI form | [5,6] |
-
-
+|Generate Playout Transition Tree (DPN)| conformance checking | PetriNetWithData, k (int) | Computes a playout transition tree for a given graph with a maximum playout length of k | [4,5] |
+|Generate (Many) Playout Transition Trees (DPN) | conformance checking |  PetriNetWithData, k (int) | same as above, but will repeat the construction 25 times for testing purposes on runtime. | [4,5] |
+|Compute determinism of a DPN| conformance checking | PetriNetWithData | Computes the determinism of a Petri net with guards, which may be a Petri net with data. Determinism computes the portion of transitions that are in the postset of places with at least two outgoing arcs and which have a non-trivial guard. | [5] |
+|Compute guard-recall of a DPN| conformance checking | PetriNetWithData, XLog | Computes the guard-recall of a Petri net with guards, which may be a Petri net with data. Guard-recall computes the portion of guards that were  true when the corsponding playout tree is traversed for traces in the log | [4] |
+|Compute guard-precision of a DPN| conformance checking| PetriNetWithData, XLog | Computes the guard-recall of a Petri net with guards, which may be a Petri net with data. Guard-precision computes the portion of guards that were only true when for the travesed path in the corsponding playout tree for traces in the log. | [4] |
+|(Prettier) Transition Tree Visualiser | visualiser | PNWDTransitionTree | Visualising the given playout transition tree using dot (Graphviz). | [5] |
+|Discover Stochastic Exogenous Dependencies in a Petri Net (Exo-SLPN)(xLog)| process enhancement, stochastic process mining | ExogenousAnnotatedLog, AcceptingPetriNet | This plugin allows users to enhance a AcceptingPetriNet into a StochasticLabelledPetriNetWithExogenousData (Exo-SLPN), by deriving parameterised weight functions for each transition in the net. The user can select several options for the form of these weight functions. | [?] |
+|Discover Stochastic Exogenous Dependencies in a Petri Net (Exo-SLPN)(Datasets)| process enhancement, stochastic process mining | XLog (Endogenous Log), AcceptingPetriNet, Many ExogenousDataset | same as above, but only the supplied ExogenousDatasets are used to form weight functions | [?] |
+|Compute duEMSC for Exo-SLPN (Datasets)| conformance checking, stochastic process mining | XLog (Endogenous Log), StochasticLabelledPetriNetWithExogenousData, Many ExogenousDataset | This plugin allows users to quantify the quality of a discovered Exo-SLPN by using the data-aware Unit Earth Mover's conformance measure. | [?] |
+|(Prettier) Stochastic labelled Petri net with Exogenous Data visualisation| visualiser | StochasticLabelledPetriNetWithExogenousData | Visualises an Exo-SLPN using dot (Graphviz). | [?] |
+|Stochastic labelled Petri net with Exogenous Data visualisation | visualiser | StochasticLabelledPetriNetWithExogenousData | Visualises an Exo-SLPN, in a simple form, using dot (Graphviz) (Graphviz). | [?] |
+|StochasticLabelledPetriNetWithExogenousData Importer| parser | InputStream | Reads a file to create an Exo-SLPN | [?] |
+|StochasticLabelledPetriNetWithExogenousData Expoert| serialiser | StochasticLabelledPetriNetWithExogenousData, File | Serialises an Exo-SLPN into a .slpned file | [?] |
 
 ## Development
 
@@ -357,3 +368,5 @@ Information Processing, vol. 433, Springer, 2021, pp. 85–97
 [7] A. Banham, S. J. J. Leemans, M. T. Wynn, R. Andrews, K. B. Laupland, and L. Shinners,
 “xPM: Enhancing exogenous data visibility,” Artif. Intell. Medicine, vol. 133,
 p. 102 409, 2022
+<br>
+[?] (Currently Unpublished) A. Banham et. al. Discovering Exogenous Influences on Decisions in Processes.
