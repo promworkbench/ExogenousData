@@ -416,4 +416,6 @@ Information Processing, vol. 433, Springer, 2021, pp. 85–97
 “xPM: Enhancing exogenous data visibility,” Artif. Intell. Medicine, vol. 133,
 p. 102 409, 2022
 <br>
-[?] (Currently Unpublished) A. Banham et. al. Discovering Exogenous Influences on Decisions in Processes.
+[8] Adam Banham, Yannis Bertrand, Robert Andrews, Moe T. Wynn, Sander J.J. Leemans. 
+Discovering Exogenous Influences on Decisions in Processes. 45th International Conference 
+on Application and Theory of Petri Nets and Concurrency, 2025
