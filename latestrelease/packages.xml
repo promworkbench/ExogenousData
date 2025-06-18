@@ -1,6 +1,6 @@
 
 					<packages>
-						<package name="ExogenousData" version="6.14.3" os="all" url="ExogenousData/ExogenousData-6.14.3-all.zip" desc="Exogenous Data" org="Queensland University of Technology" license="GPL" author="Sander Leemans and Adam Banham" auto="false" hasPlugins="true" logo="prom_subtitle_hat_300.png">
+						<package name="ExogenousData" version="6.15.5" os="all" url="ExogenousData/ExogenousData-6.15.5-all.zip" desc="Exogenous Data" org="Queensland University of Technology" license="GPL" author="Sander Leemans and Adam Banham" auto="false" hasPlugins="true" logo="prom_subtitle_hat_300.png">
 				    	<dependency org="prom" name="ProM-Plugins" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="BasicUtils" rev="latest" changing="true" transitive="true" />
     	<dependency org="prom" name="Widgets" rev="latest" changing="true" transitive="true" />
